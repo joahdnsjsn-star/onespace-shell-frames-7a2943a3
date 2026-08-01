@@ -107,12 +107,12 @@ Import the repository and use:
 
 ```bash
 npm ci
-npm run build
-npm run preview -- --host 0.0.0.0 --port 8080
+npm run build:node
+npm start            # serves the app bundle on $PORT (default 3000)
 ```
 
-Put nginx/Caddy in front for TLS. SPA fallback is handled by the framework — no
-`_redirects` or `vercel.json` needed.
+This is the same command OnSpace runs; the output is the Android app bundle the
+wrapper loads. There is no separate website build.
 
 ## 5. Routes
 

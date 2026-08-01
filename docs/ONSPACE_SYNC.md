@@ -44,15 +44,11 @@ the same three commands before continuing — OnSpace imports the same code.
 
 ---
 
-## 3. Optional: GitHub Pages preview (automated)
+## 3. CI gate
 
-`.github/workflows/deploy-pages.yml` publishes the built `dist/` to Pages.
-
-- Repo → **Settings → Pages → Build and deployment → Source: GitHub Actions**
-
-**Expected:** after the next push to `main`, the site is live at
-`https://<you>.github.io/<repo>/`. This is just a preview; OnSpace hosting is
-independent.
+`.github/workflows/ci.yml` runs on every push: typecheck, lint, Android
+permission parity, then the app bundle build. A red CI run means OnSpace will
+fail the same way — fix it before importing.
 
 ---
 
