@@ -45,8 +45,13 @@ const LEVEL_META: Record<LogLevel, { accent: "system" | "warn" | "danger" | "net
 const clock = (t: number) =>
   new Date(t).toLocaleTimeString(undefined, { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
+/** Stable empty snapshot: the recorder only exists in the browser, so the
+ *  server (and the hydration pass) must render an empty list or React tears
+ *  the tree down with a hydration mismatch. */
+const NO_LOGS: readonly never[] = [];
+
 function Logs() {
-  const entries = useSyncExternalStore(subscribeLogs, getLogs, getLogs);
+  const entries = useSyncExternalStore(subscribeLogs, getLogs, () => NO_LOGS);
   const [channel, setChannel] = useState<LogChannel | "all">("all");
   const [level, setLevel] = useState<LogLevel | "all">("all");
 
