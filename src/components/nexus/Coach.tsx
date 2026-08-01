@@ -140,7 +140,7 @@ export function Coach({
       ) : null}
 
       {/* explainer card — bottom sheet, always above the tab bar */}
-      <div className="absolute inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] mx-auto max-w-md">
+      <div className="absolute inset-x-3 bottom-[calc(11.5rem+env(safe-area-inset-bottom))] mx-auto max-w-md">
         <div className="nx-pop rounded-2xl border border-cyan/35 glass p-4 shadow-[0_28px_70px_-30px_rgba(0,0,0,0.95)]">
           <div className="flex items-center gap-2">
             <span className="grid size-7 shrink-0 place-items-center rounded-lg border border-cyan/40 bg-cyan/12 text-cyan">
