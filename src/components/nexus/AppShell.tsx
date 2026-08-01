@@ -70,10 +70,14 @@ export function AppShell({
   offline?: boolean;
   children: ReactNode;
 }) {
+  const [cmdOpen, setCmdOpen] = useState(false);
+
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background sm:max-w-xl lg:max-w-2xl">
+    <div className="relative mx-auto flex min-h-dvh w-full max-w-lg flex-col sm:max-w-xl lg:max-w-2xl">
+      <BackdropFX />
       <header className="sticky top-0 z-20 border-b border-dim/70 glass pt-[env(safe-area-inset-top)]">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 px-4 py-3 sm:px-6">
+          <NexusLogo size={28} className="press" />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="size-2 shrink-0 rounded-full bg-ok pulse-dot" aria-hidden />
@@ -83,26 +87,34 @@ export function AppShell({
               <p className="mt-1 truncate text-fluid-xs leading-snug text-muted-foreground">{subtitle}</p>
             ) : null}
           </div>
-          {accentLabel ? (
-            <div className="shrink-0">
-              <Chip accent="cyan">{accentLabel}</Chip>
-            </div>
-          ) : null}
+          <div className="flex shrink-0 items-center gap-2">
+            {accentLabel ? <Chip accent="cyan">{accentLabel}</Chip> : null}
+            <button
+              type="button"
+              onClick={() => setCmdOpen(true)}
+              aria-label="Open command palette"
+              className="press grid size-9 place-items-center rounded-xl border border-dim/70 bg-surface-2/60 text-faint hover:border-cyan/40 hover:text-cyan"
+            >
+              <Search size={16} />
+            </button>
+          </div>
         </div>
         <OfflineBanner online={!offline} />
-
+        <ScrollProgress />
       </header>
 
       <main
         key={title}
         className={cn(
-          "rise-in nexus-grid flex-1 space-y-5 px-4 pb-12 pt-5 sm:space-y-6 sm:px-6 sm:pt-6",
+          "rise-in nexus-grid flex-1 space-y-5 px-4 pb-24 pt-5 sm:space-y-6 sm:px-6 sm:pt-6",
         )}
       >
         {children}
       </main>
 
       <TabBar />
+      <ButlerDock />
+      <CommandBar open={cmdOpen} onOpenChange={setCmdOpen} />
     </div>
   );
 }
