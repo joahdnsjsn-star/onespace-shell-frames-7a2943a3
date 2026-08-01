@@ -150,6 +150,11 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    installLogger();
+    return startAutoConnect();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <PreferenceBridge />
