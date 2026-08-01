@@ -70,7 +70,7 @@ export function usePermissionDisclosure() {
         role="dialog"
         aria-modal="true"
         aria-label={copy.title}
-        className="fixed inset-0 z-[120] flex items-end justify-center bg-black/70 p-3 backdrop-blur-sm animate-in fade-in duration-200"
+        className="fixed inset-x-0 top-0 z-[120] flex h-[100dvh] max-h-[100dvh] items-end justify-center overflow-hidden bg-black/70 p-3 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={() => close(false)}
       >
         <div
