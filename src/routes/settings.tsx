@@ -302,11 +302,15 @@ function ServerSection() {
 
 /** Butler's spoken presence: voice pick, delivery, tips and alerts. */
 function VoiceSection() {
-  const supported = voiceSupported();
+  const [supported, setSupported] = useState(false);
   const [names, setNames] = useState<string[]>([]);
   const { value: chosen, set: setChosen } = useSetting<string>("voice.name", "auto");
 
-  useEffect(() => onVoicesChanged(() => setNames(listVoices().map((v) => v.name))), []);
+  useEffect(() => {
+    setSupported(voiceSupported());
+    const off = onVoicesChanged(() => setNames(listVoices().map((v) => v.name)));
+    return () => off();
+  }, []);
 
   return (
     <section>

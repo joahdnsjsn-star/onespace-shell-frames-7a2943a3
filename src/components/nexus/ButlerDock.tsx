@@ -3,7 +3,7 @@ import { Bot, Mic, Paperclip, Send, X, Sparkle, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fx } from "@/lib/fx";
 import { Mascot } from "./Mascot";
-import { isSpeaking, speakLine } from "@/lib/voice";
+import { speakLine } from "@/lib/voice";
 
 type Msg = { id: number; role: "user" | "butler"; text: string };
 
@@ -81,7 +81,7 @@ export function ButlerDock() {
         <div className="fixed inset-x-3 bottom-[calc(9.5rem+env(safe-area-inset-bottom))] z-40 mx-auto max-w-md">
           <div className="nx-pop flex max-h-[60dvh] flex-col overflow-hidden rounded-2xl border border-dim/70 glass shadow-[0_24px_60px_-24px_rgba(0,0,0,0.9)]">
             <div className="flex items-center gap-2 border-b border-dim/60 px-3 py-2">
-              <div className={cn("-my-1 shrink-0", isSpeaking() && "mascot-talk")}>
+              <div className="-my-1 shrink-0">
                 <Mascot size={30} />
               </div>
               <Sparkle size={14} className="text-neural" />
