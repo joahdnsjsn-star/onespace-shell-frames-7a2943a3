@@ -87,19 +87,27 @@ export function AppShell({
   subtitle,
   accentLabel,
   offline,
+  fill,
   children,
 }: {
   title: string;
   subtitle?: string;
   accentLabel?: string;
   offline?: boolean;
+  /** Locks the page to the viewport — no page scrolling; children own their own scroll areas. */
+  fill?: boolean;
   children: ReactNode;
 }) {
   const [cmdOpen, setCmdOpen] = useState(false);
   const [pagesOpen, setPagesOpen] = useState(false);
 
   return (
-    <div className="relative mx-auto flex min-h-dvh w-full max-w-lg flex-col sm:max-w-xl lg:max-w-2xl">
+    <div
+      className={cn(
+        "relative mx-auto flex w-full max-w-lg flex-col sm:max-w-xl lg:max-w-2xl",
+        fill ? "h-dvh overflow-hidden" : "min-h-dvh",
+      )}
+    >
       <BackdropFX />
       <header className="sticky top-0 z-20 border-b border-dim/70 glass pt-[env(safe-area-inset-top)]">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 px-4 py-3 sm:px-6">
@@ -119,22 +127,26 @@ export function AppShell({
           </div>
         </div>
         <OfflineBanner online={!offline} />
-        <ScrollProgress />
+        {fill ? null : <ScrollProgress />}
       </header>
 
       <main
         key={title}
         className={cn(
-          "rise-in nx-stagger nexus-grid flex-1 space-y-5 px-4 pb-24 pt-5 sm:space-y-6 sm:px-6 sm:pt-6",
+          "rise-in nexus-grid px-4 sm:px-6",
+          fill
+            ? "flex min-h-0 flex-1 flex-col gap-3 overflow-hidden py-3"
+            : "nx-stagger flex-1 space-y-5 pb-24 pt-5 sm:space-y-6 sm:pt-6",
         )}
       >
         {children}
       </main>
 
       <TabBar onOpenPages={() => setPagesOpen(true)} />
-      <ButlerDock />
+      {fill ? null : <ButlerDock />}
       <CommandBar open={cmdOpen} onOpenChange={setCmdOpen} />
       <PageLauncher open={pagesOpen} onOpenChange={setPagesOpen} />
     </div>
   );
 }
+
