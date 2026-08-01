@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ShieldAlert, X } from "lucide-react";
 import { ActionButton } from "@/components/nexus/ui";
 import { fx } from "@/lib/fx";
@@ -58,9 +59,12 @@ export function usePermissionDisclosure() {
     setPending(null);
   }, []);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const copy = pending ? DISCLOSURES[pending.key] : null;
 
-  const node =
+  const sheet =
     pending && copy ? (
       <div
         role="dialog"
@@ -128,6 +132,11 @@ export function usePermissionDisclosure() {
         </div>
       </div>
     ) : null;
+
+  // The handset column uses transforms/containment, which would make a
+  // position:fixed overlay resolve against that box instead of the viewport.
+  // Portalling to <body> keeps the sheet pinned to the real screen edges.
+  const node = sheet && mounted ? createPortal(sheet, document.body) : null;
 
   return { confirm, node };
 }
