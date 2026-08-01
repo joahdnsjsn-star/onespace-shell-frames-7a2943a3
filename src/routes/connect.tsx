@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Server, QrCode, Wifi, RefreshCw, ShieldCheck, Radar, Github } from "lucide-react";
+import { Server, QrCode, Wifi, RefreshCw, ShieldCheck, Radar, Github, Download, Copy, Check } from "lucide-react";
+import { useState } from "react";
+import serverAsset from "@/assets/butler_server.py.asset.json";
+import { fx } from "@/lib/fx";
 import { AppShell } from "@/components/nexus/AppShell";
 import { Card, Chip, IconBadge, Row, SectionHeader, StatTile, ActionButton } from "@/components/nexus/ui";
 
@@ -17,6 +20,23 @@ export const Route = createFileRoute("/connect")({
   }),
   component: Connect,
 });
+
+function CopyCommand() {
+  const [done, setDone] = useState(false);
+  return (
+    <ActionButton
+      variant="ghost"
+      onClick={() => {
+        void navigator.clipboard?.writeText("python butler_server.py");
+        fx.select();
+        setDone(true);
+        window.setTimeout(() => setDone(false), 1600);
+      }}
+    >
+      {done ? <Check size={16} /> : <Copy size={16} />} {done ? "Copied" : "Copy run cmd"}
+    </ActionButton>
+  );
+}
 
 function Connect() {
   return (
@@ -88,14 +108,36 @@ function Connect() {
       </section>
 
       <section>
-        <SectionHeader title="server setup" accent="system" />
-        <Card>
-          <pre className="whitespace-pre-wrap break-words rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-muted-foreground">
-{`git clone github.com/butler-ai/server
-cd server && python butler_server.py`}
+        <SectionHeader title="server bundle" accent="system" />
+        <Card accent="system">
+          <Row
+            title="butler_server.py"
+            sub={`${(serverAsset.size / 1_048_576).toFixed(2)} MB · python 3.10+ · runs on your PC`}
+            left={
+              <IconBadge accent="system" size={34}>
+                <Server size={16} />
+              </IconBadge>
+            }
+            right={<Chip accent="ok">v6</Chip>}
+          />
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <ActionButton
+              as="a"
+              href={serverAsset.url}
+              download="butler_server.py"
+              onClick={() => fx.success()}
+            >
+              <Download size={16} /> Download
+            </ActionButton>
+            <CopyCommand />
+          </div>
+          <pre className="mt-3 whitespace-pre-wrap break-words rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-muted-foreground">
+{`python butler_server.py
+# QR + pairing code print in the terminal`}
           </pre>
           <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
-            <Github size={14} className="text-cyan" /> Compatible with the OneSpace / GitHub bundle.
+            <Github size={14} className="text-cyan" /> No web console — the bridge is terminal-only and
+            LAN-scoped. This app is the only UI.
           </div>
         </Card>
       </section>
