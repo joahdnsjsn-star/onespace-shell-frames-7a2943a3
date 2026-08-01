@@ -1,10 +1,13 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Code2, Play, Plus, Search, Terminal, Trash2, Undo2 } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
 import { Chip, IconBadge, Row } from "@/components/nexus/ui";
 import { cn } from "@/lib/utils";
 import { Coach } from "@/components/nexus/Coach";
+import { fx } from "@/lib/fx";
+import { useBridge } from "@/lib/useBridge";
+import { BridgeError, fetchLibrary, runScript, undoRun, type LibraryScript } from "@/lib/butler-bridge";
 
 export const Route = createFileRoute("/scripts")({
   head: () => ({
@@ -188,7 +191,7 @@ function Scripts() {
           {FILTERS.map((f) => (
             <button key={f} type="button" onClick={() => setFilter(f)} className="press shrink-0">
               <span className={cn(filter === f ? "" : "opacity-55")}>
-                <Chip accent={f === "all" ? "cyan" : f === "python" ? "neural" : f === "bash" ? "net" : "system"}>
+                <Chip accent={f === "all" ? "cyan" : f === "media" ? "neural" : f === "network" ? "net" : "system"}>
                   {f}
                 </Chip>
               </span>
@@ -201,11 +204,11 @@ function Scripts() {
       <div data-coach="scripts-list" className="scroll-y min-h-0 flex-1 space-y-2 pr-0.5">
         {visible.map((s) => (
           <Row
-            key={s.name}
+            key={s.id}
             title={<span className="font-mono">{s.name}</span>}
-            sub={`${s.lang} · never run`}
+            sub={s.desc || s.category}
             left={
-              <IconBadge accent={s.accent} size={34}>
+              <IconBadge accent={accentFor(s.id)} size={34}>
                 <Code2 size={16} />
               </IconBadge>
             }
@@ -213,8 +216,8 @@ function Scripts() {
               <span className="flex items-center gap-2">
                 <button
                   type="button"
-                  aria-label={`Delete ${s.name}`}
-                  onClick={() => remove(s.name)}
+                  aria-label={`Hide ${s.name}`}
+                  onClick={() => remove(s.id)}
                   className="press grid size-8 place-items-center rounded-lg border border-danger/35 bg-danger/10 text-danger"
                 >
                   <Trash2 size={13} />
@@ -222,8 +225,9 @@ function Scripts() {
                 <button
                   type="button"
                   aria-label={`Run ${s.name}`}
-                  onClick={() => run(s.name)}
-                  className="press grid size-8 place-items-center rounded-lg border border-cyan/40 bg-cyan/10 text-cyan"
+                  onClick={() => run(s)}
+                  disabled={busy !== null}
+                  className="press grid size-8 place-items-center rounded-lg border border-cyan/40 bg-cyan/10 text-cyan disabled:opacity-40"
                 >
                   <Play size={13} />
                 </button>
@@ -233,7 +237,13 @@ function Scripts() {
         ))}
         {visible.length === 0 ? (
           <p className="rounded-xl border border-dashed border-dim/70 p-6 text-center text-xs text-muted-foreground">
-            {q ? `Nothing matches “${query}”.` : "No scripts match this filter."}
+            {!paired
+              ? "No PC paired yet — open the LINK page and scan the QR from butler_server.py."
+              : status !== "online"
+                ? "Bridge offline. Start butler_server.py on your PC and stay on the same Wi-Fi."
+                : q
+                  ? `Nothing matches “${query}”.`
+                  : "No scripts match this filter."}
           </p>
         ) : null}
       </div>
@@ -251,13 +261,13 @@ function Scripts() {
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <Chip accent="warn" dot>
-            {trash.length ? `${trash.length} removed` : "library synced"}
+          <Chip accent={busy ? "warn" : status === "online" ? "ok" : "danger"} dot>
+            {busy ? "running…" : status === "online" ? `${scripts.length} scripts synced` : "bridge offline"}
           </Chip>
           <button
             type="button"
             onClick={undo}
-            disabled={!trash.length}
+            disabled={!hidden.length && !lastUndoId}
             className="press inline-flex items-center gap-1.5 rounded-lg border border-warn/40 bg-warn/12 px-3 py-1.5 label-mono text-[10px] text-warn disabled:opacity-40"
           >
             <Undo2 size={12} /> undo
