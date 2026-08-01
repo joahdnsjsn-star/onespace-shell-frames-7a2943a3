@@ -22,6 +22,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { fx } from "@/lib/fx";
 
 export type PageEntry = {
   to: string;
@@ -127,7 +128,10 @@ export function PageLauncher({
           </div>
           <button
             type="button"
-            onClick={() => onOpenChange(false)}
+            onClick={() => {
+              fx.close();
+              onOpenChange(false);
+            }}
             aria-label="Close page list"
             className="press grid size-9 shrink-0 place-items-center rounded-xl border border-dim/70 bg-surface-2/60 text-faint hover:border-cyan/40 hover:text-cyan"
           >
@@ -145,7 +149,10 @@ export function PageLauncher({
                     key={p.to}
                     to={p.to}
                     activeOptions={{ exact: p.to === "/" }}
-                    onClick={() => onOpenChange(false)}
+                    onClick={() => {
+                      fx.select();
+                      onOpenChange(false);
+                    }}
                     className="press lift flex items-start gap-2.5 rounded-2xl border border-dim/60 bg-surface-2/60 p-3 hover:border-cyan/30 hover:bg-surface-3/70"
                     activeProps={{ className: "border-cyan/45 bg-cyan/8" }}
                   >

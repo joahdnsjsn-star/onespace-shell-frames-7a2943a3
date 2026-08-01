@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bot, Mic, Paperclip, Send, X, Sparkle, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { fx } from "@/lib/fx";
 
 type Msg = { id: number; role: "user" | "butler"; text: string };
 
@@ -57,7 +58,12 @@ export function ButlerDock() {
     <>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() =>
+          setOpen((o) => {
+            o ? fx.close() : fx.open();
+            return !o;
+          })
+        }
         aria-label={open ? "Close Butler" : "Ask Butler"}
         className={cn(
           "press fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] right-4 z-40 grid size-13 place-items-center rounded-2xl border border-cyan/35 bg-surface-2/90 text-cyan shadow-[0_10px_30px_-12px_color-mix(in_oklab,var(--cyan)_60%,transparent)] backdrop-blur-md transition-transform hover:scale-105",
@@ -111,7 +117,10 @@ export function ButlerDock() {
                 <button
                   key={s}
                   type="button"
-                  onClick={() => send(s)}
+                  onClick={() => {
+                    fx.tap();
+                    send(s);
+                  }}
                   className="press shrink-0 rounded-full border border-dim/70 bg-surface-2/60 px-2.5 py-1 label-mono text-[10px] text-faint hover:border-cyan/40 hover:text-cyan"
                 >
                   {s}
