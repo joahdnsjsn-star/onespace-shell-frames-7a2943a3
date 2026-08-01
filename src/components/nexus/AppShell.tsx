@@ -12,6 +12,7 @@ import {
   Palette,
   SlidersHorizontal,
   Search,
+  LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Chip } from "./ui";
@@ -19,6 +20,7 @@ import { OfflineBanner } from "./OfflineBanner";
 import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
 import { ButlerDock } from "./ButlerDock";
 import { CommandBar } from "./CommandBar";
+import { PageLauncher } from "./PageLauncher";
 
 export const TABS = [
   { to: "/", label: "HOME", icon: LayoutDashboard },
@@ -33,29 +35,52 @@ export const TABS = [
   { to: "/settings", label: "CONFIG", icon: SlidersHorizontal },
 ] as const;
 
-export function TabBar() {
+/** Fixed 5-slot bar — no horizontal scrolling. Slot 5 opens the full page list. */
+const PRIMARY = [
+  { to: "/", label: "HOME", icon: LayoutDashboard },
+  { to: "/butler", label: "BUTLER", icon: Bot },
+  { to: "/scripts", label: "SCRIPTS", icon: Code2 },
+  { to: "/settings", label: "CONFIG", icon: SlidersHorizontal },
+] as const;
+
+export function TabBar({ onOpenPages }: { onOpenPages: () => void }) {
+  const item =
+    "group press flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-faint hover:bg-surface-3/60 hover:text-cyan";
   return (
     <nav className="sticky bottom-0 z-30 border-t border-dim/70 glass pb-[env(safe-area-inset-bottom)]">
-      <div className="scroll-x flex gap-1 px-2 py-2">
-        {TABS.map((t) => (
+      <div className="flex items-stretch gap-1 px-2 py-2">
+        {PRIMARY.map((t) => (
           <Link
             key={t.to}
             to={t.to}
-            className="group press flex min-w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-xl px-2 py-2 text-faint hover:bg-surface-3/60 hover:text-cyan"
+            className={item}
             activeOptions={{ exact: t.to === "/" }}
             activeProps={{
               className:
                 "bg-cyan/12 text-cyan shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--cyan)_28%,transparent)]",
             }}
           >
-            <t.icon size={19} strokeWidth={1.7} className="transition-transform duration-200 group-hover:-translate-y-0.5" />
+            <t.icon
+              size={19}
+              strokeWidth={1.7}
+              className="transition-transform duration-200 group-hover:-translate-y-0.5"
+            />
             <span className="label-mono text-[9px] leading-none">{t.label}</span>
           </Link>
         ))}
+        <button type="button" onClick={onOpenPages} aria-label="Open all pages" className={item}>
+          <LayoutGrid
+            size={19}
+            strokeWidth={1.7}
+            className="transition-transform duration-200 group-hover:-translate-y-0.5"
+          />
+          <span className="label-mono text-[9px] leading-none">PAGES</span>
+        </button>
       </div>
     </nav>
   );
 }
+
 
 export function AppShell({
   title,
@@ -71,6 +96,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [pagesOpen, setPagesOpen] = useState(false);
 
   return (
     <div className="relative mx-auto flex min-h-dvh w-full max-w-lg flex-col sm:max-w-xl lg:max-w-2xl">
@@ -105,9 +131,10 @@ export function AppShell({
         {children}
       </main>
 
-      <TabBar />
+      <TabBar onOpenPages={() => setPagesOpen(true)} />
       <ButlerDock />
       <CommandBar open={cmdOpen} onOpenChange={setCmdOpen} />
+      <PageLauncher open={pagesOpen} onOpenChange={setPagesOpen} />
     </div>
   );
 }
