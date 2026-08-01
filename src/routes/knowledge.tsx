@@ -15,6 +15,7 @@ import {
 import { AppShell } from "@/components/nexus/AppShell";
 import { ActionButton, Card, Chip, EmptyState, IconBadge, Row, SectionHeader, Segmented, StatTile, Toggle } from "@/components/nexus/ui";
 import { CategoryBars, GrowthChart, IntakeBars, ProgressRing } from "@/components/nexus/Charts";
+import { clearGrowth, growthPoints, growthSince, growthTotal, loadGrowth, methodBreakdown, recentGrowth, subscribeGrowth } from "@/lib/kb-growth";
 import { Coach } from "@/components/nexus/Coach";
 import { cn } from "@/lib/utils";
 import { fx } from "@/lib/fx";
@@ -206,8 +207,62 @@ function PulseTab({ kb, milestonePct, remaining }: { kb: Kb; milestonePct: numbe
         </div>
       </Card>
 
+      <LocalGrowthCard />
+
       <FeedCard kb={kb} limit={8} />
     </>
+  );
+}
+
+/** Offline-safe growth ledger kept on the phone, independent of the PC bridge. */
+function LocalGrowthCard() {
+  const [, bump] = useState(0);
+  useEffect(() => {
+    loadGrowth();
+    return subscribeGrowth(() => bump((n) => n + 1));
+  }, []);
+
+  const total = growthTotal();
+  const day = growthSince(24);
+  const methods = methodBreakdown().slice(0, 6);
+  const recent = recentGrowth(5);
+  const points = growthPoints(24);
+
+  return (
+    <Card className="space-y-3">
+      <SectionHeader
+        title="on-device ledger"
+        accent="ok"
+        action={<Chip accent="ok">{compact(total)} tracked</Chip>}
+      />
+      <p className="text-xs leading-snug text-muted-foreground">
+        Every finding is timestamped locally in encrypted storage, so this curve survives the PC going offline.
+      </p>
+      {points.length > 1 ? <IntakeBars points={points} accent="ok" /> : null}
+      <div className="grid grid-cols-2 gap-2">
+        <MiniStat label="last 24h" value={compact(day)} />
+        <MiniStat label="events" value={String(recent.length ? recentGrowth(9999).length : 0)} />
+      </div>
+      {methods.length ? <CategoryBars categories={methods} max={6} /> : null}
+      {recent.length ? (
+        <ul className="space-y-1">
+          {recent.map((e, i) => (
+            <li key={`${e.ts}-${i}`} className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+              <span className="truncate font-mono uppercase tracking-wider text-faint">{e.method}</span>
+              <span className="truncate">{e.domain ?? ""}</span>
+              <span className="shrink-0 font-mono tabular-nums text-body">+{e.count}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <button
+        type="button"
+        onClick={() => clearGrowth()}
+        className="w-full rounded-xl border border-dim/60 bg-surface-3/50 px-3 py-2 text-xs font-medium text-muted-foreground active:scale-[0.99]"
+      >
+        Reset local ledger
+      </button>
+    </Card>
   );
 }
 
