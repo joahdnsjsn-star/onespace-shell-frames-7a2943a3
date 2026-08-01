@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Server, QrCode, Wifi, RefreshCw, ShieldCheck, Radar, Github, Download, Copy, Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Server, QrCode, Wifi, RefreshCw, ShieldCheck, Radar, Github, Download, Copy, Check, X, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
   checkHealth,
   forgetBridge,
@@ -9,6 +9,7 @@ import {
   saveBridge,
   type HealthReport,
 } from "@/lib/butler-bridge";
+import { parseConnection, rememberGoodHost, scanLan, toBaseUrl, type FoundHost, type ScanProgress } from "@/lib/discovery";
 import { useBridge } from "@/lib/useBridge";
 import serverAsset from "@/assets/butler_server.py.asset.json";
 import { fx } from "@/lib/fx";
