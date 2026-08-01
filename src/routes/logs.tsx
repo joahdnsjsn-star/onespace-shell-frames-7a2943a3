@@ -55,7 +55,13 @@ function Logs() {
   const [channel, setChannel] = useState<LogChannel | "all">("all");
   const [level, setLevel] = useState<LogLevel | "all">("all");
 
-  const counts = useMemo(() => logCounts(), [entries]);
+  // Derived from the same snapshot the list renders, so SSR and hydration
+  // always agree (reading the live buffer here would diverge).
+  const counts = useMemo(() => {
+    const c = { debug: 0, info: 0, warn: 0, error: 0 } as Record<LogLevel, number>;
+    for (const e of entries) c[e.level] = (c[e.level] ?? 0) + 1;
+    return c;
+  }, [entries]);
 
   const visible = useMemo(
     () =>
