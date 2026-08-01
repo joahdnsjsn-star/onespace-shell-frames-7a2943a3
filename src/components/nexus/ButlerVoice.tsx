@@ -59,7 +59,12 @@ export function ButlerVoice() {
   const lastActivity = useRef(Date.now());
   const supported = useMemo(() => voiceSupported(), []);
 
-  useEffect(() => onSpeakingChange(setTalking), []);
+  useEffect(() => {
+    const off = onSpeakingChange(setTalking);
+    return () => {
+      off();
+    };
+  }, []);
   useEffect(() => setMuted(!voicePrefs.enabled()), []);
 
   const dismiss = useCallback(() => {
