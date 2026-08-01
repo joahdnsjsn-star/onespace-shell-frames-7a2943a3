@@ -119,9 +119,10 @@ async function decryptValue<T>(payload: string): Promise<T | undefined> {
   if (!s || !key) return undefined;
   try {
     const raw = fromB64(payload);
-    const iv = raw.subarray(0, 12);
-    const body = raw.subarray(12);
+    const iv = new Uint8Array(raw.slice(0, 12));
+    const body = new Uint8Array(raw.slice(12));
     const pt = await s.decrypt({ name: "AES-GCM", iv }, key, body);
+
     return JSON.parse(dec.decode(pt)) as T;
   } catch {
     return undefined;
