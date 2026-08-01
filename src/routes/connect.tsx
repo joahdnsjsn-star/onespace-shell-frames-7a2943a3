@@ -191,8 +191,11 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
     }
     setUrl(toBaseUrl(parsed));
     if (parsed.token) setToken(parsed.token);
+    // The app signature travels in the QR payload — store it immediately so the
+    // very first paired request already carries X-Butler-App-Sig.
+    if (parsed.appSig) void saveBridge({ appSig: parsed.appSig });
     setPaste("");
-    setNote(`Imported ${parsed.ip}${parsed.port ? `:${parsed.port}` : ""}${parsed.token ? " with token" : ""}.`);
+    setNote(`Imported ${parsed.ip}${parsed.port ? `:${parsed.port}` : ""}${parsed.token ? " with code" : ""}.`);
     fx.success();
   };
   const importString = () => importText(paste);
@@ -201,17 +204,31 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
 
   const valid = url.trim().length > 0 && isLocalBridgeUrl(url.trim());
 
+  /**
+   * Real handshake: POST /pair exchanges the printed code for a session token
+   * and the machine's app signature, then /api/health confirms the link.
+   */
   const connect = () => {
     if (!valid || busy) return;
     setBusy(true);
     setNote("");
     fx.select();
-    void saveBridge({ baseUrl: url, token })
-      .then(() => checkHealth())
-      .then((h) => {
-        setHealth(h);
-        setNote(h.ollama ? "Linked — local model ready." : "Linked — Ollama not detected on the PC yet.");
-        void rememberGoodHost(url);
+    void pairWithServer(url.trim(), token.trim())
+      .then(async (result) => {
+        if (!result.ok) {
+          setNote(result.message);
+          fx.warn();
+          return;
+        }
+        const h = await checkHealth().catch(() => null);
+        if (h) setHealth(h);
+        setNote(
+          h?.ollama
+            ? "Paired — local model ready."
+            : `${result.message} Ollama not detected on the PC yet.`,
+        );
+        await rememberGoodHost(url.trim());
+        refresh();
         fx.success();
       })
       .catch((err: unknown) => setNote((err as Error).message))
