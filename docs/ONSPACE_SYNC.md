@@ -69,29 +69,20 @@ build settings below.
 
 ## 5. Build settings
 
-The repo ships three deploy modes. `onspace.json` at the root is the
-machine-readable version of this table — point OnSpace at whichever row matches
-the hosting type it gives you.
-
-| Mode | Build command | Output | Start command | Use when |
-| --- | --- | --- | --- | --- |
-| **Static** (safest) | `bun run build:static` | `dist/static` | — | Host serves files only (OnSpace static, Pages, CDN) |
-| **SSR / Node** | `bun run build:node` | `dist/server` + `dist/client` | `bun run start` (reads `$PORT`) | Host runs a Node process |
-| **Edge** | `bun run build` | `dist/server` (`wrangler.json`) + `dist/client` | platform-managed | Cloudflare Workers/Pages |
-
-Common fields:
+This project builds **one target: the Android phone app**. There is no website
+or desktop mode. `onspace.json` at the root is the machine-readable version of
+this table.
 
 | Field | Value |
 | --- | --- |
+| Target | Android phone (portrait, `com.butlerai.pc.automation`) |
 | Framework preset | Vite / TanStack Start |
 | Install command | `bun install` (or `npm install`) |
+| Build command | `bun run build:node` |
+| Output | `dist/server` (entry `dist/server/index.mjs`) + `dist/client` |
+| Start command | `bun run start` (reads `$PORT`) |
 | Node version | `22` (pinned in `.nvmrc`, `.node-version`, `engines`) |
-| SPA fallback | already emitted: `404.html` + `_redirects` in `dist/static` |
-
-Why `build:static` and not plain `build`: `vite build` writes assets only into
-`dist/client` with **no `index.html`**, so serving that folder shows a blank
-page. `build:static` boots the real SSR server, crawls all 18 routes, and writes
-genuine per-route HTML (correct `<title>`/meta for SEO) into `dist/static`.
+| Permissions contract | `app.permissions.json` (checked in CI by `bun run parity`) |
 
 **Expected:** first deploy finishes in ~1–2 min and OnSpace returns a live URL,
 and every route deep-links correctly on reload.
@@ -168,10 +159,8 @@ restores an earlier build instantly; no Git revert needed.
 bun install          # install
 bun run dev          # dev server on :8080
 bunx tsc --noEmit    # type check
-bun run build        # edge/default build
 bun run build:node   # Node SSR build  -> dist/server/index.mjs
 bun run start        # run the Node SSR build (honours $PORT)
-bun run build:static # prerender every route -> dist/static (zero-server)
 ```
 
 ## Adaptive performance (v17)

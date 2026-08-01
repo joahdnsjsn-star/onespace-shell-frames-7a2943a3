@@ -90,19 +90,7 @@ git push -u origin main
 CI runs automatically: `.github/workflows/ci.yml` installs, typechecks and builds on
 every push and pull request to `main`.
 
-### 4.2 GitHub Pages (static export)
-
-`.github/workflows/deploy-pages.yml` builds the app and publishes the client bundle to
-GitHub Pages. Enable it once:
-
-1. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-2. Push to `main`. The workflow uploads the build output and deploys it.
-3. Your site appears at `https://<you>.github.io/<repo>/`.
-
-Note: GitHub Pages is static hosting, so server functions and API routes are inert
-there. Use a Node/edge host (below) when you wire up a real backend.
-
-### 4.3 OnSpace.ai / Vercel / Netlify / Cloudflare
+### 4.2 OnSpace.ai (Android app build)
 
 Import the repository and use:
 
