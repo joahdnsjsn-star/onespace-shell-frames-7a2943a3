@@ -71,7 +71,7 @@ function Cosmetic() {
 
       <section>
         <SectionHeader title="density" />
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 min-[400px]:grid-cols-3">
           {["Compact", "Standard", "Roomy"].map((d, i) => (
             <div
               key={d}

@@ -123,7 +123,7 @@ const AGREEMENTS = [
 
 function Onboarding() {
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background sm:max-w-xl lg:max-w-2xl">
       <header className="sticky top-0 z-20 border-b border-dim bg-surface/95 px-4 py-3 backdrop-blur">
         <div className="flex items-center justify-between">
           <span className="label-mono text-cyan">init sequence</span>

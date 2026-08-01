@@ -90,7 +90,7 @@ function Connect() {
       <section>
         <SectionHeader title="server setup" accent="system" />
         <Card>
-          <pre className="overflow-x-auto rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-muted-foreground">
+          <pre className="scroll-x rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-muted-foreground">
 {`git clone github.com/butler-ai/server
 cd server && python butler_server.py`}
           </pre>

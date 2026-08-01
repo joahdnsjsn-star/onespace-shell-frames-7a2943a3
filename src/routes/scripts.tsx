@@ -77,7 +77,7 @@ function Scripts() {
             <Terminal size={14} className="text-system" />
             <span className="label-mono text-muted-foreground">stdout</span>
           </div>
-          <pre className="mt-3 min-h-28 overflow-x-auto rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-faint">
+          <pre className="mt-3 min-h-28 scroll-x rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-faint">
 {`> waiting for execution…`}
           </pre>
         </Card>

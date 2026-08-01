@@ -67,7 +67,7 @@ function Butler() {
               pending
             </Chip>
           </div>
-          <pre className="mt-3 overflow-x-auto rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-muted-foreground">
+          <pre className="mt-3 scroll-x rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-muted-foreground">
 {`{ "limit": 5, "sort": "memory" }`}
           </pre>
         </Card>
