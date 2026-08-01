@@ -21,6 +21,7 @@ import { Route as FileshareRouteImport } from './routes/fileshare'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PermissionsRouteImport } from './routes/permissions'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ScriptsRouteImport } from './routes/scripts'
 import { Route as SecurityTrustRouteImport } from './routes/security-trust'
@@ -87,6 +88,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PermissionsRoute = PermissionsRouteImport.update({
+  id: '/permissions',
+  path: '/permissions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
   id: '/privacy-policy',
   path: '/privacy-policy',
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/knowledge': typeof KnowledgeRoute
   '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
+  '/permissions': typeof PermissionsRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/scripts': typeof ScriptsRoute
   '/security-trust': typeof SecurityTrustRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/knowledge': typeof KnowledgeRoute
   '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
+  '/permissions': typeof PermissionsRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/scripts': typeof ScriptsRoute
   '/security-trust': typeof SecurityTrustRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/knowledge': typeof KnowledgeRoute
   '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
+  '/permissions': typeof PermissionsRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/scripts': typeof ScriptsRoute
   '/security-trust': typeof SecurityTrustRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/logs'
     | '/onboarding'
+    | '/permissions'
     | '/privacy-policy'
     | '/scripts'
     | '/security-trust'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/logs'
     | '/onboarding'
+    | '/permissions'
     | '/privacy-policy'
     | '/scripts'
     | '/security-trust'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/logs'
     | '/onboarding'
+    | '/permissions'
     | '/privacy-policy'
     | '/scripts'
     | '/security-trust'
@@ -244,6 +256,7 @@ export interface RootRouteChildren {
   KnowledgeRoute: typeof KnowledgeRoute
   LogsRoute: typeof LogsRoute
   OnboardingRoute: typeof OnboardingRoute
+  PermissionsRoute: typeof PermissionsRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ScriptsRoute: typeof ScriptsRoute
   SecurityTrustRoute: typeof SecurityTrustRoute
@@ -337,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/permissions': {
+      id: '/permissions'
+      path: '/permissions'
+      fullPath: '/permissions'
+      preLoaderRoute: typeof PermissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy-policy': {
       id: '/privacy-policy'
       path: '/privacy-policy'
@@ -388,6 +408,7 @@ const rootRouteChildren: RootRouteChildren = {
   KnowledgeRoute: KnowledgeRoute,
   LogsRoute: LogsRoute,
   OnboardingRoute: OnboardingRoute,
+  PermissionsRoute: PermissionsRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ScriptsRoute: ScriptsRoute,
   SecurityTrustRoute: SecurityTrustRoute,

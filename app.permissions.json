@@ -1,0 +1,36 @@
+{
+  "$comment": "Single source of truth for native permissions. Mirrors src/lib/permissions.ts. OnSpace.ai / EAS builds must keep expo.android.permissions and expo.android.blockedPermissions identical to these arrays.",
+  "android": {
+    "permissions": [
+      "android.permission.INTERNET",
+      "android.permission.CAMERA",
+      "android.permission.VIBRATE"
+    ],
+    "blockedPermissions": [
+      "android.permission.RECORD_AUDIO",
+      "android.permission.ACCESS_FINE_LOCATION",
+      "android.permission.ACCESS_COARSE_LOCATION",
+      "android.permission.ACCESS_BACKGROUND_LOCATION",
+      "android.permission.READ_CONTACTS",
+      "android.permission.READ_PHONE_STATE",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.READ_MEDIA_IMAGES",
+      "android.permission.READ_MEDIA_VIDEO",
+      "android.permission.READ_MEDIA_AUDIO",
+      "android.permission.MEDIA_PROJECTION",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+      "android.permission.BODY_SENSORS",
+      "android.permission.ACTIVITY_RECOGNITION",
+      "com.google.android.gms.permission.ACTIVITY_RECOGNITION"
+    ]
+  },
+  "ios": {
+    "NSCameraUsageDescription": "Butler AI uses the camera once to scan the pairing QR code shown by your PC. Nothing is recorded or uploaded."
+  },
+  "web": {
+    "runtimeRequested": ["camera", "notifications", "clipboard-write", "screen-wake-lock"],
+    "neverRequested": ["microphone", "geolocation", "midi", "bluetooth", "usb", "idle-detection"]
+  }
+}

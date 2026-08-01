@@ -168,3 +168,21 @@ The app ships a client-side performance governor (`src/lib/perf.ts`):
 Host CPU/RAM pressure raises `nexus:host-alert`, shown as a rate-limited toast.
 The PC bridge (`butler_server.py`) is offered as an in-app download on Link and in
 Settings → PC Server. It has no web console by design — this app is the only UI.
+
+## Permission parity (required for 100% OnSpace compatibility)
+
+OnSpace.ai builds the native shell from the repo. To keep the web shell and the
+native build in sync:
+
+1. `app.permissions.json` at the repo root is the machine-readable contract.
+2. Copy `android.permissions` -> `expo.android.permissions` and
+   `android.blockedPermissions` -> `expo.android.blockedPermissions` in the native `app.json`.
+3. Copy `ios.NSCameraUsageDescription` into `expo.ios.infoPlist`.
+4. The web/PWA side is already aligned: `public/manifest.webmanifest` declares
+   `permissions_policy` (camera self-only; microphone, geolocation and interest-cohort disabled).
+5. Verify in-app at `/permissions` — it reads live browser permission state and lists the
+   exact native strings next to each entry.
+
+Expected outcome after import: build command `bun run build`, output `dist`, Node 22,
+no environment variables required (the shell has no backend), and the permission prompt
+list on device matches the table in `docs/PERMISSIONS.md` exactly.
