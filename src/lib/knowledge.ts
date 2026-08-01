@@ -15,7 +15,6 @@
  */
 
 import {
-import { recordGrowth, trackTotal } from "@/lib/kb-growth";
   BridgeError,
   kbCrawl,
   kbExpand,
