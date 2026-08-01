@@ -24,7 +24,7 @@ export function LegalDoc({
         <p className="text-[11px] text-muted-foreground">last updated {updated}</p>
       </header>
 
-      <main className="flex-1 space-y-4 px-4 py-5 sm:px-6">
+      <main className="flex-1 space-y-4 px-4 py-5 sm:px-6 [&>section]:cv-auto">
         {sections.map((s, i) => (
           <Card key={s.heading}>
             <div className="label-mono text-cyan">
