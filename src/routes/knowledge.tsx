@@ -105,7 +105,7 @@ function Knowledge() {
 
       {kb.error ? (
         <Card accent="warn" className="flex items-start gap-3">
-          <IconBadge icon={PlugZap} accent="warn" />
+          <IconBadge accent="warn"><PlugZap className="size-4" /></IconBadge>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium leading-snug">{kb.error}</p>
             <p className="mt-1 text-xs leading-snug text-muted-foreground">
@@ -165,7 +165,7 @@ function PulseTab({ kb, milestonePct, remaining }: { kb: Kb; milestonePct: numbe
       </section>
 
       <Card data-coach="kb-graph" accent="neural" className="space-y-3">
-        <SectionHeader icon={Activity} title="growth · 24h" accent="neural" right={<Chip accent={kb.learning ? "ok" : "warn"}>{kb.learning ? "crawling" : "paused"}</Chip>} />
+        <SectionHeader title="growth · 24h" accent="neural" action={<Chip accent={kb.learning ? "ok" : "warn"}>{kb.learning ? "crawling" : "paused"}</Chip>} />
         <GrowthChart points={kb.points} accent="neural" />
         <div className="flex items-center gap-4 pt-1">
           <ProgressRing
@@ -186,11 +186,11 @@ function PulseTab({ kb, milestonePct, remaining }: { kb: Kb; milestonePct: numbe
       </Card>
 
       <Card data-coach="kb-crawler" className="space-y-3">
-        <SectionHeader icon={Globe} title="crawler" accent="cyan" />
+        <SectionHeader title="crawler" accent="cyan" />
         <Row
           title="background learning"
           sub={kb.learning ? "Indexing new sources continuously" : "Paused — full CPU reserved for chat"}
-          left={<IconBadge icon={Sparkles} accent={kb.learning ? "ok" : "warn"} />}
+          left={<IconBadge accent={kb.learning ? "ok" : "warn"}><Sparkles className="size-4" /></IconBadge>}
           right={
             <Toggle
               on={kb.learning}
@@ -226,12 +226,12 @@ function GraphTab({ kb }: { kb: Kb }) {
   return (
     <>
       <Card accent="neural" className="space-y-3">
-        <SectionHeader icon={Activity} title="total knowledge" accent="neural" right={<Chip accent="neural">{compact(kb.total)}</Chip>} />
+        <SectionHeader title="total knowledge" accent="neural" action={<Chip accent="neural">{compact(kb.total)}</Chip>} />
         <GrowthChart points={kb.points} accent="neural" height={160} />
       </Card>
 
       <Card className="space-y-3">
-        <SectionHeader icon={Database} title="intake per sample" accent="cyan" />
+        <SectionHeader title="intake per sample" accent="cyan" />
         <IntakeBars points={kb.points} accent="cyan" />
         <p className="text-xs leading-snug text-muted-foreground">
           Each bar is what the crawler added between two samples. Flat bars mean the queue is dry — feed it a topic in
@@ -240,7 +240,7 @@ function GraphTab({ kb }: { kb: Kb }) {
       </Card>
 
       <Card className="space-y-3">
-        <SectionHeader icon={Target} title="categories" accent="net" />
+        <SectionHeader title="categories" accent="net" />
         <CategoryBars categories={kb.categories} max={8} />
       </Card>
 
@@ -253,11 +253,9 @@ function FeedCard({ kb, limit }: { kb: Kb; limit: number }) {
   const items = kb.feed.slice(0, limit);
   return (
     <Card className="space-y-3">
-      <SectionHeader
-        icon={Brain}
-        title="live feed"
+      <SectionHeader title="live feed"
         accent="ok"
-        right={kb.syncing ? <Loader2 className="size-3.5 animate-spin text-cyan" /> : <Chip accent="ok">{items.length}</Chip>}
+        action={kb.syncing ? <Loader2 className="size-3.5 animate-spin text-cyan" /> : <Chip accent="ok">{items.length}</Chip>}
       />
       {items.length === 0 ? (
         <EmptyState
@@ -280,7 +278,7 @@ function FeedCard({ kb, limit }: { kb: Kb; limit: number }) {
                     <span>{ago(a.at)}</span>
                   </span>
                 }
-                left={<IconBadge icon={Globe} accent="ok" />}
+                left={<IconBadge accent="ok"><Globe className="size-4" /></IconBadge>}
               />
             </li>
           ))}
@@ -322,7 +320,7 @@ function RecallTab({ total }: { total: number }) {
   return (
     <>
       <Card className="space-y-3">
-        <SectionHeader icon={Search} title="recall" accent="cyan" right={<Chip accent="cyan">{compact(total)} indexed</Chip>} />
+        <SectionHeader title="recall" accent="cyan" action={<Chip accent="cyan">{compact(total)} indexed</Chip>} />
         <div className="flex items-center gap-2 rounded-xl border border-dim/70 bg-surface-3/60 px-3">
           <Search className="size-4 shrink-0 text-faint" aria-hidden />
           <input
@@ -360,7 +358,7 @@ function RecallTab({ total }: { total: number }) {
             <li key={`${h.url}-${i}`}>
               <Card className="space-y-1.5 p-3">
                 <div className="flex items-start gap-2">
-                  <IconBadge icon={Brain} accent="neural" />
+                  <IconBadge accent="neural"><Brain className="size-4" /></IconBadge>
                   <div className="min-w-0 flex-1">
                     <p className="line-clamp-2 text-sm font-medium leading-snug">{h.title}</p>
                     <p className="label-mono mt-0.5 truncate text-faint">{h.category}</p>
@@ -430,7 +428,7 @@ function SourcesTab({ queue }: { queue: number }) {
       ) : null}
 
       <Card data-coach="kb-sources" className="space-y-3">
-        <SectionHeader icon={Link2} title="add a page" accent="cyan" right={<Chip accent="cyan">{compact(queue)} queued</Chip>} />
+        <SectionHeader title="add a page" accent="cyan" action={<Chip accent="cyan">{compact(queue)} queued</Chip>} />
         <input
           value={url}
           onChange={(e) => setUrl(e.target.value)}
@@ -458,7 +456,7 @@ function SourcesTab({ queue }: { queue: number }) {
       </Card>
 
       <Card className="space-y-3">
-        <SectionHeader icon={Sparkles} title="learn a topic" accent="neural" />
+        <SectionHeader title="learn a topic" accent="neural" />
         <input
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
