@@ -22,6 +22,8 @@ jobs:
         run: bunx tsc --noEmit
       - name: Lint
         run: bun run lint
+      - name: Native permission parity (OnSpace / Expo contract)
+        run: bun run parity
       - name: Build (edge / default target)
         run: bun run build
       - name: Build static export (OnSpace / Pages compatible)
