@@ -93,7 +93,7 @@ export function NeuralCore({
 }) {
   const cx = size / 2;
   const cy = size / 2;
-  const rings = [size * 0.42, size * 0.32, size * 0.22];
+  const rings: [number, number, number] = [size * 0.42, size * 0.32, size * 0.22];
   const nodes = Array.from({ length: 8 }, (_, i) => {
     const a = (i / 8) * Math.PI * 2;
     return { x: cx + rings[0] * Math.cos(a), y: cy + rings[0] * Math.sin(a), d: (i % 3) * 0.6 };
