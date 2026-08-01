@@ -201,10 +201,9 @@ function Onboarding() {
             <div className="relative mt-3 flex items-end justify-center overflow-hidden rounded-xl border border-dim/60 bg-[radial-gradient(120%_90%_at_50%_0%,color-mix(in_oklch,var(--color-cyan)_18%,transparent),transparent_70%)]">
               <div className="pointer-events-none absolute inset-0 scanline opacity-40" />
               <img
-                src={butlerHero}
-                alt="Butler AI robot mascot in a suit with a glowing bowtie"
-                width={1024}
-                height={1024}
+                src={mascotArt.url}
+                alt="Butler AI robot mascot"
+                loading="lazy"
                 className="rise-in relative h-[clamp(140px,34vw,220px)] w-auto object-contain drop-shadow-[0_0_28px_color-mix(in_oklch,var(--color-cyan)_35%,transparent)]"
               />
             </div>
