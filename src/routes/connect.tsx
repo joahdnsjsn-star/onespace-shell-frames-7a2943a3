@@ -6,6 +6,7 @@ import {
   forgetBridge,
   isLocalBridgeUrl,
   loadBridge,
+  pairWithServer,
   saveBridge,
   type HealthReport,
 } from "@/lib/butler-bridge";
