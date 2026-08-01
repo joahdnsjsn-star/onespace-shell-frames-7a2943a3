@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { fx } from "@/lib/fx";
 
 type Accent = "cyan" | "ok" | "warn" | "danger" | "neural" | "system" | "net";
 
@@ -287,7 +288,14 @@ export function Toggle({
       aria-checked={!!on}
       aria-label={label ?? "toggle"}
       disabled={disabled || !interactive}
-      onClick={interactive ? () => onChange!(!on) : undefined}
+      onClick={
+        interactive
+          ? () => {
+              fx.select();
+              onChange!(!on);
+            }
+          : undefined
+      }
       className={cn(
         "inline-flex h-6 w-11 shrink-0 items-center rounded-full border p-0.5 transition-colors duration-300",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/60",
@@ -408,7 +416,14 @@ export function ActionButton({
   return (
     <button
       type={type}
-      onClick={onClick}
+      onClick={
+        onClick
+          ? () => {
+              variant === "danger" ? fx.warn() : fx.tap();
+              onClick();
+            }
+          : undefined
+      }
       disabled={disabled}
       className={cn(
         "press inline-flex h-11 cursor-pointer select-none items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold tracking-tight",

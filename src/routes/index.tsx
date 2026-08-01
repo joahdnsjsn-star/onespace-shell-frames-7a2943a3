@@ -30,6 +30,8 @@ import {
   RadialGauge,
   ScanFrame,
 } from "@/components/nexus/Instruments";
+import { Mascot, Wordmark } from "@/components/nexus/Mascot";
+import { fx } from "@/lib/fx";
 import { useTelemetry } from "@/hooks/useTelemetry";
 
 export const Route = createFileRoute("/")({
@@ -67,12 +69,27 @@ function Home() {
   const [fired, setFired] = useState<string | null>(null);
 
   const fire = (label: string) => {
+    label === "Shutdown" || label === "Restart" ? fx.warn() : fx.success();
     setFired(label);
     window.setTimeout(() => setFired((v) => (v === label ? null : v)), 1200);
   };
 
   return (
     <AppShell title="NEXUS CORE" subtitle="workstation · DESKTOP-A9F2" accentLabel="linked">
+      <section>
+        <Card accent="cyan" className="scanline lift relative overflow-hidden">
+          <div className="flex items-center gap-3">
+            <Mascot size={104} eager className="-my-2" />
+            <div className="min-w-0 flex-1">
+              <Wordmark size="md" />
+              <p className="mt-2 text-sm text-muted-foreground">
+                At your service. Everything on your workstation, one tap away.
+              </p>
+            </div>
+          </div>
+        </Card>
+      </section>
+
       <section>
         <Card accent="cyan" className="scanline nx-sheen lift relative overflow-hidden">
           <div className="flex items-start gap-3">
