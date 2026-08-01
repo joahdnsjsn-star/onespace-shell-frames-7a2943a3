@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Bot,
@@ -13,6 +13,8 @@ import {
   SlidersHorizontal,
   Search,
   LayoutGrid,
+  RefreshCw,
+  ArrowDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fx } from "@/lib/fx";
@@ -28,6 +30,7 @@ import { PageLauncher } from "./PageLauncher";
 import { Defer } from "./Lazy";
 import { useDeferredMount } from "@/lib/defer";
 import { perfQuiet } from "@/lib/perf";
+import { useAndroidBack, useDoubleBackToExit, usePullToRefresh } from "@/lib/android";
 
 export const TABS = [
   { to: "/", label: "HOME", icon: LayoutDashboard },
@@ -44,50 +47,59 @@ export const TABS = [
 
 /** Fixed 5-slot bar — no horizontal scrolling. Slot 5 opens the full page list. */
 const PRIMARY = [
-  { to: "/", label: "HOME", icon: LayoutDashboard },
-  { to: "/butler", label: "BUTLER", icon: Bot },
-  { to: "/scripts", label: "SCRIPTS", icon: Code2 },
-  { to: "/settings", label: "CONFIG", icon: SlidersHorizontal },
+  { to: "/", label: "Home", icon: LayoutDashboard },
+  { to: "/butler", label: "Butler", icon: Bot },
+  { to: "/scripts", label: "Scripts", icon: Code2 },
+  { to: "/settings", label: "Config", icon: SlidersHorizontal },
 ] as const;
 
-export function TabBar({ onOpenPages }: { onOpenPages: () => void }) {
-  const item =
-    "group press flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-faint hover:bg-surface-3/60 hover:text-cyan";
+/** Material 3 navigation bar: 5 fixed destinations, sliding active pill. */
+export function TabBar({ onOpenPages, pagesOpen }: { onOpenPages: () => void; pagesOpen: boolean }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
   return (
-    <nav data-coach="nav-bar" className="sticky bottom-0 z-30 border-t border-dim/70 glass hull-plate pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-stretch gap-1 px-2 py-2">
-        {PRIMARY.map((t) => (
-          <Link
-            key={t.to}
-            to={t.to}
-            className={item}
-            onClick={() => fx.tap()}
-            activeOptions={{ exact: t.to === "/" }}
-            activeProps={{
-              className:
-                "bg-cyan/12 text-cyan shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--cyan)_28%,transparent)]",
-            }}
-          >
-            <t.icon
-              size={19}
-              strokeWidth={1.7}
-              className="transition-transform duration-200 group-hover:-translate-y-0.5"
-            />
-            <span className="label-mono text-[9px] leading-none">{t.label}</span>
-          </Link>
-        ))}
-        <button type="button" onClick={onOpenPages} aria-label="Open all pages" className={item}>
-          <LayoutGrid
-            size={19}
-            strokeWidth={1.7}
-            className="transition-transform duration-200 group-hover:-translate-y-0.5"
-          />
-          <span className="label-mono text-[9px] leading-none">PAGES</span>
+    <nav
+      data-coach="nav-bar"
+      className="sticky bottom-0 z-30 border-t border-dim/70 glass hull-plate pb-[env(safe-area-inset-bottom)]"
+    >
+      <div className="flex items-stretch gap-0.5 px-1.5 pt-1">
+        {PRIMARY.map((t) => {
+          const active = t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
+          return (
+            <Link
+              key={t.to}
+              to={t.to}
+              data-active={active && !pagesOpen}
+              aria-current={active ? "page" : undefined}
+              className={cn("nav-slot", active && !pagesOpen ? "text-cyan" : "text-faint")}
+              onClick={() => fx.tap()}
+            >
+              <span className="nx-pill" aria-hidden="true" />
+              <t.icon size={21} strokeWidth={active ? 2.1 : 1.7} className="relative" />
+              <span className="relative text-[10px] font-semibold leading-none tracking-wide">
+                {t.label}
+              </span>
+            </Link>
+          );
+        })}
+        <button
+          type="button"
+          onClick={onOpenPages}
+          aria-label="Open all pages"
+          data-active={pagesOpen}
+          className={cn("nav-slot", pagesOpen ? "text-cyan" : "text-faint")}
+        >
+          <span className="nx-pill" aria-hidden="true" />
+          <LayoutGrid size={21} strokeWidth={pagesOpen ? 2.1 : 1.7} className="relative" />
+          <span className="relative text-[10px] font-semibold leading-none tracking-wide">
+            Pages
+          </span>
         </button>
       </div>
     </nav>
   );
 }
+
 
 
 export function AppShell({
