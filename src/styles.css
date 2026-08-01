@@ -738,3 +738,46 @@ html[data-perf="low"] * { text-shadow: none !important; }
   content-visibility: auto;
   contain-intrinsic-size: auto 320px;
 }
+
+/* ==== v18: Butler voice presence ======================================= */
+@keyframes nx-butler-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.96) }
+  to { opacity: 1; transform: translateY(0) scale(1) }
+}
+@keyframes nx-butler-out {
+  from { opacity: 1; transform: translateY(0) scale(1) }
+  to { opacity: 0; transform: translateY(10px) scale(0.97) }
+}
+@keyframes nx-voice-bar {
+  0%, 100% { height: 3px; opacity: 0.5 }
+  50% { height: 12px; opacity: 1 }
+}
+@keyframes nx-talk {
+  0%, 100% { transform: translateY(0) rotate(-1deg) scale(1) }
+  50% { transform: translateY(-3px) rotate(1deg) scale(1.045) }
+}
+@keyframes nx-caret {
+  0%, 45% { opacity: 1 }
+  55%, 100% { opacity: 0 }
+}
+
+.butler-in { animation: nx-butler-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.butler-out { animation: nx-butler-out 0.26s ease-in both; }
+.voice-bar {
+  height: 3px;
+  animation: nx-voice-bar 0.62s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 90ms);
+  will-change: height;
+}
+.mascot-talk {
+  animation: nx-talk 0.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 16px color-mix(in oklab, var(--cyan) 34%, transparent));
+  will-change: transform;
+}
+.caret { animation: nx-caret 1s steps(1, end) infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .butler-in, .butler-out, .voice-bar, .mascot-talk, .caret { animation: none !important; }
+  .voice-bar { height: 8px; }
+}
+html[data-perf="low"] .mascot-talk { animation: none !important; }
