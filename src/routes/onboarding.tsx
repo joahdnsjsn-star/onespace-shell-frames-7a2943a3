@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+
 import {
   Rocket,
   LayoutDashboard,
@@ -122,118 +124,154 @@ const AGREEMENTS = [
 ];
 
 function Onboarding() {
+  const [step, setStep] = useState(0);
+  const [checked, setChecked] = useState<boolean[]>(() => AGREEMENTS.map(() => false));
+  const s = STEPS[step]!;
+  const Icon = s.icon;
+  const allAgreed = checked.every(Boolean);
+  const blocked = step === 2 && !allAgreed;
+  const last = step === STEPS.length - 1;
+
+  const go = (dir: 1 | -1) =>
+    setStep((v) => Math.min(STEPS.length - 1, Math.max(0, v + dir)));
+
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background sm:max-w-xl lg:max-w-2xl">
-      <header className="sticky top-0 z-20 border-b border-dim bg-surface/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-dim bg-surface/95 px-4 py-3 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="flex items-center justify-between">
-          <span className="label-mono text-cyan">init sequence</span>
+          <span className="label-mono text-cyan">
+            init sequence · {String(step + 1).padStart(2, "0")}/{STEPS.length}
+          </span>
           <Link to="/" className="label-mono text-muted-foreground hover:text-cyan">
             skip
           </Link>
         </div>
         <div className="mt-3">
-          <ProgressBar value={10} />
+          <ProgressBar value={((step + 1) / STEPS.length) * 100} />
         </div>
         <div className="mt-2 flex gap-1">
-          {STEPS.map((s, i) => (
-            <span
-              key={s.label}
-              className={`h-1 flex-1 rounded-full ${i === 0 ? "bg-cyan" : "bg-surface-3"}`}
+          {STEPS.map((t, i) => (
+            <button
+              key={t.label}
+              type="button"
+              aria-label={`Go to step ${i + 1}: ${t.label}`}
+              onClick={() => setStep(i)}
+              className={`h-1.5 flex-1 rounded-full transition-colors ${
+                i <= step ? "bg-cyan" : "bg-surface-3"
+              }`}
             />
           ))}
         </div>
       </header>
 
-      <main className="flex-1 space-y-6 nexus-grid px-4 py-6">
-        {STEPS.map((s, i) => (
-          <Card key={s.label} accent={s.accent} className="scanline">
-            <div className="flex items-center gap-3">
-              <IconBadge accent={s.accent} size={52} glow={i === 0}>
-                <s.icon size={24} />
-              </IconBadge>
-              <div className="min-w-0">
-                <div className="label-mono text-muted-foreground">
-                  step {String(i + 1).padStart(2, "0")} · {s.label}
-                </div>
-                <h2 className="font-mono text-lg font-bold tracking-wide">{s.title}</h2>
-                <p className="text-xs text-muted-foreground">{s.sub}</p>
+      <main className="nexus-grid flex-1 px-4 py-6">
+        <Card key={s.label} accent={s.accent} className="scanline rise-in">
+          <div className="flex items-center gap-3">
+            <IconBadge accent={s.accent} size={52} glow>
+              <Icon size={24} />
+            </IconBadge>
+            <div className="min-w-0">
+              <div className="label-mono text-muted-foreground">
+                step {String(step + 1).padStart(2, "0")} · {s.label}
               </div>
+              <h1 className="font-mono text-lg font-bold tracking-wide text-balance">{s.title}</h1>
+              <p className="text-xs text-muted-foreground">{s.sub}</p>
             </div>
+          </div>
 
-            <p className="mt-3 rounded-lg border border-dim/60 bg-surface-3/60 p-3 text-xs text-muted-foreground">
-              {s.tip}
-            </p>
+          <p className="mt-3 rounded-lg border border-dim/60 bg-surface-3/60 p-3 text-xs leading-relaxed text-muted-foreground">
+            {s.tip}
+          </p>
 
-            {i === 2 ? (
-              <div className="mt-3 space-y-2">
-                {AGREEMENTS.map((a) => (
-                  <div
-                    key={a}
-                    className="flex items-start gap-3 rounded-lg border border-dim/50 bg-surface-3/60 p-3"
+          {step === 2 ? (
+            <div className="mt-3 space-y-2">
+              {AGREEMENTS.map((a, i) => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() =>
+                    setChecked((c) => c.map((v, idx) => (idx === i ? !v : v)))
+                  }
+                  className="press flex w-full items-start gap-3 rounded-lg border border-dim/50 bg-surface-3/60 p-3 text-left"
+                >
+                  <span
+                    className={`mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                      checked[i]
+                        ? "border-ok/50 bg-ok/20 text-ok"
+                        : "border-dim bg-surface-2 text-transparent"
+                    }`}
                   >
-                    <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-md border border-cyan/40 bg-cyan/10 text-cyan">
-                      <Check size={12} />
-                    </span>
-                    <span className="text-xs leading-relaxed">{a}</span>
-                  </div>
-                ))}
-              </div>
-            ) : null}
+                    <Check size={12} />
+                  </span>
+                  <span className="text-xs leading-relaxed">{a}</span>
+                </button>
+              ))}
+              {!allAgreed ? (
+                <p className="label-mono text-warn">accept all six to continue</p>
+              ) : null}
+            </div>
+          ) : null}
 
-            {i === 4 ? (
-              <div className="mt-3 space-y-2">
-                {[
-                  { t: "Privacy Policy", to: "/privacy-policy" as const },
-                  { t: "Terms of Service", to: "/terms" as const },
-                  { t: "Data Safety", to: "/data-safety" as const },
-                  { t: "Security & Trust", to: "/security-trust" as const },
-                ].map((d) => (
-                  <Link key={d.to} to={d.to}>
-                    <Row
-                      title={d.t}
-                      sub="Tap to read the full document"
-                      left={
-                        <IconBadge accent="neural" size={32}>
-                          <FileText size={14} />
-                        </IconBadge>
-                      }
-                      right={<ChevronRight size={16} className="text-faint" />}
-                    />
-                  </Link>
-                ))}
-              </div>
-            ) : null}
+          {step === 4 ? (
+            <div className="mt-3 space-y-2">
+              {[
+                { t: "Privacy Policy", to: "/privacy-policy" as const },
+                { t: "Terms of Service", to: "/terms" as const },
+                { t: "Data Safety", to: "/data-safety" as const },
+                { t: "Security & Trust", to: "/security-trust" as const },
+              ].map((d) => (
+                <Link key={d.to} to={d.to}>
+                  <Row
+                    title={d.t}
+                    sub="Tap to read the full document"
+                    left={
+                      <IconBadge accent="neural" size={32}>
+                        <FileText size={14} />
+                      </IconBadge>
+                    }
+                    right={<ChevronRight size={16} className="text-faint" />}
+                  />
+                </Link>
+              ))}
+            </div>
+          ) : null}
 
-            {i === 5 ? (
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Chip accent="cyan">camera · qr only</Chip>
-                <Chip accent="net">network · lan only</Chip>
-                <Chip accent="warn">storage · opt-in</Chip>
-              </div>
-            ) : null}
+          {step === 5 ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Chip accent="cyan">camera · qr only</Chip>
+              <Chip accent="net">network · lan only</Chip>
+              <Chip accent="warn">storage · opt-in</Chip>
+            </div>
+          ) : null}
 
-            {i === 8 ? (
-              <div className="mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-cyan/30 bg-surface-3/50 p-6">
-                <div className="grid size-32 place-items-center rounded-lg border border-cyan/30 bg-background text-faint">
-                  <QrCode size={72} strokeWidth={1} />
-                </div>
-                <span className="label-mono text-muted-foreground">awaiting server qr</span>
+          {step === 8 ? (
+            <div className="mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-cyan/30 bg-surface-3/50 p-6">
+              <div className="grid size-32 place-items-center rounded-lg border border-cyan/30 bg-background text-faint">
+                <QrCode size={72} strokeWidth={1} />
               </div>
-            ) : null}
-          </Card>
-        ))}
+              <span className="label-mono text-muted-foreground">awaiting server qr</span>
+            </div>
+          ) : null}
+        </Card>
       </main>
 
-      <footer className="sticky bottom-0 border-t border-dim bg-surface/95 px-4 py-3 backdrop-blur">
+      <footer className="sticky bottom-0 border-t border-dim bg-surface/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
         <div className="flex gap-3">
-          <ActionButton variant="ghost" className="flex-1">
+          <ActionButton variant="ghost" className="flex-1" onClick={() => go(-1)} disabled={step === 0}>
             Back
           </ActionButton>
-          <Link to="/" className="flex-1">
-            <ActionButton className="w-full">Next</ActionButton>
-          </Link>
+          {last ? (
+            <Link to="/" className="flex-1">
+              <ActionButton className="w-full">Enter NEXUS</ActionButton>
+            </Link>
+          ) : (
+            <ActionButton className="flex-1" onClick={() => go(1)} disabled={blocked}>
+              Next
+            </ActionButton>
+          )}
         </div>
       </footer>
     </div>
   );
 }
+
