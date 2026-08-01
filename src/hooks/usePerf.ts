@@ -13,7 +13,12 @@ export function usePerf(): PerfState {
     degraded: false,
     reason: null,
   }));
-  useEffect(() => subscribePerf(setState), []);
+  useEffect(() => {
+    const off = subscribePerf(setState);
+    return () => {
+      off();
+    };
+  }, []);
   return state;
 }
 
