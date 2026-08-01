@@ -12,9 +12,10 @@
     "start": "node dist/server/index.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm run build",
+    "verify": "npm run typecheck && npm run parity && npm run build",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "parity": "node scripts/check-native-parity.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

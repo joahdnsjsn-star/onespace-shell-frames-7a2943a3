@@ -1,5 +1,16 @@
 {
-  "$comment": "Single source of truth for native permissions. Mirrors src/lib/permissions.ts. OnSpace.ai / EAS builds must keep expo.android.permissions and expo.android.blockedPermissions identical to these arrays.",
+  "$comment": "Single source of truth shared by the Lovable web shell and the OnSpace.ai / Expo native app. Mirrors src/lib/permissions.ts. The native repo's app.json MUST keep expo.android.permissions and expo.android.blockedPermissions byte-identical to the arrays below. Verified against butler-ai-final/app.json (Butler AI 5.0.9) on 2026-08-01.",
+  "native": {
+    "$comment": "Identity fields copied from the OnSpace/Expo app.json so the two repos cannot drift.",
+    "name": "Butler AI",
+    "slug": "butler-ai",
+    "scheme": "butlerai",
+    "androidPackage": "com.butlerai.pc.automation",
+    "iosBundleIdentifier": "com.butlerai.pc.automation",
+    "userInterfaceStyle": "dark",
+    "orientation": "portrait",
+    "backgroundColor": "#0C0E14"
+  },
   "android": {
     "permissions": [
       "android.permission.INTERNET",
@@ -13,6 +24,7 @@
       "android.permission.ACCESS_BACKGROUND_LOCATION",
       "android.permission.READ_CONTACTS",
       "android.permission.READ_PHONE_STATE",
+      "android.permission.PHONE_CALL",
       "android.permission.READ_EXTERNAL_STORAGE",
       "android.permission.WRITE_EXTERNAL_STORAGE",
       "android.permission.READ_MEDIA_IMAGES",

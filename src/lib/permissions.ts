@@ -124,9 +124,16 @@ export const DENIED_NATIVE: { native: string; label: string }[] = [
   { native: "android.permission.READ_MEDIA_AUDIO", label: "Audio library" },
   { native: "android.permission.MEDIA_PROJECTION", label: "Screen capture" },
   { native: "android.permission.FOREGROUND_SERVICE", label: "Background service" },
+  { native: "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK", label: "Background playback" },
+  { native: "android.permission.PHONE_CALL", label: "Place calls" },
   { native: "android.permission.BODY_SENSORS", label: "Body sensors" },
   { native: "android.permission.ACTIVITY_RECOGNITION", label: "Activity recognition" },
+  {
+    native: "com.google.android.gms.permission.ACTIVITY_RECOGNITION",
+    label: "Activity recognition (GMS)",
+  },
 ];
+
 
 const isBrowser = () => typeof window !== "undefined" && typeof navigator !== "undefined";
 
