@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as ButlerRouteImport } from './routes/butler'
+import { Route as ComponentsRouteImport } from './routes/components'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as CosmeticRouteImport } from './routes/cosmetic'
+import { Route as CrashReportRouteImport } from './routes/crash-report'
 import { Route as DataSafetyRouteImport } from './routes/data-safety'
 import { Route as FileshareRouteImport } from './routes/fileshare'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
@@ -40,6 +42,11 @@ const ButlerRoute = ButlerRouteImport.update({
   path: '/butler',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsRoute = ComponentsRouteImport.update({
+  id: '/components',
+  path: '/components',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConnectRoute = ConnectRouteImport.update({
   id: '/connect',
   path: '/connect',
@@ -48,6 +55,11 @@ const ConnectRoute = ConnectRouteImport.update({
 const CosmeticRoute = CosmeticRouteImport.update({
   id: '/cosmetic',
   path: '/cosmetic',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CrashReportRoute = CrashReportRouteImport.update({
+  id: '/crash-report',
+  path: '/crash-report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DataSafetyRoute = DataSafetyRouteImport.update({
@@ -105,8 +117,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
+  '/components': typeof ComponentsRoute
   '/connect': typeof ConnectRoute
   '/cosmetic': typeof CosmeticRoute
+  '/crash-report': typeof CrashReportRoute
   '/data-safety': typeof DataSafetyRoute
   '/fileshare': typeof FileshareRoute
   '/knowledge': typeof KnowledgeRoute
@@ -122,8 +136,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
+  '/components': typeof ComponentsRoute
   '/connect': typeof ConnectRoute
   '/cosmetic': typeof CosmeticRoute
+  '/crash-report': typeof CrashReportRoute
   '/data-safety': typeof DataSafetyRoute
   '/fileshare': typeof FileshareRoute
   '/knowledge': typeof KnowledgeRoute
@@ -140,8 +156,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
+  '/components': typeof ComponentsRoute
   '/connect': typeof ConnectRoute
   '/cosmetic': typeof CosmeticRoute
+  '/crash-report': typeof CrashReportRoute
   '/data-safety': typeof DataSafetyRoute
   '/fileshare': typeof FileshareRoute
   '/knowledge': typeof KnowledgeRoute
@@ -159,8 +177,10 @@ export interface FileRouteTypes {
     | '/'
     | '/builder'
     | '/butler'
+    | '/components'
     | '/connect'
     | '/cosmetic'
+    | '/crash-report'
     | '/data-safety'
     | '/fileshare'
     | '/knowledge'
@@ -176,8 +196,10 @@ export interface FileRouteTypes {
     | '/'
     | '/builder'
     | '/butler'
+    | '/components'
     | '/connect'
     | '/cosmetic'
+    | '/crash-report'
     | '/data-safety'
     | '/fileshare'
     | '/knowledge'
@@ -193,8 +215,10 @@ export interface FileRouteTypes {
     | '/'
     | '/builder'
     | '/butler'
+    | '/components'
     | '/connect'
     | '/cosmetic'
+    | '/crash-report'
     | '/data-safety'
     | '/fileshare'
     | '/knowledge'
@@ -211,8 +235,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BuilderRoute: typeof BuilderRoute
   ButlerRoute: typeof ButlerRoute
+  ComponentsRoute: typeof ComponentsRoute
   ConnectRoute: typeof ConnectRoute
   CosmeticRoute: typeof CosmeticRoute
+  CrashReportRoute: typeof CrashReportRoute
   DataSafetyRoute: typeof DataSafetyRoute
   FileshareRoute: typeof FileshareRoute
   KnowledgeRoute: typeof KnowledgeRoute
@@ -248,6 +274,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ButlerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components': {
+      id: '/components'
+      path: '/components'
+      fullPath: '/components'
+      preLoaderRoute: typeof ComponentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/connect': {
       id: '/connect'
       path: '/connect'
@@ -260,6 +293,13 @@ declare module '@tanstack/react-router' {
       path: '/cosmetic'
       fullPath: '/cosmetic'
       preLoaderRoute: typeof CosmeticRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crash-report': {
+      id: '/crash-report'
+      path: '/crash-report'
+      fullPath: '/crash-report'
+      preLoaderRoute: typeof CrashReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/data-safety': {
@@ -339,8 +379,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BuilderRoute: BuilderRoute,
   ButlerRoute: ButlerRoute,
+  ComponentsRoute: ComponentsRoute,
   ConnectRoute: ConnectRoute,
   CosmeticRoute: CosmeticRoute,
+  CrashReportRoute: CrashReportRoute,
   DataSafetyRoute: DataSafetyRoute,
   FileshareRoute: FileshareRoute,
   KnowledgeRoute: KnowledgeRoute,
