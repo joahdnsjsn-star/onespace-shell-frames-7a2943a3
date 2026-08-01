@@ -26,7 +26,7 @@ import { OfflineBanner } from "./OfflineBanner";
 import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
 import { ButlerDock } from "./ButlerDock";
 import { CommandBar } from "./CommandBar";
-import { PageLauncher } from "./PageLauncher";
+import { ALL_PAGES, PageLauncher, rememberPage } from "./PageLauncher";
 import { Defer } from "./Lazy";
 import { useDeferredMount } from "@/lib/defer";
 import { perfQuiet } from "@/lib/perf";
