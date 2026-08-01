@@ -473,6 +473,82 @@ function DiagnosticsPanel() {
   );
 }
 
+function RemotePanel() {
+  const caps = remoteCapabilities();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+  const any = caps.clipboard || caps.keyboard || caps.power;
+
+  async function run(id: string, fn: () => Promise<{ ok: boolean; error?: string }>, okMsg: string) {
+    setBusy(id);
+    setNote(null);
+    const r = await fn();
+    setBusy(null);
+    if (r.ok) {
+      fx.success();
+      setNote(okMsg);
+    } else {
+      fx.error();
+      setNote(r.error ?? "Failed");
+    }
+  }
+
+  return (
+    <Card accent="cyan" className="space-y-3">
+      <Row
+        title="PC remote"
+        sub={any ? "Capabilities reported by the paired host" : "Pair a host to unlock remote actions"}
+        left={
+          <IconBadge accent="cyan" size={34}>
+            <Keyboard size={16} />
+          </IconBadge>
+        }
+        right={<Chip accent={any ? "ok" : "warn"}>{any ? "live" : "idle"}</Chip>}
+      />
+
+      <div className="flex flex-wrap gap-1.5">
+        <Chip accent={caps.clipboard ? "ok" : "warn"}>clipboard</Chip>
+        <Chip accent={caps.keyboard ? "ok" : "warn"}>keyboard</Chip>
+        <Chip accent={caps.power ? "ok" : "warn"}>power</Chip>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <ActionButton
+          disabled={!caps.clipboard || busy !== null}
+          onClick={() => run("sync", syncClipboard, "Clipboard synced with host")}
+        >
+          <Copy size={16} /> {busy === "sync" ? "Syncing…" : "Sync clipboard"}
+        </ActionButton>
+        <ActionButton
+          disabled={!caps.clipboard || busy !== null}
+          onClick={() => run("pull", pullFromPc, "Pulled host clipboard")}
+        >
+          <Download size={16} /> {busy === "pull" ? "Pulling…" : "Pull from PC"}
+        </ActionButton>
+      </div>
+
+      {caps.power ? (
+        <div className="grid grid-cols-3 gap-2">
+          {(["sleep", "restart", "shutdown"] as const).map((a) => (
+            <ActionButton
+              key={a}
+              disabled={busy !== null}
+              onClick={() => run(a, () => powerAction(a), `Host ${a} requested`)}
+            >
+              <Power size={14} /> {a}
+            </ActionButton>
+          ))}
+        </div>
+      ) : null}
+
+      {note ? <p className="label-mono text-muted-foreground">{note}</p> : null}
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
+        Nothing here fires on its own — every action is one explicit tap, over the LAN, to the host you paired.
+      </p>
+    </Card>
+  );
+}
+
 function Connect() {
 
   const [reloadKey, setReloadKey] = useState(0);
@@ -491,6 +567,12 @@ function Connect() {
         <SectionHeader title="link diagnostics" accent="warn" action={<Activity size={14} className="text-faint" />} />
         <DiagnosticsPanel />
       </section>
+
+      <section>
+        <SectionHeader title="pc remote" accent="cyan" action={<Keyboard size={14} className="text-faint" />} />
+        <RemotePanel />
+      </section>
+
 
 
       <section>
