@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Bot,
@@ -13,6 +13,8 @@ import {
   SlidersHorizontal,
   Search,
   LayoutGrid,
+  RefreshCw,
+  ArrowDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fx } from "@/lib/fx";
@@ -28,6 +30,7 @@ import { PageLauncher } from "./PageLauncher";
 import { Defer } from "./Lazy";
 import { useDeferredMount } from "@/lib/defer";
 import { perfQuiet } from "@/lib/perf";
+import { useAndroidBack, useDoubleBackToExit, usePullToRefresh } from "@/lib/android";
 
 export const TABS = [
   { to: "/", label: "HOME", icon: LayoutDashboard },
@@ -44,50 +47,59 @@ export const TABS = [
 
 /** Fixed 5-slot bar — no horizontal scrolling. Slot 5 opens the full page list. */
 const PRIMARY = [
-  { to: "/", label: "HOME", icon: LayoutDashboard },
-  { to: "/butler", label: "BUTLER", icon: Bot },
-  { to: "/scripts", label: "SCRIPTS", icon: Code2 },
-  { to: "/settings", label: "CONFIG", icon: SlidersHorizontal },
+  { to: "/", label: "Home", icon: LayoutDashboard },
+  { to: "/butler", label: "Butler", icon: Bot },
+  { to: "/scripts", label: "Scripts", icon: Code2 },
+  { to: "/settings", label: "Config", icon: SlidersHorizontal },
 ] as const;
 
-export function TabBar({ onOpenPages }: { onOpenPages: () => void }) {
-  const item =
-    "group press flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-faint hover:bg-surface-3/60 hover:text-cyan";
+/** Material 3 navigation bar: 5 fixed destinations, sliding active pill. */
+export function TabBar({ onOpenPages, pagesOpen }: { onOpenPages: () => void; pagesOpen: boolean }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
   return (
-    <nav data-coach="nav-bar" className="sticky bottom-0 z-30 border-t border-dim/70 glass hull-plate pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-stretch gap-1 px-2 py-2">
-        {PRIMARY.map((t) => (
-          <Link
-            key={t.to}
-            to={t.to}
-            className={item}
-            onClick={() => fx.tap()}
-            activeOptions={{ exact: t.to === "/" }}
-            activeProps={{
-              className:
-                "bg-cyan/12 text-cyan shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--cyan)_28%,transparent)]",
-            }}
-          >
-            <t.icon
-              size={19}
-              strokeWidth={1.7}
-              className="transition-transform duration-200 group-hover:-translate-y-0.5"
-            />
-            <span className="label-mono text-[9px] leading-none">{t.label}</span>
-          </Link>
-        ))}
-        <button type="button" onClick={onOpenPages} aria-label="Open all pages" className={item}>
-          <LayoutGrid
-            size={19}
-            strokeWidth={1.7}
-            className="transition-transform duration-200 group-hover:-translate-y-0.5"
-          />
-          <span className="label-mono text-[9px] leading-none">PAGES</span>
+    <nav
+      data-coach="nav-bar"
+      className="sticky bottom-0 z-30 border-t border-dim/70 glass hull-plate pb-[env(safe-area-inset-bottom)]"
+    >
+      <div className="flex items-stretch gap-0.5 px-1.5 pt-1">
+        {PRIMARY.map((t) => {
+          const active = t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
+          return (
+            <Link
+              key={t.to}
+              to={t.to}
+              data-active={active && !pagesOpen}
+              aria-current={active ? "page" : undefined}
+              className={cn("nav-slot", active && !pagesOpen ? "text-cyan" : "text-faint")}
+              onClick={() => fx.tap()}
+            >
+              <span className="nx-pill" aria-hidden="true" />
+              <t.icon size={21} strokeWidth={active ? 2.1 : 1.7} className="relative" />
+              <span className="relative text-[10px] font-semibold leading-none tracking-wide">
+                {t.label}
+              </span>
+            </Link>
+          );
+        })}
+        <button
+          type="button"
+          onClick={onOpenPages}
+          aria-label="Open all pages"
+          data-active={pagesOpen}
+          className={cn("nav-slot", pagesOpen ? "text-cyan" : "text-faint")}
+        >
+          <span className="nx-pill" aria-hidden="true" />
+          <LayoutGrid size={21} strokeWidth={pagesOpen ? 2.1 : 1.7} className="relative" />
+          <span className="relative text-[10px] font-semibold leading-none tracking-wide">
+            Pages
+          </span>
         </button>
       </div>
     </nav>
   );
 }
+
 
 
 export function AppShell({
@@ -126,12 +138,30 @@ export function AppShell({
     return cleanup;
   }, []);
   const [pagesOpen, setPagesOpen] = useState(false);
+  const router = useRouter();
 
   // Route swap = an expected burst of work. Silence the governor briefly so a
   // normal page transition can never fire a false "performance mode" toast.
   useEffect(() => {
     perfQuiet(900);
   }, [title]);
+
+  // Hardware / gesture back closes the top-most sheet before it ever leaves
+  // the app — exactly how an Android activity stack behaves.
+  useAndroidBack(cmdOpen, () => setCmdOpen(false));
+  useAndroidBack(pagesOpen, () => setPagesOpen(false));
+  const exitArmed = useDoubleBackToExit(!cmdOpen && !pagesOpen);
+
+  // Pull-to-refresh on scrolling pages.
+  const ptr = usePullToRefresh(
+    async () => {
+      fx.success();
+      perfQuiet(1200);
+      await router.invalidate();
+      await new Promise((r) => window.setTimeout(r, 420));
+    },
+    { enabled: !fill },
+  );
 
   // Overlays live in the bundle already; we just keep them out of the tree
   // until the app is idle — or instantly, the moment the user opens one.
@@ -175,12 +205,31 @@ export function AppShell({
         {fill ? null : <ScrollProgress />}
       </header>
 
+      {/* Material pull-to-refresh indicator — rides the finger, spins on release. */}
+      {!fill && (ptr.pull > 0 || ptr.refreshing) ? (
+        <div
+          className="nx-ptr"
+          data-spin={ptr.refreshing}
+          style={{
+            top: `calc(env(safe-area-inset-top) + ${ptr.pull}px)`,
+            transform: `translate(-50%, -50%) rotate(${ptr.pull * 3}deg)`,
+            opacity: Math.min(1, ptr.pull / 40 + (ptr.refreshing ? 1 : 0)),
+          }}
+        >
+          {ptr.refreshing ? (
+            <RefreshCw size={16} />
+          ) : (
+            <ArrowDown size={16} className={ptr.armed ? "text-ok" : undefined} />
+          )}
+        </div>
+      ) : null}
+
       <main
         id="nexus-main"
         key={title}
-
+        style={ptr.pull ? { transform: `translateY(${ptr.pull}px)` } : undefined}
         className={cn(
-          "rise-in nexus-grid px-4 sm:px-6",
+          "axis-in nexus-grid px-4 transition-transform duration-200 sm:px-6",
           fill
             ? "flex min-h-0 flex-1 flex-col gap-3 overflow-hidden py-3"
             : "nx-stagger flex-1 space-y-5 pb-24 pt-5 sm:space-y-6 sm:pt-6",
@@ -189,12 +238,23 @@ export function AppShell({
         {children}
       </main>
 
-      <TabBar onOpenPages={() => setPagesOpen(true)} />
+      <TabBar onOpenPages={() => setPagesOpen(true)} pagesOpen={pagesOpen} />
       {fill ? null : (
         <Defer timeout={4000}>
           <ButlerDock />
         </Defer>
       )}
+
+      {/* Android "press back again to exit" snackbar. */}
+      {exitArmed ? (
+        <div
+          role="status"
+          className="snackbar pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-40 mx-auto w-fit max-w-[90vw] rounded-xl border border-dim/70 bg-surface-2/95 px-4 py-2.5 text-sm text-foreground shadow-lg backdrop-blur"
+        >
+          Press back again to exit
+        </div>
+      ) : null}
+
       {booting ? (
         <SplashScreen
           onDone={() => {
@@ -220,4 +280,5 @@ export function AppShell({
     </div>
   );
 }
+
 

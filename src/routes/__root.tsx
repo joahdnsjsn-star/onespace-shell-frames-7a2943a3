@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { PreferenceBridge } from "../components/nexus/PreferenceBridge";
 import { PerfGuard } from "../components/nexus/PerfGuard";
 import { ButlerVoice } from "../components/nexus/ButlerVoice";
+import { TouchInk } from "../components/nexus/TouchInk";
+
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -79,7 +81,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
+      },
+
       { title: "Butler AI NEXUS — Local PC Command Centre" },
       { name: "description", content: "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing." },
       { property: "og:type", content: "website" },
@@ -143,6 +150,7 @@ function RootComponent() {
       <PreferenceBridge />
       <PerfGuard />
       <ButlerVoice />
+      <TouchInk />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
