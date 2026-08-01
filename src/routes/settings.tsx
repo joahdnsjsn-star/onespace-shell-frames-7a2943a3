@@ -316,7 +316,7 @@ function VoiceSection() {
         accent="neural"
       />
       <Card accent="neural" className="space-y-2.5">
-        <ToggleRow
+        <SwitchRow
           id="voice.enabled"
           title="Butler speaks"
           sub="Voice lines for boot, onboarding, tips and alerts"
@@ -324,7 +324,7 @@ function VoiceSection() {
           accent="neural"
           initial
         />
-        <ToggleRow
+        <SwitchRow
           id="voice.tips"
           title="Idle tips"
           sub="A short hint after 45s of inactivity"
@@ -332,7 +332,7 @@ function VoiceSection() {
           accent="cyan"
           initial
         />
-        <ToggleRow
+        <SwitchRow
           id="voice.alerts"
           title="Spoken alerts"
           sub="Say it out loud when something needs attention"
