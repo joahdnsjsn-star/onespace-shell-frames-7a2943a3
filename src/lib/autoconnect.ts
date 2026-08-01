@@ -161,7 +161,7 @@ async function rediscover(): Promise<boolean> {
       networkMonitor.scanEmpty();
       return false;
     }
-    networkMonitor.scanFound(best.ip, String(best.port), best.latency ?? 0);
+    networkMonitor.scanFound(best.ip, String(best.port), best.latencyMs ?? 0);
     const baseUrl = `http://${best.ip}:${best.port}`;
     await saveBridge({ baseUrl });
     await rememberGoodHost(baseUrl);
