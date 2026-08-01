@@ -41,10 +41,10 @@ export function Mascot({
 }
 
 const LINES = [
-  "core.link ......... ok",
-  "telemetry ......... ok",
-  "butler.mind ....... ok",
-  "vault.seal ........ ok",
+  "vault.seal ........ sealed",
+  "link.engine ....... armed",
+  "butler.mind ....... online",
+  "telemetry ......... streaming",
 ];
 
 /**
@@ -101,7 +101,7 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
   );
 }
 
-/** Logo + typeset wordmark lockup: hex mark, NEXUS in wide caps, butler subline. */
+/** Logo + typeset wordmark lockup: hex mark, BUTLER AI in wide caps, product subline. */
 export function Wordmark({
   size = "md",
   className,
@@ -110,21 +110,21 @@ export function Wordmark({
   className?: string;
 }) {
   const mark = size === "lg" ? 40 : size === "md" ? 30 : 24;
-  const title = size === "lg" ? "text-3xl" : size === "md" ? "text-xl" : "text-base";
+  const title = size === "lg" ? "text-[26px]" : size === "md" ? "text-lg" : "text-sm";
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
       <HexMark size={mark} />
       <div className="min-w-0 text-left">
         <div
           className={cn(
-            "wordmark truncate font-semibold uppercase leading-none tracking-[0.24em]",
+            "wordmark truncate font-semibold uppercase leading-none tracking-[0.22em]",
             title,
           )}
         >
-          Nexus
-        </div>
-        <div className="mt-1 font-mono text-[10px] uppercase leading-none tracking-[0.3em] text-faint">
           Butler&nbsp;AI
+        </div>
+        <div className="mt-1 font-mono text-[10px] uppercase leading-none tracking-[0.28em] text-faint">
+          PC&nbsp;Automation
         </div>
       </div>
     </div>

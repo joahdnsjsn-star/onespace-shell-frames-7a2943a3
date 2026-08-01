@@ -141,6 +141,33 @@ function Onboarding() {
 
   const go = (dir: 1 | -1) => setStep((v) => Math.min(STEPS.length - 1, Math.max(0, v + dir)));
 
+  // Horizontal swipe between steps — the welcome copy promises it, so it ships.
+  // Blocked steps (agreements) can still be swiped backwards, never forwards.
+  const swipeX = useRef<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    swipeX.current = e.touches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = swipeX.current;
+    swipeX.current = null;
+    const end = e.changedTouches[0]?.clientX;
+    if (start == null || end == null) return;
+    const dx = end - start;
+    if (Math.abs(dx) < 56) return;
+    if (dx < 0 && !blocked && !last) go(1);
+    if (dx > 0) go(-1);
+  };
+
+  // Remember that the walkthrough was completed so the shell can stop nagging.
+  useEffect(() => {
+    if (!last) return;
+    try {
+      window.localStorage.setItem("nexus:onboarded", "1");
+    } catch {
+      /* storage blocked — harmless */
+    }
+  }, [last]);
+
   // Butler narrates every step — spoken when voice is on, always captioned.
   const spoken = useRef(-1);
   useEffect(() => {
@@ -188,7 +215,11 @@ function Onboarding() {
         </div>
       </header>
 
-      <main className="nexus-grid flex-1 px-4 py-6">
+      <main
+        className="nexus-grid flex-1 px-4 py-6"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <Card key={s.label} accent={s.accent} className="scanline rise-in">
           <div className="flex items-center gap-3">
             <IconBadge accent={s.accent} size={52} glow>

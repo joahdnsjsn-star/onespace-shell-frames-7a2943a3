@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as ButlerRouteImport } from './routes/butler'
-import { Route as ComponentsRouteImport } from './routes/components'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as CosmeticRouteImport } from './routes/cosmetic'
 import { Route as CrashReportRouteImport } from './routes/crash-report'
@@ -42,11 +41,6 @@ const BuilderRoute = BuilderRouteImport.update({
 const ButlerRoute = ButlerRouteImport.update({
   id: '/butler',
   path: '/butler',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComponentsRoute = ComponentsRouteImport.update({
-  id: '/components',
-  path: '/components',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConnectRoute = ConnectRouteImport.update({
@@ -129,7 +123,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
-  '/components': typeof ComponentsRoute
   '/connect': typeof ConnectRoute
   '/cosmetic': typeof CosmeticRoute
   '/crash-report': typeof CrashReportRoute
@@ -150,7 +143,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
-  '/components': typeof ComponentsRoute
   '/connect': typeof ConnectRoute
   '/cosmetic': typeof CosmeticRoute
   '/crash-report': typeof CrashReportRoute
@@ -172,7 +164,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
-  '/components': typeof ComponentsRoute
   '/connect': typeof ConnectRoute
   '/cosmetic': typeof CosmeticRoute
   '/crash-report': typeof CrashReportRoute
@@ -195,7 +186,6 @@ export interface FileRouteTypes {
     | '/'
     | '/builder'
     | '/butler'
-    | '/components'
     | '/connect'
     | '/cosmetic'
     | '/crash-report'
@@ -216,7 +206,6 @@ export interface FileRouteTypes {
     | '/'
     | '/builder'
     | '/butler'
-    | '/components'
     | '/connect'
     | '/cosmetic'
     | '/crash-report'
@@ -237,7 +226,6 @@ export interface FileRouteTypes {
     | '/'
     | '/builder'
     | '/butler'
-    | '/components'
     | '/connect'
     | '/cosmetic'
     | '/crash-report'
@@ -259,7 +247,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BuilderRoute: typeof BuilderRoute
   ButlerRoute: typeof ButlerRoute
-  ComponentsRoute: typeof ComponentsRoute
   ConnectRoute: typeof ConnectRoute
   CosmeticRoute: typeof CosmeticRoute
   CrashReportRoute: typeof CrashReportRoute
@@ -298,13 +285,6 @@ declare module '@tanstack/react-router' {
       path: '/butler'
       fullPath: '/butler'
       preLoaderRoute: typeof ButlerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/components': {
-      id: '/components'
-      path: '/components'
-      fullPath: '/components'
-      preLoaderRoute: typeof ComponentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/connect': {
@@ -419,7 +399,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BuilderRoute: BuilderRoute,
   ButlerRoute: ButlerRoute,
-  ComponentsRoute: ComponentsRoute,
   ConnectRoute: ConnectRoute,
   CosmeticRoute: CosmeticRoute,
   CrashReportRoute: CrashReportRoute,
@@ -439,13 +418,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
