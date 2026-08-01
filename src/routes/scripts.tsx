@@ -4,6 +4,7 @@ import { Code2, Play, Plus, Search, Terminal, Trash2, Undo2 } from "lucide-react
 import { AppShell } from "@/components/nexus/AppShell";
 import { Chip, IconBadge, Row } from "@/components/nexus/ui";
 import { cn } from "@/lib/utils";
+import { Coach } from "@/components/nexus/Coach";
 
 export const Route = createFileRoute("/scripts")({
   head: () => ({
@@ -38,13 +39,42 @@ const SEED: Script[] = [
 
 const FILTERS = ["all", "powershell", "python", "bash"] as const;
 
+const COACH = [
+  {
+    target: "scripts-search",
+    title: "find any script",
+    body: "Start typing and the library filters as you go — name or language, no exact spelling needed.",
+  },
+  {
+    target: "scripts-filters",
+    title: "filter by language",
+    body: "Tap a chip to narrow the library to PowerShell, Python or Bash in one press.",
+  },
+  {
+    target: "scripts-list",
+    title: "run or remove",
+    body: "Green play runs a script on your PC; red bin removes it from the library.",
+  },
+  {
+    target: "scripts-console",
+    title: "live output & undo",
+    body: "Output streams into this console, and undo restores anything you deleted by accident.",
+  },
+];
+
 function Scripts() {
   const [scripts, setScripts] = useState<Script[]>(SEED);
   const [trash, setTrash] = useState<{ item: Script; index: number }[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [out, setOut] = useState<string[]>(["> waiting for execution…"]);
+  const [query, setQuery] = useState("");
 
-  const visible = scripts.filter((s) => filter === "all" || s.lang === filter);
+  const q = query.trim().toLowerCase();
+  const visible = scripts.filter(
+    (s) =>
+      (filter === "all" || s.lang === filter) &&
+      (!q || s.name.toLowerCase().includes(q) || s.lang.includes(q)),
+  );
 
   const remove = useCallback((name: string) => {
     setScripts((list) => {
@@ -73,16 +103,39 @@ function Scripts() {
   }, []);
 
   return (
-    <AppShell title="SCRIPTS" subtitle="local automation library" accentLabel={`${scripts.length} loaded`} fill>
+    <AppShell title="SCRIPTS" subtitle="local automation library" accentLabel={`${visible.length}/${scripts.length}`} fill>
+      <Coach id="scripts-lib" steps={COACH} />
+
       <div className="shrink-0 space-y-3">
-        <div className="flex items-center gap-2 rounded-xl border border-dim bg-surface-2 px-3 py-2.5">
-          <Search size={16} className="text-faint" />
-          <span className="flex-1 text-sm text-muted-foreground">Search scripts…</span>
-          <IconBadge accent="cyan" size={30}>
-            <Plus size={14} />
-          </IconBadge>
+        <div
+          data-coach="scripts-search"
+          className="flex items-center gap-2 rounded-xl border border-dim bg-surface-2 px-3 py-2 focus-within:border-cyan/55"
+        >
+          <Search size={16} className="shrink-0 text-faint" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search scripts…"
+            aria-label="Search scripts"
+            className="min-w-0 flex-1 bg-transparent py-1.5 text-sm outline-none placeholder:text-faint"
+          />
+          {query ? (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => setQuery("")}
+              className="press label-mono shrink-0 rounded-md border border-dim bg-surface-3 px-2 py-1 text-[10px] text-faint"
+            >
+              clear
+            </button>
+          ) : null}
+          <button type="button" aria-label="Add script" className="press shrink-0">
+            <IconBadge accent="cyan" size={30}>
+              <Plus size={14} />
+            </IconBadge>
+          </button>
         </div>
-        <div className="scroll-x -mx-4 flex gap-2 px-4 sm:-mx-6 sm:px-6">
+        <div data-coach="scripts-filters" className="scroll-x -mx-4 flex gap-2 px-4 sm:-mx-6 sm:px-6">
           {FILTERS.map((f) => (
             <button key={f} type="button" onClick={() => setFilter(f)} className="press shrink-0">
               <span className={cn(filter === f ? "" : "opacity-55")}>
@@ -96,7 +149,7 @@ function Scripts() {
       </div>
 
       {/* library — the only scrolling region */}
-      <div className="scroll-y min-h-0 flex-1 space-y-2 pr-0.5">
+      <div data-coach="scripts-list" className="scroll-y min-h-0 flex-1 space-y-2 pr-0.5">
         {visible.map((s) => (
           <Row
             key={s.name}
@@ -131,13 +184,13 @@ function Scripts() {
         ))}
         {visible.length === 0 ? (
           <p className="rounded-xl border border-dashed border-dim/70 p-6 text-center text-xs text-muted-foreground">
-            No scripts match this filter.
+            {q ? `Nothing matches “${query}”.` : "No scripts match this filter."}
           </p>
         ) : null}
       </div>
 
       {/* console + undo — pinned, no page scroll */}
-      <div className="shrink-0 space-y-2">
+      <div data-coach="scripts-console" className="shrink-0 space-y-2">
         <div className="rounded-xl border border-dim/60 bg-surface-2 p-3">
           <div className="flex items-center gap-2">
             <Terminal size={14} className="text-system" />

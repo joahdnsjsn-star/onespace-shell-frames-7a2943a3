@@ -30,7 +30,9 @@ import {
   MessageSquareQuote,
   Mic,
   Sparkles,
+  Lightbulb,
 } from "lucide-react";
+import { resetCoach } from "@/components/nexus/Coach";
 import { AppShell } from "@/components/nexus/AppShell";
 import { notifyPrefsChanged } from "@/components/nexus/PreferenceBridge";
 import { PerfReadout } from "@/components/nexus/PerfGuard";
@@ -923,6 +925,9 @@ function Settings() {
           >
             <RotateCcw size={16} /> Replay tutorial
           </Link>
+          <ActionButton variant="ghost" className="w-full" onClick={() => resetCoach()}>
+            <Lightbulb size={16} /> Show first-time tips again
+          </ActionButton>
           <ActionButton variant="danger" className="w-full" onClick={erase} disabled={erased}>
             <Trash2 size={16} /> {erased ? "Erasing…" : "Erase local data"}
           </ActionButton>

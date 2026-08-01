@@ -51,7 +51,7 @@ export function TabBar({ onOpenPages }: { onOpenPages: () => void }) {
   const item =
     "group press flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-faint hover:bg-surface-3/60 hover:text-cyan";
   return (
-    <nav className="sticky bottom-0 z-30 border-t border-dim/70 glass hull-plate pb-[env(safe-area-inset-bottom)]">
+    <nav data-coach="nav-bar" className="sticky bottom-0 z-30 border-t border-dim/70 glass hull-plate pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-stretch gap-1 px-2 py-2">
         {PRIMARY.map((t) => (
           <Link
