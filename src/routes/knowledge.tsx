@@ -345,11 +345,28 @@ function RecallTab({ total }: { total: number }) {
           body="Type at least two characters. Results come straight from your PC's local index — no cloud search."
         />
       ) : hits.length === 0 ? (
-        <EmptyState
-          icon={<Search className="size-7" />}
-          title="no matches"
-          body="Nothing indexed for that yet. Queue the topic in SOURCES and Butler will go learn it."
-        />
+        <Card className="space-y-3">
+          <EmptyState
+            icon={<Search className="size-7" />}
+            title="no matches"
+            body="Nothing indexed for that yet — Butler can go and learn it right now."
+          />
+          <ActionButton
+            className="w-full"
+            disabled={teaching}
+            onClick={() => {
+              setTeaching(true);
+              void expandTopic(q)
+                .then(() => setErr(""))
+                .catch((e: Error) => setErr(e?.message ?? "Could not queue that topic."))
+                .finally(() => setTeaching(false));
+            }}
+          >
+            {teaching ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />} teach Butler “
+            {q.trim().slice(0, 22)}”
+          </ActionButton>
+        </Card>
+
       ) : (
         <ul className="space-y-2">
           {hits.map((h, i) => (
