@@ -77,16 +77,9 @@ export function AppShell({
       <BackdropFX />
       <header className="sticky top-0 z-20 border-b border-dim/70 glass pt-[env(safe-area-inset-top)]">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 px-4 py-3 sm:px-6">
-          <NexusLogo size={28} className="press" />
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="size-2 shrink-0 rounded-full bg-ok pulse-dot" aria-hidden />
-              <h1 className="truncate font-mono text-fluid-lg font-bold tracking-[0.12em]">{title}</h1>
-            </div>
-            {subtitle ? (
-              <p className="mt-1 truncate text-fluid-xs leading-snug text-muted-foreground">{subtitle}</p>
-            ) : null}
-          </div>
+          <NexusLogo size={30} className="press" status={offline ? "offline" : "online"} />
+          <AnimatedTitle title={title} subtitle={subtitle} online={!offline} />
+
           <div className="flex shrink-0 items-center gap-2">
             {accentLabel ? <Chip accent="cyan">{accentLabel}</Chip> : null}
             <button
