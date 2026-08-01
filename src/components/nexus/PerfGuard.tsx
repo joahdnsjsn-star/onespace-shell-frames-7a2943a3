@@ -17,6 +17,10 @@ export function PerfGuard() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const lastReason = useRef<string | null>(null);
   const lastHost = useRef(0);
+  // The governor can flip tiers many times while a heavy page settles. Users
+  // only need to be told once per app session, so the notice is one-shot and
+  // "effects restored" never interrupts at all.
+  const perfNoticeShown = useRef(false);
 
   useEffect(() => startPerfGovernor(), []);
 
@@ -26,20 +30,20 @@ export function PerfGuard() {
     window.setTimeout(() => setToasts((prev) => prev.filter((x) => x.id !== id)), 6000);
   };
 
-  // Automatic quality changes.
+  // Automatic quality changes — announced once, quietly.
   useEffect(() => {
     if (!perf.reason || perf.reason === lastReason.current) return;
     lastReason.current = perf.reason;
-    if (perf.mode !== "auto") return;
+    if (perf.mode !== "auto" || !perf.degraded) return;
+    if (perfNoticeShown.current) return;
+    perfNoticeShown.current = true;
     push({
       kind: "perf",
-      title: perf.degraded ? "Performance mode engaged" : "Full effects restored",
-      body: perf.degraded
-        ? `${perf.reason} — visual effects reduced to keep things smooth.`
-        : "Frame rate is healthy again.",
+      title: "Performance mode engaged",
+      body: `${perf.reason} — visual effects reduced to keep things smooth.`,
     });
     haptic("tap");
-    if (perf.degraded && voicePrefs.alerts()) {
+    if (voicePrefs.alerts()) {
       butlerSay("Frames were dropping, so I trimmed the heavy effects to keep things smooth.", {
         tone: "warn",
         label: "AUTO-TUNED",
@@ -53,7 +57,8 @@ export function PerfGuard() {
       const detail = (e as CustomEvent<HostAlert>).detail;
       if (!detail) return;
       const now = Date.now();
-      if (now - lastHost.current < 20_000) return;
+      // One host-pressure warning every five minutes at most.
+      if (now - lastHost.current < 300_000) return;
       lastHost.current = now;
       push({
         kind: "host",
