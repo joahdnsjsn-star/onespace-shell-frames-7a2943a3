@@ -3,6 +3,7 @@ import { Activity, Cpu, Gauge, X } from "lucide-react";
 import { startPerfGovernor } from "@/lib/perf";
 import { usePerf, type HostAlert } from "@/hooks/usePerf";
 import { haptic } from "@/lib/haptics";
+import { butlerSay, voicePrefs } from "@/lib/voice";
 
 type Toast = { id: number; title: string; body: string; kind: "perf" | "host" };
 
@@ -38,6 +39,12 @@ export function PerfGuard() {
         : "Frame rate is healthy again.",
     });
     haptic("tap");
+    if (perf.degraded && voicePrefs.alerts()) {
+      butlerSay("Frames were dropping, so I trimmed the heavy effects to keep things smooth.", {
+        tone: "warn",
+        label: "AUTO-TUNED",
+      });
+    }
   }, [perf.reason, perf.degraded, perf.mode]);
 
   // Host-side load warnings raised by any page.
