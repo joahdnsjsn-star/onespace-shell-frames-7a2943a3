@@ -31,18 +31,21 @@ export const TABS = [
 
 export function TabBar() {
   return (
-    <nav className="sticky bottom-0 z-20 border-t border-dim bg-surface/95 backdrop-blur">
+    <nav className="sticky bottom-0 z-20 border-t border-dim/70 glass pb-[env(safe-area-inset-bottom)]">
       <div className="flex gap-1 overflow-x-auto px-2 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {TABS.map((t) => (
           <Link
             key={t.to}
             to={t.to}
-            className="group flex min-w-16 shrink-0 flex-col items-center gap-1 rounded-lg px-2 py-1.5 text-faint transition-colors hover:text-cyan"
+            className="group press flex min-w-16 shrink-0 flex-col items-center gap-1 rounded-xl px-2 py-2 text-faint hover:bg-surface-3/60 hover:text-cyan"
             activeOptions={{ exact: t.to === "/" }}
-            activeProps={{ className: "bg-cyan/10 text-cyan" }}
+            activeProps={{
+              className:
+                "bg-cyan/12 text-cyan shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--cyan)_28%,transparent)]",
+            }}
           >
-            <t.icon size={20} strokeWidth={1.6} />
-            <span className="label-mono text-[9px]">{t.label}</span>
+            <t.icon size={19} strokeWidth={1.7} className="transition-transform duration-200 group-hover:-translate-y-0.5" />
+            <span className="label-mono text-[9px] leading-none">{t.label}</span>
           </Link>
         ))}
       </div>
@@ -65,15 +68,15 @@ export function AppShell({
 }) {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col bg-background">
-      <header className="sticky top-0 z-20 border-b border-dim bg-surface/95 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-dim/70 glass pt-[env(safe-area-inset-top)]">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="size-2 rounded-full bg-ok pulse-dot" aria-hidden />
-              <h1 className="truncate font-mono text-base font-bold tracking-widest">{title}</h1>
+              <h1 className="truncate font-mono text-base font-bold tracking-[0.14em]">{title}</h1>
             </div>
             {subtitle ? (
-              <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{subtitle}</p>
+              <p className="mt-1 truncate text-xs leading-snug text-muted-foreground">{subtitle}</p>
             ) : null}
           </div>
           {accentLabel ? <Chip accent="cyan">{accentLabel}</Chip> : null}
@@ -82,7 +85,12 @@ export function AppShell({
 
       </header>
 
-      <main className={cn("flex-1 space-y-5 nexus-grid px-4 pb-8 pt-5")}>{children}</main>
+      <main
+        key={title}
+        className={cn("rise-in flex-1 space-y-6 nexus-grid px-4 pb-10 pt-6")}
+      >
+        {children}
+      </main>
 
       <TabBar />
     </div>
