@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import mascot from "@/assets/butler-mascot.png.asset.json";
+import { fx } from "@/lib/fx";
 import { cn } from "@/lib/utils";
 
 /**
@@ -56,6 +57,7 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
+    fx.boot();
     const timers: ReturnType<typeof setTimeout>[] = [];
     LINES.forEach((_, i) => timers.push(setTimeout(() => setStep(i + 1), 260 + i * 240)));
     timers.push(setTimeout(() => setLeaving(true), 260 + LINES.length * 240 + 220));
