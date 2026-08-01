@@ -73,10 +73,6 @@ fail the same way — fix it before importing.
 **Expected:** OnSpace detects a Vite + TanStack Start project and pre-fills the
 build settings below.
 
-If the native preview shows `Error: No routes found` from `ContextNavigator`,
-sync the latest `main` branch first. This repo includes a minimal Expo Router
-fallback under `/app` so native previews never boot with an empty route tree.
-
 ---
 
 ## 5. Build settings
