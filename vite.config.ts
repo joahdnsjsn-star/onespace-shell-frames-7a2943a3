@@ -11,6 +11,10 @@ const nitroPreset = process.env["NITRO_PRESET"] ?? "cloudflare-module";
 export default defineConfig({
   nitro: {
     preset: nitroPreset,
+    output: {
+      dir: "dist",
+      publicDir: "dist/client",
+    },
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
