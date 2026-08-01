@@ -58,6 +58,11 @@ let snap: LinkSnapshot = {
   attempts: 0,
   lastOkAt: 0,
   message: "Not paired yet.",
+  cpu: 0,
+  ram: 0,
+  model: "",
+  serverVersion: "",
+  kbTotal: 0,
 };
 
 const listeners = new Set<() => void>();
