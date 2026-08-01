@@ -29,6 +29,7 @@ import {
   type KbHit,
   type KbPoint,
 } from "./butler-bridge";
+import { recordGrowth, trackTotal } from "./kb-growth";
 import { log } from "./logger";
 import { vaultGet, vaultPeek, vaultSet } from "./vault";
 
