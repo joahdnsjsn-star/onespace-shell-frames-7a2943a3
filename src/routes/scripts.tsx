@@ -1,10 +1,13 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Code2, Play, Plus, Search, Terminal, Trash2, Undo2 } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
 import { Chip, IconBadge, Row } from "@/components/nexus/ui";
 import { cn } from "@/lib/utils";
 import { Coach } from "@/components/nexus/Coach";
+import { fx } from "@/lib/fx";
+import { useBridge } from "@/lib/useBridge";
+import { BridgeError, fetchLibrary, runScript, undoRun, type LibraryScript } from "@/lib/butler-bridge";
 
 export const Route = createFileRoute("/scripts")({
   head: () => ({
@@ -26,67 +29,96 @@ export const Route = createFileRoute("/scripts")({
   component: Scripts,
 });
 
-type Script = { name: string; lang: string; accent: "system" | "cyan" | "neural" | "net" };
+const FILTERS = ["all", "system", "files", "media", "network"] as const;
 
-const SEED: Script[] = [
-  { name: "backup_docs.ps1", lang: "powershell", accent: "system" },
-  { name: "clean_temp.sh", lang: "bash", accent: "cyan" },
-  { name: "render_queue.py", lang: "python", accent: "neural" },
-  { name: "wake_nas.ps1", lang: "powershell", accent: "net" },
-  { name: "sync_photos.py", lang: "python", accent: "neural" },
-  { name: "restart_spooler.ps1", lang: "powershell", accent: "system" },
-];
-
-const FILTERS = ["all", "powershell", "python", "bash"] as const;
+const ACCENTS = ["system", "cyan", "neural", "net"] as const;
+const accentFor = (id: string) =>
+  ACCENTS[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % ACCENTS.length]!;
 
 const COACH = [
   {
     target: "scripts-search",
     title: "find any script",
-    body: "Start typing and the library filters as you go — name or language, no exact spelling needed.",
+    body: "Start typing and your PC's library filters as you go — name, tag or category.",
   },
   {
     target: "scripts-filters",
-    title: "filter by language",
-    body: "Tap a chip to narrow the library to PowerShell, Python or Bash in one press.",
+    title: "filter by category",
+    body: "Tap a chip to narrow the library in one press.",
   },
   {
     target: "scripts-list",
-    title: "run or remove",
-    body: "Green play runs a script on your PC; red bin removes it from the library.",
+    title: "run or hide",
+    body: "Green play runs the script on your paired PC; red bin hides it from this list.",
   },
   {
     target: "scripts-console",
     title: "live output & undo",
-    body: "Output streams into this console, and undo restores anything you deleted by accident.",
+    body: "Output lands in this console. Undo rolls back the last run, or restores a hidden script.",
   },
 ];
 
 function Scripts() {
-  const [scripts, setScripts] = useState<Script[]>(SEED);
-  const [trash, setTrash] = useState<{ item: Script; index: number }[]>([]);
+  const { status, paired } = useBridge();
+  const [scripts, setScripts] = useState<LibraryScript[]>([]);
+  const [hidden, setHidden] = useState<{ item: LibraryScript; index: number }[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [out, setOut] = useState<string[]>(["> waiting for execution…"]);
   const [query, setQuery] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [lastUndoId, setLastUndoId] = useState<string | null>(null);
+
+  const log = useCallback((...lines: string[]) => {
+    setOut((o) => [...o, ...lines].slice(-80));
+  }, []);
+
+  // Pull the real library from the PC whenever the link comes up.
+  useEffect(() => {
+    if (status !== "online") return;
+    let alive = true;
+    void fetchLibrary()
+      .then((list) => {
+        if (alive) setScripts(list);
+      })
+      .catch((err: unknown) => {
+        if (alive) log(`! library unavailable: ${(err as Error).message}`);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [log, status]);
 
   const q = query.trim().toLowerCase();
   const visible = scripts.filter(
     (s) =>
-      (filter === "all" || s.lang === filter) &&
-      (!q || s.name.toLowerCase().includes(q) || s.lang.includes(q)),
+      (filter === "all" || s.category.toLowerCase().includes(filter)) &&
+      (!q ||
+        s.name.toLowerCase().includes(q) ||
+        s.desc.toLowerCase().includes(q) ||
+        s.tags.some((t) => t.toLowerCase().includes(q))),
   );
 
-  const remove = useCallback((name: string) => {
+  const remove = useCallback((id: string) => {
     setScripts((list) => {
-      const index = list.findIndex((s) => s.name === name);
+      const index = list.findIndex((s) => s.id === id);
       if (index < 0) return list;
-      setTrash((t) => [...t, { item: list[index]!, index }]);
+      setHidden((t) => [...t, { item: list[index]!, index }]);
       return list.filter((_, i) => i !== index);
     });
   }, []);
 
   const undo = useCallback(() => {
-    setTrash((t) => {
+    // Rolling back a real run always wins over un-hiding a row.
+    if (lastUndoId) {
+      const id = lastUndoId;
+      setLastUndoId(null);
+      log(`> undo ${id}`);
+      void undoRun(id)
+        .then((r) => log(r.output || (r.ok ? "  rolled back" : "  undo refused")))
+        .catch((err: unknown) => log(`! ${(err as Error).message}`));
+      return;
+    }
+    setHidden((t) => {
       const last = t[t.length - 1];
       if (!last) return t;
       setScripts((list) => {
@@ -96,11 +128,31 @@ function Scripts() {
       });
       return t.slice(0, -1);
     });
-  }, []);
+  }, [lastUndoId, log]);
 
-  const run = useCallback((name: string) => {
-    setOut((o) => [...o.slice(-40), `> run ${name}`, "  simulated — no host attached"]);
-  }, []);
+  const run = useCallback(
+    (s: LibraryScript) => {
+      if (busy) return;
+      fx.tap();
+      setBusy(s.id);
+      log(`> run ${s.name}`);
+      void runScript(s.id)
+        .then((r) => {
+          log(r.output || (r.ok ? "  done" : "  failed"));
+          setLastUndoId(r.undoId ?? null);
+        })
+        .catch((err: unknown) => {
+          const message =
+            err instanceof BridgeError && err.code === "no-config"
+              ? "  no PC paired — open the LINK page first"
+              : `! ${(err as Error).message}`;
+          log(message);
+        })
+        .finally(() => setBusy(null));
+    },
+    [busy, log],
+  );
+
 
   return (
     <AppShell title="SCRIPTS" subtitle="local automation library" accentLabel={`${visible.length}/${scripts.length}`} fill>
@@ -139,7 +191,7 @@ function Scripts() {
           {FILTERS.map((f) => (
             <button key={f} type="button" onClick={() => setFilter(f)} className="press shrink-0">
               <span className={cn(filter === f ? "" : "opacity-55")}>
-                <Chip accent={f === "all" ? "cyan" : f === "python" ? "neural" : f === "bash" ? "net" : "system"}>
+                <Chip accent={f === "all" ? "cyan" : f === "media" ? "neural" : f === "network" ? "net" : "system"}>
                   {f}
                 </Chip>
               </span>
@@ -152,11 +204,11 @@ function Scripts() {
       <div data-coach="scripts-list" className="scroll-y min-h-0 flex-1 space-y-2 pr-0.5">
         {visible.map((s) => (
           <Row
-            key={s.name}
+            key={s.id}
             title={<span className="font-mono">{s.name}</span>}
-            sub={`${s.lang} · never run`}
+            sub={s.desc || s.category}
             left={
-              <IconBadge accent={s.accent} size={34}>
+              <IconBadge accent={accentFor(s.id)} size={34}>
                 <Code2 size={16} />
               </IconBadge>
             }
@@ -164,8 +216,8 @@ function Scripts() {
               <span className="flex items-center gap-2">
                 <button
                   type="button"
-                  aria-label={`Delete ${s.name}`}
-                  onClick={() => remove(s.name)}
+                  aria-label={`Hide ${s.name}`}
+                  onClick={() => remove(s.id)}
                   className="press grid size-8 place-items-center rounded-lg border border-danger/35 bg-danger/10 text-danger"
                 >
                   <Trash2 size={13} />
@@ -173,8 +225,9 @@ function Scripts() {
                 <button
                   type="button"
                   aria-label={`Run ${s.name}`}
-                  onClick={() => run(s.name)}
-                  className="press grid size-8 place-items-center rounded-lg border border-cyan/40 bg-cyan/10 text-cyan"
+                  onClick={() => run(s)}
+                  disabled={busy !== null}
+                  className="press grid size-8 place-items-center rounded-lg border border-cyan/40 bg-cyan/10 text-cyan disabled:opacity-40"
                 >
                   <Play size={13} />
                 </button>
@@ -184,7 +237,13 @@ function Scripts() {
         ))}
         {visible.length === 0 ? (
           <p className="rounded-xl border border-dashed border-dim/70 p-6 text-center text-xs text-muted-foreground">
-            {q ? `Nothing matches “${query}”.` : "No scripts match this filter."}
+            {!paired
+              ? "No PC paired yet — open the LINK page and scan the QR from butler_server.py."
+              : status !== "online"
+                ? "Bridge offline. Start butler_server.py on your PC and stay on the same Wi-Fi."
+                : q
+                  ? `Nothing matches “${query}”.`
+                  : "No scripts match this filter."}
           </p>
         ) : null}
       </div>
@@ -202,13 +261,13 @@ function Scripts() {
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <Chip accent="warn" dot>
-            {trash.length ? `${trash.length} removed` : "library synced"}
+          <Chip accent={busy ? "warn" : status === "online" ? "ok" : "danger"} dot>
+            {busy ? "running…" : status === "online" ? `${scripts.length} scripts synced` : "bridge offline"}
           </Chip>
           <button
             type="button"
             onClick={undo}
-            disabled={!trash.length}
+            disabled={!hidden.length && !lastUndoId}
             className="press inline-flex items-center gap-1.5 rounded-lg border border-warn/40 bg-warn/12 px-3 py-1.5 label-mono text-[10px] text-warn disabled:opacity-40"
           >
             <Undo2 size={12} /> undo

@@ -1,10 +1,14 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Bot, Paperclip, SendHorizonal, Undo2, User, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
 import { Chip, IconBadge } from "@/components/nexus/ui";
 import { Coach } from "@/components/nexus/Coach";
 import { fx } from "@/lib/fx";
+import { askButler, BridgeError } from "@/lib/butler-bridge";
+import { useBridge } from "@/lib/useBridge";
+import { vaultGet, vaultSet } from "@/lib/vault";
+
 
 export const Route = createFileRoute("/butler")({
   head: () => ({
@@ -54,51 +58,94 @@ const COACH = [
 
 type Msg = { id: number; role: "user" | "bot"; text: string };
 
-const SEED: Msg[] = [
-  {
-    id: 1,
-    role: "bot",
-    text: "Bridge connected. Ask me anything about this machine — I run locally and never leave your LAN.",
-  },
-  { id: 2, role: "user", text: "What's eating my memory right now?" },
-  {
-    id: 3,
-    role: "bot",
-    text: "Top consumer is chrome.exe at 3.4 GB across 14 renderer processes, then Photoshop at 1.9 GB.",
-  },
-];
+const GREETING: Msg = {
+  id: 1,
+  role: "bot",
+  text: "Butler here. Pair your PC on the LINK page and I answer from the model running on your own machine — nothing leaves your network.",
+};
+
+const TRANSCRIPT_KEY = "butler.transcript";
+const MAX_REMEMBERED = 60;
 
 function Butler() {
-  const [msgs, setMsgs] = useState<Msg[]>(SEED);
+  const [msgs, setMsgs] = useState<Msg[]>([GREETING]);
   const [undone, setUndone] = useState<Msg[]>([]);
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState("");
   const idRef = useRef(100);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const { status, paired } = useBridge();
 
-  const push = useCallback((text: string) => {
-    if (!text.trim()) return;
-    fx.tap();
-    const mine: Msg = { id: ++idRef.current, role: "user", text: text.trim() };
-    setMsgs((m) => [...m, mine]);
-    setUndone([]);
-    setDraft("");
-    setTyping(true);
-    window.setTimeout(() => {
-      setMsgs((m) => [
-        ...m,
-        {
-          id: ++idRef.current,
-          role: "bot",
-          text: "Shell offline — this build is a visual prototype, so responses are simulated.",
-        },
-      ]);
-      setTyping(false);
-      requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: "smooth" }));
-    }, 700);
-    requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: "smooth" }));
+  // Restore the encrypted transcript so Butler remembers the conversation.
+  useEffect(() => {
+    let alive = true;
+    void vaultGet<Msg[]>(TRANSCRIPT_KEY, []).then((saved) => {
+      if (!alive || !saved.length) return;
+      idRef.current = Math.max(100, ...saved.map((m) => m.id));
+      setMsgs([GREETING, ...saved]);
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
+
+  const remember = useCallback((next: Msg[]) => {
+    void vaultSet(TRANSCRIPT_KEY, next.filter((m) => m.id !== GREETING.id).slice(-MAX_REMEMBERED));
+  }, []);
+
+  const push = useCallback(
+    (text: string) => {
+      const clean = text.trim().slice(0, 4000);
+      if (!clean || typing) return;
+      fx.tap();
+      const mine: Msg = { id: ++idRef.current, role: "user", text: clean };
+      const history = msgs
+        .filter((m) => m.id !== GREETING.id)
+        .slice(-12)
+        .map((m) => ({ role: m.role === "bot" ? ("assistant" as const) : ("user" as const), content: m.text }));
+
+      setMsgs((m) => {
+        const next = [...m, mine];
+        remember(next);
+        return next;
+      });
+      setUndone([]);
+      setDraft("");
+      setTyping(true);
+      requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: "smooth" }));
+
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      void askButler(clean, history, controller.signal)
+        .then((reply) => {
+          setMsgs((m) => {
+            const next = [...m, { id: ++idRef.current, role: "bot" as const, text: reply.text }];
+            remember(next);
+            return next;
+          });
+        })
+        .catch((err: unknown) => {
+          const message =
+            err instanceof BridgeError
+              ? err.code === "no-config"
+                ? "No PC paired yet. Open the LINK page and scan the QR code shown by butler_server.py."
+                : err.message
+              : "Something went wrong talking to your PC.";
+          setMsgs((m) => [...m, { id: ++idRef.current, role: "bot" as const, text: message }]);
+        })
+        .finally(() => {
+          setTyping(false);
+          requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: "smooth" }));
+        });
+    },
+    [msgs, remember, typing],
+  );
+
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   const undo = useCallback(() => {
     setMsgs((m) => {
@@ -112,15 +159,21 @@ function Butler() {
         trailing.unshift(next.pop()!);
       }
       setUndone(trailing);
+      remember(next);
       return next;
     });
-  }, []);
+  }, [remember]);
 
   const redo = useCallback(() => {
     if (!undone.length) return;
-    setMsgs((m) => [...m, ...undone]);
+    setMsgs((m) => {
+      const next = [...m, ...undone];
+      remember(next);
+      return next;
+    });
     setUndone([]);
-  }, [undone]);
+  }, [remember, undone]);
+
 
   return (
     <AppShell title="BUTLER" subtitle="neural command interface" accentLabel="ai ready" fill>
@@ -233,9 +286,16 @@ function Butler() {
         </div>
 
         <div data-coach="chat-undo" className="flex items-center justify-between gap-2">
-          <Chip accent={typing ? "warn" : "ok"} dot>
-            {typing ? "thinking" : "bridge idle"}
+          <Chip accent={typing ? "warn" : status === "online" ? "ok" : paired ? "warn" : "danger"} dot>
+            {typing
+              ? "thinking"
+              : status === "online"
+                ? "bridge online"
+                : paired
+                  ? "bridge offline"
+                  : "no pc paired"}
           </Chip>
+
           <div className="flex gap-2">
             {undone.length ? (
               <button
