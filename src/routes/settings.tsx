@@ -663,6 +663,14 @@ function Settings() {
       <section>
         <SectionHeader title="permissions" hint="All revocable, all local" accent="warn" />
         <div className="space-y-2">
+          <Link to="/permissions" className="block">
+            <Row
+              left={<IconBadge accent="ok"><ShieldCheck size={14} /></IconBadge>}
+              title="Permission centre"
+              sub="Live status, reasons, fallbacks and the build-time block list"
+              right={<ChevronRight size={16} className="text-muted-foreground" />}
+            />
+          </Link>
           <SwitchRow
             id="perm.camera"
             title="Camera"
