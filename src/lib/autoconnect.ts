@@ -35,6 +35,12 @@ export type LinkSnapshot = {
   attempts: number;
   lastOkAt: number;
   message: string;
+  /** PC vitals, refreshed on a slower cadence than the heartbeat. */
+  cpu: number;
+  ram: number;
+  model: string;
+  serverVersion: string;
+  kbTotal: number;
 };
 
 const BACKOFF = [2_000, 5_000, 10_000, 20_000, 40_000, 60_000];
