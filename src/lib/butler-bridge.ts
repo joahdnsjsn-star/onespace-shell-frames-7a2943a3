@@ -20,10 +20,21 @@ export type BridgeConfig = {
   baseUrl: string;
   token: string;
   deviceId: string;
+  /**
+   * `X-Butler-App-Sig` — the per-PC client secret handed out by the server in
+   * the QR payload / pair response. `butler_server.py` derives it from that
+   * machine's HMAC secret and rejects (403 INVALID_APP_SIG) any request that
+   * does not carry it once the server is locked to a device.
+   */
+  appSig: string;
+  pairedAt: number;
 };
 
 const CFG_KEY = "bridge.config";
-const DEFAULTS: BridgeConfig = { baseUrl: "", token: "", deviceId: "" };
+const DEFAULTS: BridgeConfig = { baseUrl: "", token: "", deviceId: "", appSig: "", pairedAt: 0 };
+
+/** Sent on every request so the PC can tell app builds apart in its audit log. */
+export const APP_VERSION = "5.0.9";
 
 export type BridgeStatus = "idle" | "connecting" | "online" | "offline" | "unauthorized";
 
