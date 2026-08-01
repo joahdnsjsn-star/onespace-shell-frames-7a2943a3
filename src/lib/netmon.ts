@@ -237,7 +237,7 @@ class NetworkMonitorService {
   connectOk(ip: string, port: string, ms: number) { this.log("CONNECT_OK", true, { ip, port, ms }); }
   connectFail(ip: string, port: string, error: string) { this.log("CONNECT_FAIL", false, { ip, port, error }); }
   pingOk(ip: string, port: string, ms: number) { this.log("PING_OK", true, { ip, port, ms }); }
-  pingFail(ip: string, port: string, error?: string) { this.log("PING_FAIL", false, { ip, port, error }); }
+  pingFail(ip: string, port: string, error?: string) { this.log("PING_FAIL", false, { ip, port, ...(error ? { error } : {}) }); }
   scanStart() { this.log("SCAN_START", true, {}); }
   scanFound(ip: string, port: string, ms: number) { this.log("SCAN_FOUND", true, { ip, port, ms }); }
   scanEmpty() { this.log("SCAN_EMPTY", false, {}); }
