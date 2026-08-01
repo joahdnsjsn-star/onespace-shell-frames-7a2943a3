@@ -29,6 +29,9 @@ import {
   subscribeBridge,
 } from "./butler-bridge";
 import { rememberGoodHost, scanLan } from "./discovery";
+import { networkMonitor } from "./netmon";
+import { neuralTripwire } from "./tripwire";
+import { features } from "./server-features";
 import { log } from "./logger";
 
 export type EngineState = "idle" | "connecting" | "online" | "offline" | "discovering";
@@ -116,6 +119,16 @@ function recompute() {
   return { latencyMs: Math.round(avg), jitterMs: jitter, loss, quality };
 }
 
+/** Split a bridge URL into host/port for the network monitor. */
+function endpoint(baseUrl: string): { ip: string; port: string } {
+  try {
+    const u = new URL(baseUrl);
+    return { ip: u.hostname, port: u.port || "80" };
+  } catch {
+    return { ip: baseUrl, port: "" };
+  }
+}
+
 function record(latency: number) {
   samples.push(latency);
   if (samples.length > SAMPLES) samples.shift();
@@ -140,10 +153,15 @@ async function rediscover(): Promise<boolean> {
   if (Date.now() - lastSweep < SWEEP_COOLDOWN) return false;
   lastSweep = Date.now();
   set({ state: "discovering", message: "Searching your network for the server…" });
+  networkMonitor.scanStart();
   try {
     const hosts = await scanLan(() => undefined);
     const best = hosts[0];
-    if (!best) return false;
+    if (!best) {
+      networkMonitor.scanEmpty();
+      return false;
+    }
+    networkMonitor.scanFound(best.ip, String(best.port), best.latencyMs ?? 0);
     const baseUrl = `http://${best.ip}:${best.port}`;
     await saveBridge({ baseUrl });
     await rememberGoodHost(baseUrl);
@@ -165,6 +183,7 @@ async function refreshVitals(): Promise<void> {
     serverMetrics().catch(() => null),
     statusFull().catch(() => null),
   ]);
+  if (status) features.setFromStatus(status as unknown as Record<string, unknown>);
   if (!metrics && !status) return;
   set({
     ...(metrics ? { cpu: Math.round(metrics.cpu), ram: Math.round(metrics.ram) } : {}),
@@ -193,6 +212,11 @@ async function tick(): Promise<void> {
     const health = await checkHealth();
     const ms = Math.round(performance.now() - t0);
     record(ms);
+    {
+      const { ip, port } = endpoint(cfg.baseUrl);
+      networkMonitor.pingOk(ip, port, ms);
+      neuralTripwire.recordLatency(ms, ip, port);
+    }
     failStreak = 0;
     set({
       state: "online",
@@ -205,6 +229,10 @@ async function tick(): Promise<void> {
     schedule(OK_INTERVAL);
   } catch (err) {
     record(-1);
+    {
+      const { ip, port } = endpoint(cfg.baseUrl);
+      networkMonitor.pingFail(ip, port, (err as Error).message);
+    }
     failStreak += 1;
     const wait = BACKOFF[Math.min(failStreak - 1, BACKOFF.length - 1)] ?? 60_000;
     set({
