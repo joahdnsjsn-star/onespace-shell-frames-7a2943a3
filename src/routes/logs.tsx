@@ -9,7 +9,6 @@ import {
   clearLogs,
   downloadBundle,
   getLogs,
-  logCounts,
   subscribeLogs,
   type LogChannel,
   type LogEntry,
