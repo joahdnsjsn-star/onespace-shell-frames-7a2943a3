@@ -115,7 +115,7 @@ export function AnimatedTitle({
   online = true,
 }: {
   title: string;
-  subtitle?: string;
+  subtitle?: string | undefined;
   online?: boolean;
 }) {
   return (
