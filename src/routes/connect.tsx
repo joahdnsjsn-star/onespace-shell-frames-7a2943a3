@@ -12,6 +12,7 @@ import {
 import { parseConnection, rememberGoodHost, scanLan, toBaseUrl, type FoundHost, type ScanProgress } from "@/lib/discovery";
 import { useBridge } from "@/lib/useBridge";
 import serverAsset from "@/assets/butler_server.py.asset.json";
+import { QrScanner } from "@/components/nexus/QrScanner";
 import { fx } from "@/lib/fx";
 import { AppShell } from "@/components/nexus/AppShell";
 import { Card, Chip, IconBadge, Row, SectionHeader, StatTile, ActionButton } from "@/components/nexus/ui";
@@ -170,6 +171,7 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
   const [paste, setPaste] = useState("");
+  const [scanOpen, setScanOpen] = useState(false);
 
   useEffect(() => {
     void loadBridge().then((cfg) => {
@@ -234,8 +236,21 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
         </Chip>
       </div>
 
+      <QrScanner open={scanOpen} onClose={() => setScanOpen(false)} onResult={importText} />
+
+      <button
+        type="button"
+        onClick={() => {
+          fx.tap();
+          setScanOpen(true);
+        }}
+        className="press flex w-full items-center justify-center gap-2 rounded-xl border border-cyan/45 bg-cyan/12 px-3 py-2.5 label-mono text-[11px] text-cyan"
+      >
+        <QrCode size={14} /> scan pairing qr
+      </button>
+
       <label className="block space-y-1">
-        <span className="label-mono text-[10px] text-faint">paste qr / terminal line</span>
+        <span className="label-mono text-[10px] text-faint">or paste qr / terminal line</span>
         <div className="flex gap-2">
           <input
             value={paste}
