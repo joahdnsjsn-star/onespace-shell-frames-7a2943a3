@@ -221,7 +221,7 @@ export async function scanLan(
 
   found.sort((a, b) => a.latencyMs - b.latencyMs);
   const best = found[0];
-  if (best) await vaultSet<LastGood>(LAST_KEY, { ip: best.ip, port: best.port });
+  if (best) await vaultSet(LAST_KEY, { ip: best.ip, port: best.port });
 
   log(found.length ? "info" : "warn", "bridge", `lan sweep ${found.length} host(s)`, {
     scanned,
@@ -236,5 +236,5 @@ export async function scanLan(
 export async function rememberGoodHost(baseUrl: string): Promise<void> {
   const c = parseConnection(baseUrl);
   if (!c?.ip || !c.port) return;
-  await vaultSet<LastGood>(LAST_KEY, { ip: c.ip, port: Number(c.port) });
+  await vaultSet(LAST_KEY, { ip: c.ip, port: Number(c.port) });
 }
