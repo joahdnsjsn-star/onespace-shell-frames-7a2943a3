@@ -22,6 +22,35 @@ truth for "what's left".
 - [x] Permissions hub, Play Store compliance docs, native parity checker
 - [x] Butler voice muted by default until a better voice is chosen
 
+## Gap-report reconciliation (2026-08-01)
+
+The uploaded `shell-gap-analysis.md` was written against
+`butler-nexus-shell-v11-complete` and is stale. Mapping of its 23 "missing"
+services to this repo:
+
+| Native service | Web shell |
+|---|---|
+| connectionHub / serverConnection / connectionPersistence | `lib/butler-bridge.ts` |
+| serverFeatures | `lib/server-features.ts` |
+| autoConnectEngine / heartbeatEngine | `lib/autoconnect.ts` |
+| lanScanner / qrParser | `lib/discovery.ts` + `components/nexus/QrScanner.tsx` |
+| networkMonitor | `lib/netmon.ts` |
+| neuralTripwire | `lib/tripwire.ts` |
+| encryptedStorage | `lib/vault.ts` (AES-GCM) |
+| knowledgeAccumulator | `lib/knowledge.ts` |
+| kbGrowthTracker | `lib/kb-growth.ts` |
+| executionHistory | `lib/history.ts` |
+| runtimeErrorMonitor / autoErrorLogger / bootErrorLog | `lib/logger.ts` + `lib/error-capture.ts` |
+| deviceIdentifier | device id inside `butler-bridge.ts` |
+| onboardingState | `lib/useSetting.ts` persistence |
+| bootGuard | root error boundary in `__root.tsx` |
+| haptics | `lib/haptics.ts` + `lib/fx.ts` |
+| safeClipboard / pcClipboard | `lib/pc-remote.ts` (added this pass) |
+| remoteAccessTiers | intentionally omitted — LAN-only, no tiers |
+
+`butler_server.py` ships inside the app as a downloadable asset on the Link
+page, so there is no separate repo to fetch.
+
 ## Open — needs a decision from the user
 
 - [ ] **i18n** — native `LanguageContext.tsx` (629 lines) has no web
