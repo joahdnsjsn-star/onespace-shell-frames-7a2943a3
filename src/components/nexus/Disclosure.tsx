@@ -70,7 +70,7 @@ export function usePermissionDisclosure() {
         onClick={() => close(false)}
       >
         <div
-          className="w-full max-w-[440px] rounded-2xl border border-border/70 bg-card/95 p-4 shadow-2xl animate-in slide-in-from-bottom-4 duration-250"
+          className="w-full max-w-[440px] rounded-2xl border border-border/70 bg-card/95 p-4 shadow-2xl animate-in slide-in-from-bottom-4 fade-in duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="mb-3 flex items-start gap-3">
