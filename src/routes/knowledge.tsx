@@ -1,7 +1,36 @@
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Brain, FileText, Upload, Sparkles, Database } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import {
+  Activity,
+  Brain,
+  Database,
+  Globe,
+  Link2,
+  Loader2,
+  PlugZap,
+  RefreshCw,
+  Search,
+  Sparkles,
+  Target,
+} from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
-import { Card, Chip, EmptyState, IconBadge, ProgressBar, Row, SectionHeader, StatTile, ActionButton } from "@/components/nexus/ui";
+import { ActionButton, Card, Chip, EmptyState, IconBadge, Row, SectionHeader, Segmented, StatTile, Toggle } from "@/components/nexus/ui";
+import { CategoryBars, GrowthChart, IntakeBars, ProgressRing } from "@/components/nexus/Charts";
+import { Coach } from "@/components/nexus/Coach";
+import { cn } from "@/lib/utils";
+import { fx } from "@/lib/fx";
+import {
+  addSource,
+  expandTopic,
+  knowledgeSnapshot,
+  recall,
+  setCrawler,
+  subscribeKnowledge,
+  syncKnowledge,
+  watchKnowledge,
+  type KbHit,
+} from "@/lib/knowledge";
 
 export const Route = createFileRoute("/knowledge")({
   head: () => ({
@@ -9,97 +38,444 @@ export const Route = createFileRoute("/knowledge")({
       { title: "Knowledge Base — Butler AI NEXUS" },
       {
         name: "description",
-        content: "Neural knowledge base: indexed local documents, growth tracking and recall sources.",
+        content:
+          "Live crawler graph, category breakdown and full-text recall over everything your self-hosted Butler has learned.",
       },
       { property: "og:title", content: "Knowledge Base — NEXUS" },
       { property: "og:description", content: "Everything Butler learns stays on your own machine." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Knowledge,
 });
 
+const TABS = ["pulse", "graph", "recall", "sources"] as const;
+type Tab = (typeof TABS)[number];
+
+const COACH = [
+  {
+    target: "kb-stats",
+    title: "your brain, in numbers",
+    body: "Articles stored on your PC, queue depth and intake speed. Cached on the handset so it reads instantly.",
+  },
+  {
+    target: "kb-graph",
+    title: "crawler graph",
+    body: "The curve is total knowledge over 24h; the bars underneath are what landed each sample.",
+  },
+  {
+    target: "kb-crawler",
+    title: "throttle the crawler",
+    body: "Pause learning to hand the whole CPU to chat. Butler resumes exactly where it stopped.",
+  },
+  {
+    target: "kb-sources",
+    title: "feed it anything",
+    body: "Drop a URL to queue it, or name a topic and Butler goes hunting on its own.",
+  },
+];
+
+function ago(t: number) {
+  if (!t) return "never";
+  const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.round(s / 60)}m ago`;
+  if (s < 86400) return `${Math.round(s / 3600)}h ago`;
+  return `${Math.round(s / 86400)}d ago`;
+}
+
+const compact = (n: number) =>
+  n >= 10000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k` : n.toLocaleString();
+
 function Knowledge() {
+  const kb = useSyncExternalStore(subscribeKnowledge, knowledgeSnapshot, knowledgeSnapshot);
+  const [tab, setTab] = useState<Tab>("pulse");
+
+  // Declare this screen as a watcher so the shared engine polls fast while
+  // it is open, then falls back to the idle cadence on unmount.
+  useEffect(() => watchKnowledge(), []);
+
+  const milestonePct = kb.milestone > 0 ? Math.min(1, kb.total / kb.milestone) : 0;
+  const remaining = Math.max(0, kb.milestone - kb.total);
+
   return (
-    <AppShell title="BRAIN" subtitle="local knowledge accumulator" accentLabel="indexing" offline>
-      <section className="grid grid-cols-2 gap-3">
-        <StatTile label="documents" value="—" accent="neural" sub="awaiting index" />
-        <StatTile label="fragments" value="—" accent="cyan" sub="awaiting index" />
-        <StatTile label="vectors" value="—" accent="system" sub="awaiting index" />
-        <StatTile label="last sync" value="—" accent="warn" sub="never" />
-      </section>
+    <AppShell title="BRAIN" subtitle="knowledge base & crawler" accentLabel={kb.learning ? "learning" : "paused"}>
+      <Coach id="knowledge" steps={COACH} />
 
-      <section>
-        <SectionHeader title="growth" accent="neural" hint="Knowledge added over the last 7 days" />
-        <Card>
-          <div className="flex h-28 items-end gap-1.5">
-            {Array.from({ length: 14 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex-1 rounded-t bg-surface-3"
-                style={{ height: `${12 + ((i * 7) % 40)}%` }}
-              />
-            ))}
-          </div>
-          <div className="mt-3 label-mono text-muted-foreground">no data yet</div>
-        </Card>
-      </section>
-
-      <section>
-        <SectionHeader title="sources" hint="Folders Butler is allowed to read" />
-        <div className="space-y-2">
-          {["C:\\Users\\me\\Documents", "C:\\Projects\\butler", "D:\\Archive\\notes"].map((p) => (
-            <Row
-              key={p}
-              title={<span className="font-mono text-xs">{p}</span>}
-              sub="opt-in · read only"
-              left={
-                <IconBadge accent="neural" size={32}>
-                  <Database size={14} />
-                </IconBadge>
-              }
-              right={<Chip accent="ok">allowed</Chip>}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <SectionHeader title="ingestion queue" accent="warn" />
-        <Card>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>queued files</span>
-            <span className="font-mono">— / —</span>
-          </div>
-          <div className="mt-3">
-            <ProgressBar value={0} accent="warn" />
+      {kb.error ? (
+        <Card accent="warn" className="flex items-start gap-3">
+          <IconBadge icon={PlugZap} accent="warn" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium leading-snug">{kb.error}</p>
+            <p className="mt-1 text-xs leading-snug text-muted-foreground">
+              {kb.lastSync
+                ? `Showing the last synced snapshot from ${ago(kb.lastSync)}.`
+                : "Nothing cached yet — pair your PC to fill the brain."}
+            </p>
+            <div className="mt-3 flex gap-2">
+              <ActionButton variant="ghost" className="h-9 px-3 text-xs" onClick={() => void syncKnowledge(true)}>
+                <RefreshCw className="size-3.5" /> retry
+              </ActionButton>
+              <Link to="/connect" className="contents">
+                <ActionButton variant="ghost" className="h-9 px-3 text-xs">
+                  <Link2 className="size-3.5" /> pairing
+                </ActionButton>
+              </Link>
+            </div>
           </div>
         </Card>
-      </section>
+      ) : null}
 
-      <section>
-        <SectionHeader title="recall" accent="cyan" />
-        <EmptyState
-          title="no recalls yet"
-          body="Passages Butler cites in answers will be listed here with their source file."
-          icon={<Sparkles size={28} />}
-        />
-      </section>
-
-      <div className="grid grid-cols-2 gap-3">
-        <ActionButton variant="ghost">
-          <FileText size={16} /> Browse
-        </ActionButton>
-        <ActionButton>
-          <Upload size={16} /> Ingest
-        </ActionButton>
+      <div className="flex items-center gap-2">
+        <Segmented options={TABS} value={tab} onChange={(t) => { fx.select(); setTab(t); }} className="flex-1" />
+        <button
+          type="button"
+          aria-label="refresh knowledge"
+          onClick={() => { fx.tap(); void syncKnowledge(true); }}
+          className="press grid size-9 shrink-0 place-items-center rounded-xl border border-dim/70 bg-surface-3/60 text-muted hover:text-cyan"
+        >
+          {kb.syncing ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+        </button>
       </div>
 
-      <div className="flex items-center gap-2 rounded-xl border border-neural/30 bg-neural/10 p-3">
-        <Brain size={16} className="text-neural" />
-        <p className="text-[11px] text-muted-foreground">
-          Embeddings are computed on your PC. Nothing is uploaded anywhere.
-        </p>
-      </div>
+      {tab === "pulse" ? <PulseTab kb={kb} milestonePct={milestonePct} remaining={remaining} /> : null}
+      {tab === "graph" ? <GraphTab kb={kb} /> : null}
+      {tab === "recall" ? <RecallTab total={kb.total} /> : null}
+      {tab === "sources" ? <SourcesTab queue={kb.queue} /> : null}
     </AppShell>
+  );
+}
+
+type Kb = ReturnType<typeof knowledgeSnapshot>;
+
+function PulseTab({ kb, milestonePct, remaining }: { kb: Kb; milestonePct: number; remaining: number }) {
+  return (
+    <>
+      <section data-coach="kb-stats" className="grid grid-cols-2 gap-3">
+        <StatTile label="articles" value={compact(kb.total)} accent="neural" sub={kb.stale ? "cached" : "live on your PC"} />
+        <StatTile label="queue" value={compact(kb.queue)} accent="cyan" sub={`${kb.workers || 0} workers`} />
+        <StatTile
+          label="intake"
+          value={kb.velocity ? `${kb.velocity}/h` : "—"}
+          accent="system"
+          sub={kb.etaHours != null ? `next tier in ~${kb.etaHours}h` : "measuring"}
+        />
+        <StatTile label="this session" value={compact(kb.session)} accent="ok" sub={`synced ${ago(kb.lastSync)}`} />
+      </section>
+
+      <Card data-coach="kb-graph" accent="neural" className="space-y-3">
+        <SectionHeader icon={Activity} title="growth · 24h" accent="neural" right={<Chip accent={kb.learning ? "ok" : "warn"}>{kb.learning ? "crawling" : "paused"}</Chip>} />
+        <GrowthChart points={kb.points} accent="neural" />
+        <div className="flex items-center gap-4 pt-1">
+          <ProgressRing
+            value={milestonePct}
+            center={`${Math.round(milestonePct * 100)}%`}
+            caption={`to ${compact(kb.milestone)}`}
+            accent="cyan"
+          />
+          <div className="min-w-0 flex-1 space-y-1">
+            <p className="text-sm leading-snug text-body">
+              <span className="font-mono font-bold text-cyan">{compact(remaining)}</span> articles until the next milestone.
+            </p>
+            <p className="text-xs leading-snug text-muted-foreground">
+              Butler crawls continuously in the background on your own machine. Nothing is uploaded anywhere.
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      <Card data-coach="kb-crawler" className="space-y-3">
+        <SectionHeader icon={Globe} title="crawler" accent="cyan" />
+        <Row
+          title="background learning"
+          sub={kb.learning ? "Indexing new sources continuously" : "Paused — full CPU reserved for chat"}
+          left={<IconBadge icon={Sparkles} accent={kb.learning ? "ok" : "warn"} />}
+          right={
+            <Toggle
+              on={kb.learning}
+              onChange={(next) => {
+                void setCrawler(next).catch(() => undefined);
+              }}
+              label="background learning"
+            />
+          }
+        />
+        <div className="grid grid-cols-3 gap-2">
+          <MiniStat label="queued" value={compact(kb.queue)} />
+          <MiniStat label="workers" value={String(kb.workers || 0)} />
+          <MiniStat label="synced" value={ago(kb.lastSync)} />
+        </div>
+      </Card>
+
+      <FeedCard kb={kb} limit={8} />
+    </>
+  );
+}
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-dim/50 bg-surface-3/50 px-3 py-2">
+      <div className="label-mono text-faint">{label}</div>
+      <div className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-body">{value}</div>
+    </div>
+  );
+}
+
+function GraphTab({ kb }: { kb: Kb }) {
+  return (
+    <>
+      <Card accent="neural" className="space-y-3">
+        <SectionHeader icon={Activity} title="total knowledge" accent="neural" right={<Chip accent="neural">{compact(kb.total)}</Chip>} />
+        <GrowthChart points={kb.points} accent="neural" height={160} />
+      </Card>
+
+      <Card className="space-y-3">
+        <SectionHeader icon={Database} title="intake per sample" accent="cyan" />
+        <IntakeBars points={kb.points} accent="cyan" />
+        <p className="text-xs leading-snug text-muted-foreground">
+          Each bar is what the crawler added between two samples. Flat bars mean the queue is dry — feed it a topic in
+          SOURCES.
+        </p>
+      </Card>
+
+      <Card className="space-y-3">
+        <SectionHeader icon={Target} title="categories" accent="net" />
+        <CategoryBars categories={kb.categories} max={8} />
+      </Card>
+
+      <FeedCard kb={kb} limit={20} />
+    </>
+  );
+}
+
+function FeedCard({ kb, limit }: { kb: Kb; limit: number }) {
+  const items = kb.feed.slice(0, limit);
+  return (
+    <Card className="space-y-3">
+      <SectionHeader
+        icon={Brain}
+        title="live feed"
+        accent="ok"
+        right={kb.syncing ? <Loader2 className="size-3.5 animate-spin text-cyan" /> : <Chip accent="ok">{items.length}</Chip>}
+      />
+      {items.length === 0 ? (
+        <EmptyState
+          icon={<Brain className="size-7" />}
+          title="nothing indexed yet"
+          body="Once your PC is paired the crawler starts filling this feed within a minute."
+        />
+      ) : (
+        <ul className="space-y-2">
+          {items.map((a) => (
+            <li key={a.url || `${a.title}-${a.at}`}>
+              <Row
+                title={<span className="line-clamp-2">{a.title}</span>}
+                sub={
+                  <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                    <span className="text-cyan">{a.category}</span>
+                    <span aria-hidden>·</span>
+                    <span>{a.words ? `${compact(a.words)} words` : "indexed"}</span>
+                    <span aria-hidden>·</span>
+                    <span>{ago(a.at)}</span>
+                  </span>
+                }
+                left={<IconBadge icon={Globe} accent="ok" />}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
+function RecallTab({ total }: { total: number }) {
+  const [q, setQ] = useState("");
+  const [hits, setHits] = useState<KbHit[] | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const run = useCallback(async (query: string) => {
+    if (query.trim().length < 2) {
+      setHits(null);
+      return;
+    }
+    setBusy(true);
+    setErr("");
+    try {
+      setHits(await recall(query));
+    } catch (e) {
+      setErr((e as Error)?.message ?? "Recall failed.");
+      setHits([]);
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  // Debounced live recall — one request per pause in typing, never per keystroke.
+  useEffect(() => {
+    const id = setTimeout(() => void run(q), 420);
+    return () => clearTimeout(id);
+  }, [q, run]);
+
+  return (
+    <>
+      <Card className="space-y-3">
+        <SectionHeader icon={Search} title="recall" accent="cyan" right={<Chip accent="cyan">{compact(total)} indexed</Chip>} />
+        <div className="flex items-center gap-2 rounded-xl border border-dim/70 bg-surface-3/60 px-3">
+          <Search className="size-4 shrink-0 text-faint" aria-hidden />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            enterKeyHint="search"
+            inputMode="search"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            placeholder="search everything Butler has learned"
+            aria-label="search the knowledge base"
+            className="h-11 min-w-0 flex-1 bg-transparent text-sm text-body outline-none placeholder:text-faint"
+          />
+          {busy ? <Loader2 className="size-4 shrink-0 animate-spin text-cyan" /> : null}
+        </div>
+        {err ? <p className="text-xs text-warn">{err}</p> : null}
+      </Card>
+
+      {hits === null ? (
+        <EmptyState
+          icon={<Search className="size-7" />}
+          title="ask the archive"
+          body="Type at least two characters. Results come straight from your PC's local index — no cloud search."
+        />
+      ) : hits.length === 0 ? (
+        <EmptyState
+          icon={<Search className="size-7" />}
+          title="no matches"
+          body="Nothing indexed for that yet. Queue the topic in SOURCES and Butler will go learn it."
+        />
+      ) : (
+        <ul className="space-y-2">
+          {hits.map((h, i) => (
+            <li key={`${h.url}-${i}`}>
+              <Card className="space-y-1.5 p-3">
+                <div className="flex items-start gap-2">
+                  <IconBadge icon={Brain} accent="neural" />
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 text-sm font-medium leading-snug">{h.title}</p>
+                    <p className="label-mono mt-0.5 truncate text-faint">{h.category}</p>
+                  </div>
+                </div>
+                {h.snippet ? (
+                  <p className="line-clamp-4 text-xs leading-relaxed text-muted-foreground">{h.snippet}</p>
+                ) : null}
+              </Card>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
+
+function SourcesTab({ queue }: { queue: number }) {
+  const [url, setUrl] = useState("");
+  const [topic, setTopic] = useState("");
+  const [busy, setBusy] = useState<"" | "queue" | "now" | "topic">("");
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const feedback = useCallback((ok: boolean, text: string) => {
+    setMsg({ ok, text });
+    ok ? fx.success?.() ?? fx.tap() : fx.warn();
+    setTimeout(() => setMsg(null), 6000);
+  }, []);
+
+  const submitUrl = useCallback(
+    async (immediate: boolean) => {
+      setBusy(immediate ? "now" : "queue");
+      try {
+        const res = await addSource(url, "Custom", immediate);
+        setUrl("");
+        feedback(true, immediate && "title" in res ? `Stored “${String(res.title).slice(0, 48)}”` : "Queued for the crawler.");
+      } catch (e) {
+        feedback(false, (e as Error)?.message ?? "Could not add that source.");
+      } finally {
+        setBusy("");
+      }
+    },
+    [url, feedback],
+  );
+
+  const submitTopic = useCallback(async () => {
+    setBusy("topic");
+    try {
+      const res = await expandTopic(topic);
+      setTopic("");
+      feedback(true, `Hunting ${res.queued} new leads.`);
+    } catch (e) {
+      feedback(false, (e as Error)?.message ?? "Could not expand that topic.");
+    } finally {
+      setBusy("");
+    }
+  }, [topic, feedback]);
+
+  const urlValid = useMemo(() => /^https?:\/\/\S+$/i.test(url.trim()), [url]);
+
+  return (
+    <>
+      {msg ? (
+        <Card accent={msg.ok ? "ok" : "warn"} className="py-3">
+          <p className={cn("text-sm leading-snug", msg.ok ? "text-ok" : "text-warn")}>{msg.text}</p>
+        </Card>
+      ) : null}
+
+      <Card data-coach="kb-sources" className="space-y-3">
+        <SectionHeader icon={Link2} title="add a page" accent="cyan" right={<Chip accent="cyan">{compact(queue)} queued</Chip>} />
+        <input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://docs.example.com/guide"
+          aria-label="source URL"
+          inputMode="url"
+          enterKeyHint="go"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          className="h-11 w-full rounded-xl border border-dim/70 bg-surface-3/60 px-3 text-sm text-body outline-none placeholder:text-faint focus:border-cyan/50"
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <ActionButton variant="ghost" disabled={!urlValid || busy !== ""} onClick={() => void submitUrl(false)}>
+            {busy === "queue" ? <Loader2 className="size-4 animate-spin" /> : <Database className="size-4" />} queue
+          </ActionButton>
+          <ActionButton disabled={!urlValid || busy !== ""} onClick={() => void submitUrl(true)}>
+            {busy === "now" ? <Loader2 className="size-4 animate-spin" /> : <Globe className="size-4" />} crawl now
+          </ActionButton>
+        </div>
+        <p className="text-xs leading-snug text-muted-foreground">
+          Queue is polite and runs in the background. Crawl now fetches the page immediately and stores it before you
+          leave this screen.
+        </p>
+      </Card>
+
+      <Card className="space-y-3">
+        <SectionHeader icon={Sparkles} title="learn a topic" accent="neural" />
+        <input
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="e.g. windows disk cleanup scripting"
+          aria-label="topic to learn"
+          enterKeyHint="go"
+          autoComplete="off"
+          className="h-11 w-full rounded-xl border border-dim/70 bg-surface-3/60 px-3 text-sm text-body outline-none placeholder:text-faint focus:border-neural/50"
+        />
+        <ActionButton className="w-full" disabled={topic.trim().length < 3 || busy !== ""} onClick={() => void submitTopic()}>
+          {busy === "topic" ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />} send Butler hunting
+        </ActionButton>
+        <p className="text-xs leading-snug text-muted-foreground">
+          Butler searches from your PC, filters out junk domains, then indexes what survives. Results show up in the live
+          feed.
+        </p>
+      </Card>
+    </>
   );
 }
