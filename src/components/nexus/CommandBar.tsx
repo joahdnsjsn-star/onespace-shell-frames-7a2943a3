@@ -6,7 +6,13 @@ import { cn } from "@/lib/utils";
 
 type Item = { to: string; label: string };
 
-export function CommandBar({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+export function CommandBar({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [i, setI] = useState(0);
@@ -15,7 +21,9 @@ export function CommandBar({ open, onOpenChange }: { open: boolean; onOpenChange
   const items = useMemo<Item[]>(() => {
     const all: Item[] = ALL_PAGES.map((p) => ({ to: p.to, label: p.label.toUpperCase() }));
     const needle = q.trim().toLowerCase();
-    return needle ? all.filter((x) => x.label.toLowerCase().includes(needle) || x.to.includes(needle)) : all;
+    return needle
+      ? all.filter((x) => x.label.toLowerCase().includes(needle) || x.to.includes(needle))
+      : all;
   }, [q]);
 
   useEffect(() => {
@@ -47,7 +55,10 @@ export function CommandBar({ open, onOpenChange }: { open: boolean; onOpenChange
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-background/70 px-4 pt-[18vh] backdrop-blur-sm" onClick={() => onOpenChange(false)}>
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center bg-background/70 px-4 pt-[18vh] backdrop-blur-sm"
+      onClick={() => onOpenChange(false)}
+    >
       <div
         className="nx-pop w-full max-w-md overflow-hidden rounded-2xl border border-dim/70 glass shadow-[0_30px_80px_-30px_rgba(0,0,0,0.95)]"
         onClick={(e) => e.stopPropagation()}
@@ -76,11 +87,15 @@ export function CommandBar({ open, onOpenChange }: { open: boolean; onOpenChange
             placeholder="Jump to a module…"
             className="flex-1 bg-transparent text-fluid-sm text-foreground outline-none placeholder:text-faint"
           />
-          <kbd className="label-mono rounded border border-dim/70 px-1.5 py-0.5 text-[9px] text-faint">ESC</kbd>
+          <kbd className="label-mono rounded border border-dim/70 px-1.5 py-0.5 text-[9px] text-faint">
+            ESC
+          </kbd>
         </div>
         <div className="scroll-y max-h-[46dvh] p-1.5">
           {items.length === 0 ? (
-            <p className="px-3 py-6 text-center text-fluid-xs text-faint">No module matches “{q}”.</p>
+            <p className="px-3 py-6 text-center text-fluid-xs text-faint">
+              No module matches “{q}”.
+            </p>
           ) : (
             items.map((it, idx) => (
               <button

@@ -91,7 +91,11 @@ export function useTelemetry(active = true) {
           raiseHostAlert({ kind: "cpu", value: live.cpu, label: `CPU at ${live.cpu.toFixed(0)}%` });
         } else if (live.mem > 28) {
           sinceAlert = 0;
-          raiseHostAlert({ kind: "ram", value: live.mem, label: `RAM at ${live.mem.toFixed(1)} GB` });
+          raiseHostAlert({
+            kind: "ram",
+            value: live.mem,
+            label: `RAM at ${live.mem.toFixed(1)} GB`,
+          });
         }
       }
 

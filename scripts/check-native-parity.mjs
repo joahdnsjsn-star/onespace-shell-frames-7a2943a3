@@ -36,7 +36,7 @@ for (const p of contract.android.permissions) {
 //    same Play Store listing as the native package id.
 const policy = manifest["permissions_policy"] ?? {};
 if (JSON.stringify(policy["camera"]) !== JSON.stringify(["self"])) {
-  problems.push("manifest permissions_policy.camera must be [\"self\"]");
+  problems.push('manifest permissions_policy.camera must be ["self"]');
 }
 for (const key of ["microphone", "geolocation", "interest-cohort"]) {
   if (JSON.stringify(policy[key]) !== "[]") {
@@ -75,7 +75,9 @@ if (nativePath) {
       problems.push(`native app.json blocks extras not in the contract: ${extra.join(", ")}`);
     }
     if (a.package && a.package !== contract.native.androidPackage) {
-      problems.push(`expo.android.package "${a.package}" != contract "${contract.native.androidPackage}"`);
+      problems.push(
+        `expo.android.package "${a.package}" != contract "${contract.native.androidPackage}"`,
+      );
     }
     if (expo.scheme && expo.scheme !== contract.native.scheme) {
       problems.push(`expo.scheme "${expo.scheme}" != contract "${contract.native.scheme}"`);
@@ -84,7 +86,9 @@ if (nativePath) {
       problems.push(`expo.version "${expo.version}" != contract "${contract.native.version}"`);
     }
     if (a.versionCode && a.versionCode !== contract.native.androidVersionCode) {
-      problems.push(`expo.android.versionCode ${a.versionCode} != contract ${contract.native.androidVersionCode}`);
+      problems.push(
+        `expo.android.versionCode ${a.versionCode} != contract ${contract.native.androidVersionCode}`,
+      );
     }
   }
 }
@@ -93,7 +97,8 @@ if (nativePath) {
 //    docs the Play Console submission depends on must all be present and in sync.
 const n = contract.native ?? {};
 for (const key of ["version", "androidVersionCode", "description", "copyright", "minAge"]) {
-  if (n[key] === undefined || n[key] === "") problems.push(`app.permissions.json native.${key} is missing`);
+  if (n[key] === undefined || n[key] === "")
+    problems.push(`app.permissions.json native.${key} is missing`);
 }
 if (n.minAge !== 18) problems.push("native.minAge must stay 18 (Play target audience is 18+)");
 if (!/^\d+\.\d+\.\d+$/.test(String(n.version ?? ""))) {
@@ -102,11 +107,13 @@ if (!/^\d+\.\d+\.\d+$/.test(String(n.version ?? ""))) {
 const ps = contract.playStore ?? {};
 if (ps.encryptedInTransit !== true) problems.push("playStore.encryptedInTransit must be true");
 if (ps.adsOrTracking !== false) problems.push("playStore.adsOrTracking must be false");
-if ((ps.dataShared ?? []).length) problems.push("playStore.dataShared must stay empty (nothing is shared)");
+if ((ps.dataShared ?? []).length)
+  problems.push("playStore.dataShared must stay empty (nothing is shared)");
 if (!(ps.dataCollected ?? []).length) {
   problems.push("playStore.dataCollected must list what the Data safety form declares");
 }
-if (!String(ps.deletionPath ?? "").trim()) problems.push("playStore.deletionPath is required by Play policy");
+if (!String(ps.deletionPath ?? "").trim())
+  problems.push("playStore.deletionPath is required by Play policy");
 
 const requiredDocs = [
   "docs/native/DATA_SAFETY_FORM.md",
@@ -138,7 +145,9 @@ for (const t of ps.dataCollected ?? []) {
   }
 }
 if (/no data is collected/i.test(safety)) {
-  problems.push('src/routes/data-safety.tsx claims "no data is collected" but the form declares data types');
+  problems.push(
+    'src/routes/data-safety.tsx claims "no data is collected" but the form declares data types',
+  );
 }
 
 // 7. The OnSpace build contract must target the same package/scheme.

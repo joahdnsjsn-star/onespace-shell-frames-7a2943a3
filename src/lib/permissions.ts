@@ -11,13 +11,7 @@
 export type PermState = "granted" | "denied" | "prompt" | "unsupported" | "checking";
 
 export type PermKey =
-  | "network"
-  | "camera"
-  | "haptics"
-  | "notifications"
-  | "clipboard"
-  | "storage"
-  | "wakelock";
+  "network" | "camera" | "haptics" | "notifications" | "clipboard" | "storage" | "wakelock";
 
 export type PermDef = {
   key: PermKey;
@@ -134,7 +128,6 @@ export const DENIED_NATIVE: { native: string; label: string }[] = [
   },
 ];
 
-
 const isBrowser = () => typeof window !== "undefined" && typeof navigator !== "undefined";
 
 /** Reads current state without ever triggering a permission prompt. */
@@ -184,9 +177,9 @@ export async function requestPermission(def: PermDef): Promise<PermState> {
       }
       case "notifications": {
         if (!("Notification" in window)) return "unsupported";
-        return ((await Notification.requestPermission()) === "granted"
-          ? "granted"
-          : "denied") as PermState;
+        return (
+          (await Notification.requestPermission()) === "granted" ? "granted" : "denied"
+        ) as PermState;
       }
       case "clipboard": {
         if (!navigator.clipboard?.writeText) return "unsupported";
@@ -194,7 +187,11 @@ export async function requestPermission(def: PermDef): Promise<PermState> {
         return "granted";
       }
       case "wakelock": {
-        const wl = (navigator as Navigator & { wakeLock?: { request: (t: "screen") => Promise<{ release: () => Promise<void> }> } }).wakeLock;
+        const wl = (
+          navigator as Navigator & {
+            wakeLock?: { request: (t: "screen") => Promise<{ release: () => Promise<void> }> };
+          }
+        ).wakeLock;
         if (!wl) return "unsupported";
         const lock = await wl.request("screen");
         await lock.release();

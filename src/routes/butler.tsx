@@ -9,7 +9,6 @@ import { askButler, BridgeError } from "@/lib/butler-bridge";
 import { useBridge } from "@/lib/useBridge";
 import { vaultGet, vaultSet } from "@/lib/vault";
 
-
 export const Route = createFileRoute("/butler")({
   head: () => ({
     meta: [
@@ -104,7 +103,10 @@ function Butler() {
       const history = msgs
         .filter((m) => m.id !== GREETING.id)
         .slice(-12)
-        .map((m) => ({ role: m.role === "bot" ? ("assistant" as const) : ("user" as const), content: m.text }));
+        .map((m) => ({
+          role: m.role === "bot" ? ("assistant" as const) : ("user" as const),
+          content: m.text,
+        }));
 
       setMsgs((m) => {
         const next = [...m, mine];
@@ -173,7 +175,6 @@ function Butler() {
     });
     setUndone([]);
   }, [remember, undone]);
-
 
   return (
     <AppShell title="BUTLER" subtitle="neural command interface" accentLabel="ai ready" fill>
@@ -286,7 +287,10 @@ function Butler() {
         </div>
 
         <div data-coach="chat-undo" className="flex items-center justify-between gap-2">
-          <Chip accent={typing ? "warn" : status === "online" ? "ok" : paired ? "warn" : "danger"} dot>
+          <Chip
+            accent={typing ? "warn" : status === "online" ? "ok" : paired ? "warn" : "danger"}
+            dot
+          >
             {typing
               ? "thinking"
               : status === "online"

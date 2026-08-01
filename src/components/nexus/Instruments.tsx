@@ -36,7 +36,10 @@ export function RadialGauge({
   const uid = label.replace(/\W+/g, "-").toLowerCase();
 
   return (
-    <div className="relative inline-flex shrink-0 flex-col items-center" style={{ width: size, height: size }}>
+    <div
+      className="relative inline-flex shrink-0 flex-col items-center"
+      style={{ width: size, height: size }}
+    >
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block" aria-hidden>
         <defs>
           <filter id={`rg-glow-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
@@ -99,12 +102,22 @@ export function NeuralCore({
   const rings: [number, number, number] = [size * 0.42, size * 0.32, size * 0.22];
   const nodes = Array.from({ length: 8 }, (_, i) => {
     const a = (i / 8) * Math.PI * 2;
-    return { x: r(cx + rings[0] * Math.cos(a)), y: r(cy + rings[0] * Math.sin(a)), d: (i % 3) * 0.6 };
+    return {
+      x: r(cx + rings[0] * Math.cos(a)),
+      y: r(cy + rings[0] * Math.sin(a)),
+      d: (i % 3) * 0.6,
+    };
   });
 
   return (
     <div className="relative mx-auto block max-w-full" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block h-full w-full" aria-hidden>
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="block h-full w-full"
+        aria-hidden
+      >
         <defs>
           <radialGradient id="nc-core" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor={color} stopOpacity="0.85" />
@@ -184,11 +197,30 @@ export function NeuralCore({
           ) : null}
         </circle>
 
-        <circle cx={cx} cy={cy} r={rings[2]} fill="none" stroke={accent} strokeOpacity={0.5} strokeWidth={1} filter="url(#nc-glow)">
+        <circle
+          cx={cx}
+          cy={cy}
+          r={rings[2]}
+          fill="none"
+          stroke={accent}
+          strokeOpacity={0.5}
+          strokeWidth={1}
+          filter="url(#nc-glow)"
+        >
           {active ? (
             <>
-              <animate attributeName="r" values={`${rings[2]};${rings[2] + 6};${rings[2]}`} dur="3.2s" repeatCount="indefinite" />
-              <animate attributeName="stroke-opacity" values="0.15;0.7;0.15" dur="3.2s" repeatCount="indefinite" />
+              <animate
+                attributeName="r"
+                values={`${rings[2]};${rings[2] + 6};${rings[2]}`}
+                dur="3.2s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="stroke-opacity"
+                values="0.15;0.7;0.15"
+                dur="3.2s"
+                repeatCount="indefinite"
+              />
             </>
           ) : null}
         </circle>
@@ -200,24 +232,43 @@ export function NeuralCore({
 
         {nodes.map((n, i) => (
           <g key={i}>
-            <line x1={cx} y1={cy} x2={n.x} y2={n.y} stroke={color} strokeOpacity={0.08} strokeWidth={0.8} />
+            <line
+              x1={cx}
+              y1={cy}
+              x2={n.x}
+              y2={n.y}
+              stroke={color}
+              strokeOpacity={0.08}
+              strokeWidth={0.8}
+            />
             <circle cx={n.x} cy={n.y} r={2.4} fill={color} filter="url(#nc-glow)">
               {active ? (
-                <animate attributeName="opacity" values="0.25;1;0.25" dur="2.4s" begin={`${n.d}s`} repeatCount="indefinite" />
+                <animate
+                  attributeName="opacity"
+                  values="0.25;1;0.25"
+                  dur="2.4s"
+                  begin={`${n.d}s`}
+                  repeatCount="indefinite"
+                />
               ) : null}
             </circle>
           </g>
         ))}
 
         <circle cx={cx} cy={cy} r={4.5} fill={color} filter="url(#nc-glow)">
-          {active ? <animate attributeName="r" values="4;6;4" dur="1.8s" repeatCount="indefinite" /> : null}
+          {active ? (
+            <animate attributeName="r" values="4;6;4" dur="1.8s" repeatCount="indefinite" />
+          ) : null}
         </circle>
       </svg>
 
       {label || value ? (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
           {value ? (
-            <span className="font-mono text-xl font-bold leading-none tabular-nums" style={{ color }}>
+            <span
+              className="font-mono text-xl font-bold leading-none tabular-nums"
+              style={{ color }}
+            >
               {value}
             </span>
           ) : null}
@@ -284,11 +335,16 @@ export function ScanFrame({
       />
       {title || status ? (
         <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-          <span className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.2em]" style={{ color: accent }}>
+          <span
+            className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.2em]"
+            style={{ color: accent }}
+          >
             {title}
           </span>
           {status ? (
-            <span className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground">{status}</span>
+            <span className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground">
+              {status}
+            </span>
           ) : null}
         </div>
       ) : null}
@@ -318,7 +374,9 @@ export function LiveClock({ className }: { className?: string }) {
         {time}
         <span className="opacity-60">:{secs}</span>
       </div>
-      <div className="mt-1 text-[0.6rem] uppercase tracking-[0.18em] text-muted-foreground">local · secure</div>
+      <div className="mt-1 text-[0.6rem] uppercase tracking-[0.18em] text-muted-foreground">
+        local · secure
+      </div>
     </div>
   );
 }

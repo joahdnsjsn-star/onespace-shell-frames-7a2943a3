@@ -11,7 +11,10 @@ export const Route = createFileRoute("/privacy-policy")({
           "How Butler AI handles data: local-only processing, no analytics, no cloud relay, 18+ only, one-tap deletion of everything stored.",
       },
       { property: "og:title", content: "Privacy Policy — Butler AI" },
-      { property: "og:description", content: "Local-only processing, no cloud relay, no analytics, no accounts." },
+      {
+        property: "og:description",
+        content: "Local-only processing, no cloud relay, no analytics, no accounts.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

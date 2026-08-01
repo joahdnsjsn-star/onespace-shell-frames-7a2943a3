@@ -56,7 +56,6 @@ let parked = false;
 let popBound = false;
 let selfPop = false;
 
-
 function park() {
   if (parked || typeof window === "undefined") return;
   try {
@@ -93,7 +92,6 @@ function onPop() {
   if (backStack.length > 1) park();
 }
 
-
 function bindPop() {
   if (popBound || typeof window === "undefined") return;
   window.addEventListener("popstate", onPop);
@@ -124,7 +122,6 @@ export function useAndroidBack(active: boolean, onBack: () => void) {
     };
   }, [active]);
 }
-
 
 /**
  * Back on the home screen should feel like Android: the first press warns,

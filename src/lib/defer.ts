@@ -16,15 +16,19 @@ type IdleHandle = { cancel: () => void };
 /** requestIdleCallback with a rAF+timeout fallback, always cancellable. */
 export function onIdle(cb: () => void, timeout = 2000): IdleHandle {
   if (typeof window === "undefined") return { cancel: () => {} };
-  const ric = (window as Window & {
-    requestIdleCallback?: (fn: () => void, opts?: { timeout: number }) => number;
-    cancelIdleCallback?: (id: number) => void;
-  }).requestIdleCallback;
+  const ric = (
+    window as Window & {
+      requestIdleCallback?: (fn: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    }
+  ).requestIdleCallback;
   if (ric) {
     const id = ric(cb, { timeout });
     return {
       cancel: () =>
-        (window as unknown as { cancelIdleCallback?: (i: number) => void }).cancelIdleCallback?.(id),
+        (window as unknown as { cancelIdleCallback?: (i: number) => void }).cancelIdleCallback?.(
+          id,
+        ),
     };
   }
   const t = window.setTimeout(() => requestAnimationFrame(cb), Math.min(timeout, 220));
@@ -101,7 +105,10 @@ export function useDeferredMount({ force, timeout = 2500, skipOnLowTier }: Defer
  * so content is never visibly missing. Falls back to "always visible" when
  * IntersectionObserver is unavailable.
  */
-export function useInView<T extends HTMLElement>(options?: { rootMargin?: string; once?: boolean }) {
+export function useInView<T extends HTMLElement>(options?: {
+  rootMargin?: string;
+  once?: boolean;
+}) {
   const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
 

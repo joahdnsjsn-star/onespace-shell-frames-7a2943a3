@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Hammer, Blocks, Play, Save, GitBranch, Wand2 } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
-import { Card, Chip, IconBadge, Row, SectionHeader, ActionButton, EmptyState } from "@/components/nexus/ui";
+import {
+  Card,
+  Chip,
+  IconBadge,
+  Row,
+  SectionHeader,
+  ActionButton,
+  EmptyState,
+} from "@/components/nexus/ui";
 
 export const Route = createFileRoute("/builder")({
   head: () => ({
@@ -9,7 +17,8 @@ export const Route = createFileRoute("/builder")({
       { title: "Automation Builder — Butler AI NEXUS" },
       {
         name: "description",
-        content: "Visual builder for chaining triggers, conditions and PC actions into automations.",
+        content:
+          "Visual builder for chaining triggers, conditions and PC actions into automations.",
       },
       { property: "og:title", content: "Automation Builder — NEXUS" },
       { property: "og:description", content: "Compose local automations block by block." },
@@ -70,13 +79,17 @@ function Builder() {
         <SectionHeader title="test run" accent="warn" />
         <Card>
           <pre className="scroll-x rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-faint">
-{`> no dry-run executed yet`}
+            {`> no dry-run executed yet`}
           </pre>
         </Card>
       </section>
 
       <section>
-        <SectionHeader title="saved flows" accent="system" action={<GitBranch size={14} className="text-faint" />} />
+        <SectionHeader
+          title="saved flows"
+          accent="system"
+          action={<GitBranch size={14} className="text-faint" />}
+        />
         <EmptyState
           title="nothing saved"
           body="Saved automations appear here and sync only with your paired PC."

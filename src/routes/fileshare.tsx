@@ -1,7 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FolderOpen, File, ArrowUpFromLine, ArrowDownToLine, Clipboard, ChevronRight } from "lucide-react";
+import {
+  FolderOpen,
+  File,
+  ArrowUpFromLine,
+  ArrowDownToLine,
+  Clipboard,
+  ChevronRight,
+} from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
-import { Card, Chip, IconBadge, ProgressBar, Row, SectionHeader, ActionButton, EmptyState } from "@/components/nexus/ui";
+import {
+  Card,
+  Chip,
+  IconBadge,
+  ProgressBar,
+  Row,
+  SectionHeader,
+  ActionButton,
+  EmptyState,
+} from "@/components/nexus/ui";
 
 export const Route = createFileRoute("/fileshare")({
   head: () => ({
@@ -12,7 +28,10 @@ export const Route = createFileRoute("/fileshare")({
         content: "Browse, push and pull files between phone and PC over an encrypted LAN channel.",
       },
       { property: "og:title", content: "File Share — NEXUS" },
-      { property: "og:description", content: "Direct device-to-device transfers, no cloud in between." },
+      {
+        property: "og:description",
+        content: "Direct device-to-device transfers, no cloud in between.",
+      },
     ],
   }),
   component: FileShare,

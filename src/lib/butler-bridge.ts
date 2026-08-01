@@ -153,7 +153,8 @@ export async function bridgeRequest<T = Json>(
 ): Promise<T> {
   const cfg = peekBridge();
   if (!cfg.baseUrl) throw new BridgeError("No bridge paired yet.", "no-config");
-  if (!isLocalBridgeUrl(cfg.baseUrl)) throw new BridgeError("Bridge address is not on your local network.", "unsafe-url");
+  if (!isLocalBridgeUrl(cfg.baseUrl))
+    throw new BridgeError("Bridge address is not on your local network.", "unsafe-url");
 
   const started = performance.now();
   const controller = new AbortController();
@@ -206,7 +207,13 @@ export async function bridgeRequest<T = Json>(
       throw new BridgeError(msg, "server");
     }
     setStatus("online");
-    log("info", "bridge", `${opts.method ?? (opts.body ? "POST" : "GET")} ${path}`, undefined, performance.now() - started);
+    log(
+      "info",
+      "bridge",
+      `${opts.method ?? (opts.body ? "POST" : "GET")} ${path}`,
+      undefined,
+      performance.now() - started,
+    );
     return data;
   } catch (err) {
     if (err instanceof BridgeError) throw err;
@@ -240,9 +247,12 @@ export async function checkHealth(): Promise<HealthReport> {
   const raw = await bridgeRequest<Json>("/api/health", { timeoutMs: 6000 });
   return {
     online: true,
-    version: typeof raw['serverVersion'] === "string" ? raw['serverVersion'] : (raw['version'] as string | undefined),
-    ollama: Boolean(raw['ollama'] ?? raw['ollamaOk'] ?? raw['ai']),
-    model: (raw['model'] ?? raw['activeModel']) as string | undefined,
+    version:
+      typeof raw["serverVersion"] === "string"
+        ? raw["serverVersion"]
+        : (raw["version"] as string | undefined),
+    ollama: Boolean(raw["ollama"] ?? raw["ollamaOk"] ?? raw["ai"]),
+    model: (raw["model"] ?? raw["activeModel"]) as string | undefined,
     raw,
   };
 }
@@ -267,16 +277,16 @@ export async function askButler(
     ...(signal ? { signal } : {}),
   });
   const text =
-    (raw['response'] as string) ??
-    (raw['reply'] as string) ??
-    (raw['message'] as string) ??
+    (raw["response"] as string) ??
+    (raw["reply"] as string) ??
+    (raw["message"] as string) ??
     "Butler returned an empty reply.";
-  log("info", "ai", "butler replied", { chars: text.length, model: raw['model'] });
+  log("info", "ai", "butler replied", { chars: text.length, model: raw["model"] });
   return {
     text,
-    degraded: Boolean(raw['degraded']),
-    model: raw['model'] as string | undefined,
-    ollama: raw['ollama'] !== false,
+    degraded: Boolean(raw["degraded"]),
+    model: raw["model"] as string | undefined,
+    ollama: raw["ollama"] !== false,
   };
 }
 
@@ -300,30 +310,33 @@ export async function fetchLibrary(q = "", category = ""): Promise<LibraryScript
   if (q) params.set("q", q);
   if (category && category !== "all") params.set("category", category);
   params.set("sort", "popularity");
-  const raw = await bridgeRequest<Json>(`/api/scripts/library?${params.toString()}`, { timeoutMs: 15000 });
+  const raw = await bridgeRequest<Json>(`/api/scripts/library?${params.toString()}`, {
+    timeoutMs: 15000,
+  });
   const out: LibraryScript[] = [];
   const push = (cat: string, s: Json) => {
-    const id = String(s['id'] ?? "");
+    const id = String(s["id"] ?? "");
     if (!id) return;
     out.push({
       id,
-      name: String(s['name'] ?? id),
-      desc: String(s['desc'] ?? s['description'] ?? ""),
-      category: String(s['category'] ?? cat ?? "general"),
-      tags: Array.isArray(s['tags']) ? (s['tags'] as string[]) : [],
-      icon: s['icon'] as string | undefined,
-      popularity: typeof s['popularity'] === "number" ? s['popularity'] : 0,
+      name: String(s["name"] ?? id),
+      desc: String(s["desc"] ?? s["description"] ?? ""),
+      category: String(s["category"] ?? cat ?? "general"),
+      tags: Array.isArray(s["tags"]) ? (s["tags"] as string[]) : [],
+      icon: s["icon"] as string | undefined,
+      popularity: typeof s["popularity"] === "number" ? s["popularity"] : 0,
     });
   };
-  const lib = (raw['library'] ?? raw['categories'] ?? raw['scripts'] ?? raw) as unknown;
+  const lib = (raw["library"] ?? raw["categories"] ?? raw["scripts"] ?? raw) as unknown;
   if (Array.isArray(lib)) {
     for (const s of lib) push("", s as Json);
   } else if (lib && typeof lib === "object") {
     for (const [cat, val] of Object.entries(lib as Json)) {
       if (Array.isArray(val)) for (const s of val) push(cat, s as Json);
       else if (val && typeof val === "object") {
-        const scripts = (val as Json)['scripts'];
-        if (Array.isArray(scripts)) for (const s of scripts) push(String((val as Json)['name'] ?? cat), s as Json);
+        const scripts = (val as Json)["scripts"];
+        if (Array.isArray(scripts))
+          for (const s of scripts) push(String((val as Json)["name"] ?? cat), s as Json);
       }
     }
   }
@@ -346,16 +359,16 @@ export async function runScript(id: string, signal?: AbortSignal): Promise<RunRe
     timeoutMs: 180000,
     ...(signal ? { signal } : {}),
   });
-  log(raw['status'] === "ok" ? "info" : "error", "script", `run ${id}`, {
-    exitCode: raw['exitCode'],
-    undoId: raw['undoId'],
+  log(raw["status"] === "ok" ? "info" : "error", "script", `run ${id}`, {
+    exitCode: raw["exitCode"],
+    undoId: raw["undoId"],
   });
   return {
-    ok: raw['status'] === "ok",
-    output: String(raw['output'] ?? raw['error'] ?? ""),
-    exitCode: raw['exitCode'] as number | undefined,
-    undoId: raw['undoId'] as string | undefined,
-    generated: Boolean(raw['generated']),
+    ok: raw["status"] === "ok",
+    output: String(raw["output"] ?? raw["error"] ?? ""),
+    exitCode: raw["exitCode"] as number | undefined,
+    undoId: raw["undoId"] as string | undefined,
+    generated: Boolean(raw["generated"]),
   };
 }
 
@@ -370,9 +383,9 @@ export async function undoRun(undoId: string): Promise<RunResult> {
     body: { id: undoId, entryId: undoId },
     timeoutMs: 60000,
   });
-  const ok = raw['ok'] === true || raw['status'] === "ok";
+  const ok = raw["ok"] === true || raw["status"] === "ok";
   log(ok ? "info" : "warn", "script", `undo ${undoId}`, { ok });
-  return { ok, output: String(raw['message'] ?? raw['output'] ?? raw['error'] ?? "") };
+  return { ok, output: String(raw["message"] ?? raw["output"] ?? raw["error"] ?? "") };
 }
 
 export type UndoEntry = {
@@ -387,17 +400,17 @@ export type UndoEntry = {
 /** The rollback journal — what can still be reverted, newest first. */
 export async function undoList(): Promise<{ entries: UndoEntry[]; windowSec: number }> {
   const raw = await bridgeRequest<Json>("/api/undo/list", { timeoutMs: 12000 });
-  const rows = Array.isArray(raw['entries']) ? (raw['entries'] as Json[]) : [];
+  const rows = Array.isArray(raw["entries"]) ? (raw["entries"] as Json[]) : [];
   return {
     entries: rows.map((r) => ({
-      id: String(r['id'] ?? ""),
-      at: toMs(r['ts'] ?? r['at']),
-      request: String(r['user_req'] ?? r['userRequest'] ?? r['request'] ?? ""),
-      language: String(r['language'] ?? "python"),
-      status: String(r['status'] ?? ""),
-      undone: Boolean(r['undone']),
+      id: String(r["id"] ?? ""),
+      at: toMs(r["ts"] ?? r["at"]),
+      request: String(r["user_req"] ?? r["userRequest"] ?? r["request"] ?? ""),
+      language: String(r["language"] ?? "python"),
+      status: String(r["status"] ?? ""),
+      undone: Boolean(r["undone"]),
     })),
-    windowSec: Number(raw['undoWindow'] ?? 0) || 0,
+    windowSec: Number(raw["undoWindow"] ?? 0) || 0,
   };
 }
 
@@ -409,18 +422,24 @@ export type OllamaState = {
 
 export async function ollamaStatus(): Promise<OllamaState> {
   const raw = await bridgeRequest<Json>("/api/ollama/status", { timeoutMs: 8000 });
-  const models = Array.isArray(raw['models'])
-    ? (raw['models'] as unknown[]).map((m) => (typeof m === "string" ? m : String((m as Json)['name'] ?? "")))
+  const models = Array.isArray(raw["models"])
+    ? (raw["models"] as unknown[]).map((m) =>
+        typeof m === "string" ? m : String((m as Json)["name"] ?? ""),
+      )
     : [];
   return {
-    running: Boolean(raw['running'] ?? raw['ok'] ?? raw['online']),
+    running: Boolean(raw["running"] ?? raw["ok"] ?? raw["online"]),
     models: models.filter(Boolean),
-    active: (raw['active'] ?? raw['activeModel'] ?? raw['model']) as string | undefined,
+    active: (raw["active"] ?? raw["activeModel"] ?? raw["model"]) as string | undefined,
   };
 }
 
 export async function setOllamaModel(model: string): Promise<void> {
-  await bridgeRequest("/api/ollama/set_model", { method: "POST", body: { model }, timeoutMs: 15000 });
+  await bridgeRequest("/api/ollama/set_model", {
+    method: "POST",
+    body: { model },
+    timeoutMs: 15000,
+  });
 }
 
 /* ------------------------------------------------------------------ *
@@ -466,7 +485,8 @@ export type KbGrowth = {
   session: number;
 };
 
-const num = (v: unknown, d = 0) => (typeof v === "number" && Number.isFinite(v) ? v : Number(v) || d);
+const num = (v: unknown, d = 0) =>
+  typeof v === "number" && Number.isFinite(v) ? v : Number(v) || d;
 const str = (v: unknown, d = "") => (typeof v === "string" ? v : v == null ? d : String(v));
 
 /** Server timestamps are unix seconds; the UI works in milliseconds. */
@@ -478,11 +498,11 @@ const toMs = (v: unknown) => {
 
 function toArticle(raw: Json): KbArticle {
   return {
-    url: str(raw['url']),
-    title: str(raw['title'], "untitled"),
-    category: str(raw['category'] ?? raw['domain'], "General"),
-    words: num(raw['word_count'] ?? raw['wordCount'] ?? raw['words']),
-    at: toMs(raw['crawled_at'] ?? raw['crawledAt'] ?? raw['ts']),
+    url: str(raw["url"]),
+    title: str(raw["title"], "untitled"),
+    category: str(raw["category"] ?? raw["domain"], "General"),
+    words: num(raw["word_count"] ?? raw["wordCount"] ?? raw["words"]),
+    at: toMs(raw["crawled_at"] ?? raw["crawledAt"] ?? raw["ts"]),
   };
 }
 
@@ -490,40 +510,45 @@ function toArticle(raw: Json): KbArticle {
 export async function kbFeed(sinceMs = 0): Promise<KbFeed> {
   const since = sinceMs > 0 ? Math.floor(sinceMs / 1000) : 0;
   const raw = await bridgeRequest<Json>(`/api/kb/feed?since=${since}`, { timeoutMs: 12000 });
-  const list = Array.isArray(raw['articles']) ? (raw['articles'] as Json[]) : [];
+  const list = Array.isArray(raw["articles"]) ? (raw["articles"] as Json[]) : [];
   return {
     articles: list.map(toArticle).filter((a) => a.url || a.title),
-    total: num(raw['total']),
-    queue: num(raw['queue']),
-    learning: raw['learning'] !== false,
-    session: num(raw['session']),
-    milestone: num(raw['milestone']),
-    workers: num(raw['workers']),
+    total: num(raw["total"]),
+    queue: num(raw["queue"]),
+    learning: raw["learning"] !== false,
+    session: num(raw["session"]),
+    milestone: num(raw["milestone"]),
+    workers: num(raw["workers"]),
   };
 }
 
 /** Time-series growth for the graph. `hours` is clamped server-side to 1..168. */
 export async function kbGrowth(hours = 24): Promise<KbGrowth> {
-  const raw = await bridgeRequest<Json>(`/api/kb/growth?hours=${Math.max(1, Math.min(168, Math.round(hours)))}`, {
-    timeoutMs: 15000,
-  });
-  const pts = Array.isArray(raw['points']) ? (raw['points'] as Json[]) : [];
-  const cats = Array.isArray(raw['categories']) ? (raw['categories'] as Json[]) : [];
-  const eta = raw['etaHours'];
+  const raw = await bridgeRequest<Json>(
+    `/api/kb/growth?hours=${Math.max(1, Math.min(168, Math.round(hours)))}`,
+    {
+      timeoutMs: 15000,
+    },
+  );
+  const pts = Array.isArray(raw["points"]) ? (raw["points"] as Json[]) : [];
+  const cats = Array.isArray(raw["categories"]) ? (raw["categories"] as Json[]) : [];
+  const eta = raw["etaHours"];
   return {
     points: pts
-      .map((p) => ({ ts: toMs(p['ts']), total: num(p['total']), added: num(p['added']) }))
+      .map((p) => ({ ts: toMs(p["ts"]), total: num(p["total"]), added: num(p["added"]) }))
       .filter((p) => p.ts > 0)
       .sort((a, b) => a.ts - b.ts),
-    total: num(raw['total']),
-    milestone: num(raw['milestone']),
-    velocity: num(raw['velocity']),
+    total: num(raw["total"]),
+    milestone: num(raw["milestone"]),
+    velocity: num(raw["velocity"]),
     etaHours: typeof eta === "number" ? eta : null,
-    categories: cats.map((c) => ({ name: str(c['name'], "other"), count: num(c['count']) })).filter((c) => c.count > 0),
-    queue: num(raw['queue']),
-    workers: num(raw['workers']),
-    learning: raw['learning'] !== false,
-    session: num(raw['session']),
+    categories: cats
+      .map((c) => ({ name: str(c["name"], "other"), count: num(c["count"]) }))
+      .filter((c) => c.count > 0),
+    queue: num(raw["queue"]),
+    workers: num(raw["workers"]),
+    learning: raw["learning"] !== false,
+    session: num(raw["session"]),
   };
 }
 
@@ -542,40 +567,46 @@ export async function kbSearch(q: string, limit = 12): Promise<KbHit[]> {
     body: { q, query: q, limit },
     timeoutMs: 20000,
   });
-  const rows = Array.isArray(raw['results']) ? (raw['results'] as Json[]) : [];
+  const rows = Array.isArray(raw["results"]) ? (raw["results"] as Json[]) : [];
   return rows.map((r) => ({
-    title: str(r['title'], "untitled"),
-    url: str(r['url']),
-    category: str(r['category'], "General"),
-    snippet: str(r['snippet'] ?? r['clean_text'] ?? r['text'] ?? r['excerpt']).slice(0, 400),
-    score: typeof r['score'] === "number" ? r['score'] : undefined,
+    title: str(r["title"], "untitled"),
+    url: str(r["url"]),
+    category: str(r["category"], "General"),
+    snippet: str(r["snippet"] ?? r["clean_text"] ?? r["text"] ?? r["excerpt"]).slice(0, 400),
+    score: typeof r["score"] === "number" ? r["score"] : undefined,
   }));
 }
 
 /** Crawl one page right now and store it. */
-export async function kbCrawl(url: string, domain = "Custom"): Promise<{ ok: boolean; title: string; words: number; error?: string }> {
+export async function kbCrawl(
+  url: string,
+  domain = "Custom",
+): Promise<{ ok: boolean; title: string; words: number; error?: string }> {
   const raw = await bridgeRequest<Json>("/api/crawl", {
     method: "POST",
     body: { url, domain, topic: domain },
     timeoutMs: 60000,
   });
-  const ok = raw['status'] === "ok" || raw['saved'] === true;
+  const ok = raw["status"] === "ok" || raw["saved"] === true;
   return {
     ok,
-    title: str(raw['title'], url),
-    words: num(raw['wordCount']),
-    ...(ok ? {} : { error: str(raw['error'], "crawl failed") }),
+    title: str(raw["title"], url),
+    words: num(raw["wordCount"]),
+    ...(ok ? {} : { error: str(raw["error"], "crawl failed") }),
   };
 }
 
 /** Queue a URL for the background crawler instead of blocking on it. */
-export async function kbQueueUrl(url: string, topic = "General"): Promise<{ queued: boolean; queueSize: number }> {
+export async function kbQueueUrl(
+  url: string,
+  topic = "General",
+): Promise<{ queued: boolean; queueSize: number }> {
   const raw = await bridgeRequest<Json>("/api/kb/feed", {
     method: "POST",
     body: { url, topic, source: "app" },
     timeoutMs: 15000,
   });
-  return { queued: raw['queued'] !== false, queueSize: num(raw['queueSize']) };
+  return { queued: raw["queued"] !== false, queueSize: num(raw["queueSize"]) };
 }
 
 /** Ask the PC to go find more material about a topic. */
@@ -585,17 +616,21 @@ export async function kbExpand(topic: string): Promise<{ queued: number; queueSi
     body: { topic, query: topic },
     timeoutMs: 20000,
   });
-  return { queued: num(raw['queued']), queueSize: num(raw['queueSize']) };
+  return { queued: num(raw["queued"]), queueSize: num(raw["queueSize"]) };
 }
 
 /** Save a note straight into the knowledge base. */
-export async function kbSaveNote(title: string, content: string, domain = "App"): Promise<{ total: number }> {
+export async function kbSaveNote(
+  title: string,
+  content: string,
+  domain = "App",
+): Promise<{ total: number }> {
   const raw = await bridgeRequest<Json>("/api/kb/log", {
     method: "POST",
     body: { entry: { title, content, domain } },
     timeoutMs: 20000,
   });
-  return { total: num(raw['entryCount']) };
+  return { total: num(raw["entryCount"]) };
 }
 
 /** Pause the crawler so the whole CPU goes to chat, or resume it. */
@@ -605,7 +640,7 @@ export async function kbSetCrawler(on: boolean): Promise<boolean> {
     body: {},
     timeoutMs: 10000,
   });
-  return raw['crawling'] !== false && on;
+  return raw["crawling"] !== false && on;
 }
 
 /* ------------------------------------------------------------------ *
@@ -622,7 +657,8 @@ export type PairResult = { ok: boolean; message: string; token: string };
 
 export async function pairWithServer(baseUrl: string, pairingCode: string): Promise<PairResult> {
   const url = baseUrl.trim().replace(/\/+$/, "");
-  if (!isLocalBridgeUrl(url)) throw new BridgeError("Bridge address is not on your local network.", "unsafe-url");
+  if (!isLocalBridgeUrl(url))
+    throw new BridgeError("Bridge address is not on your local network.", "unsafe-url");
   const cfg = await loadBridge();
   const started = performance.now();
 
@@ -659,16 +695,23 @@ export async function pairWithServer(baseUrl: string, pairingCode: string): Prom
       ({ res, data } = await post("/pair", payload, 12000));
     }
 
-    const token = String(data['sessionToken'] ?? data['token'] ?? "");
-    const appSig = String(data['appSig'] ?? "");
+    const token = String(data["sessionToken"] ?? data["token"] ?? "");
+    const appSig = String(data["appSig"] ?? "");
 
     if (res.ok && token) {
-      await saveBridge({ baseUrl: url, token, ...(appSig ? { appSig } : {}), pairedAt: Date.now() });
+      await saveBridge({
+        baseUrl: url,
+        token,
+        ...(appSig ? { appSig } : {}),
+        pairedAt: Date.now(),
+      });
       log("info", "bridge", "paired with pc", { ms: Math.round(performance.now() - started) });
       // Fire-and-forget confirmation so the server marks the device seen.
-      void bridgeRequest("/api/verify", { method: "POST", body: { deviceId: cfg.deviceId }, timeoutMs: 6000 }).catch(
-        () => undefined,
-      );
+      void bridgeRequest("/api/verify", {
+        method: "POST",
+        body: { deviceId: cfg.deviceId },
+        timeoutMs: 6000,
+      }).catch(() => undefined);
       setStatus("online");
       return { ok: true, message: "Paired. Credentials stored encrypted on this device.", token };
     }
@@ -682,18 +725,30 @@ export async function pairWithServer(baseUrl: string, pairingCode: string): Prom
 
     if (res.status === 403) {
       setStatus("unauthorized", "Server is locked to another device.");
-      return { ok: false, message: "That PC is paired to another device. Enter the code shown on its screen.", token: "" };
+      return {
+        ok: false,
+        message: "That PC is paired to another device. Enter the code shown on its screen.",
+        token: "",
+      };
     }
     if (res.status === 401) {
       setStatus("unauthorized", "Wrong pairing code.");
       return { ok: false, message: "Wrong pairing code — check the server terminal.", token: "" };
     }
-    return { ok: false, message: String(data['error'] ?? data['message'] ?? `Server returned ${res.status}`), token: "" };
+    return {
+      ok: false,
+      message: String(data["error"] ?? data["message"] ?? `Server returned ${res.status}`),
+      token: "",
+    };
   } catch (err) {
     const aborted = (err as Error)?.name === "AbortError";
     setStatus("offline", aborted ? "Pairing timed out." : "Bridge unreachable on this network.");
     log("error", "bridge", "pairing failed", { aborted });
-    return { ok: false, message: aborted ? "Pairing timed out." : "Could not reach that address.", token: "" };
+    return {
+      ok: false,
+      message: aborted ? "Pairing timed out." : "Could not reach that address.",
+      token: "",
+    };
   }
 }
 
@@ -730,16 +785,16 @@ export async function statusFull(): Promise<ServerStatus> {
   }
   return {
     online: true,
-    version: str(raw['serverVersion'] ?? raw['version']),
-    uptimeSec: num(raw['uptime']),
-    locked: Boolean(raw['locked']),
-    ollama: Boolean(raw['ollama'] ?? raw['ollamaReady'] ?? raw['modelAlive']),
-    model: str(raw['ollamaModel'] ?? raw['model'] ?? raw['activeModel']),
-    kbTotal: num(raw['kbTotal']),
-    kbQueue: num(raw['kbQueue']),
-    host: str(raw['hostname']),
-    os: [str(raw['os']), str(raw['osVersion'])].filter(Boolean).join(" "),
-    features: Array.isArray(raw['features']) ? (raw['features'] as string[]) : [],
+    version: str(raw["serverVersion"] ?? raw["version"]),
+    uptimeSec: num(raw["uptime"]),
+    locked: Boolean(raw["locked"]),
+    ollama: Boolean(raw["ollama"] ?? raw["ollamaReady"] ?? raw["modelAlive"]),
+    model: str(raw["ollamaModel"] ?? raw["model"] ?? raw["activeModel"]),
+    kbTotal: num(raw["kbTotal"]),
+    kbQueue: num(raw["kbQueue"]),
+    host: str(raw["hostname"]),
+    os: [str(raw["os"]), str(raw["osVersion"])].filter(Boolean).join(" "),
+    features: Array.isArray(raw["features"]) ? (raw["features"] as string[]) : [],
   };
 }
 
@@ -748,27 +803,27 @@ export type PcMetrics = { cpu: number; ram: number; disk: number; at: number };
 /** Live CPU / RAM / disk from the PC. Both flat and nested shapes are handled. */
 export async function serverMetrics(): Promise<PcMetrics> {
   const raw = await bridgeRequest<Json>("/api/metrics", { timeoutMs: 8000 });
-  const nested = (raw['metrics'] as Json | undefined) ?? raw;
+  const nested = (raw["metrics"] as Json | undefined) ?? raw;
   const pct = (v: unknown): number => {
     if (typeof v === "number") return v;
-    if (v && typeof v === "object") return num((v as Json)['percent']);
+    if (v && typeof v === "object") return num((v as Json)["percent"]);
     return 0;
   };
   return {
-    cpu: pct(nested['cpu']),
-    ram: pct(nested['ram'] ?? nested['memory']),
-    disk: pct(nested['disk']),
-    at: toMs(raw['timestamp']) || Date.now(),
+    cpu: pct(nested["cpu"]),
+    ram: pct(nested["ram"] ?? nested["memory"]),
+    disk: pct(nested["disk"]),
+    at: toMs(raw["timestamp"]) || Date.now(),
   };
 }
 
 /** Installed Ollama models for the picker — this route needs no pairing. */
 export async function listModels(): Promise<{ models: string[]; active: string }> {
   const raw = await bridgeRequest<Json>("/api/ollama/models", { timeoutMs: 10000 });
-  const list = Array.isArray(raw['models']) ? (raw['models'] as unknown[]) : [];
+  const list = Array.isArray(raw["models"]) ? (raw["models"] as unknown[]) : [];
   return {
-    models: list.map((m) => (typeof m === "string" ? m : str((m as Json)['name']))).filter(Boolean),
-    active: str(raw['active']),
+    models: list.map((m) => (typeof m === "string" ? m : str((m as Json)["name"]))).filter(Boolean),
+    active: str(raw["active"]),
   };
 }
 
@@ -780,7 +835,7 @@ export async function abortChat(requestId: string): Promise<boolean> {
       body: { requestId },
       timeoutMs: 6000,
     });
-    return raw['ok'] === true;
+    return raw["ok"] === true;
   } catch {
     return false;
   }
@@ -798,13 +853,13 @@ export type OutcomeSummary = {
 /** Aggregated results of everything Butler has actually done on the PC. */
 export async function scriptOutcomes(): Promise<OutcomeSummary> {
   const raw = await bridgeRequest<Json>("/api/scripts/outcome", { timeoutMs: 12000 });
-  const agg = ((raw['aggregate'] ?? raw['agg'] ?? raw) as Json) ?? {};
+  const agg = ((raw["aggregate"] ?? raw["agg"] ?? raw) as Json) ?? {};
   return {
-    runs: num(agg['runs']),
-    ok: num(agg['ok']),
-    errors: num(agg['errors']),
-    bytesFreed: num(agg['bytesFreed']),
-    filesCleaned: num(agg['filesCleaned']),
-    filesOrganized: num(agg['filesOrganized']),
+    runs: num(agg["runs"]),
+    ok: num(agg["ok"]),
+    errors: num(agg["errors"]),
+    bytesFreed: num(agg["bytesFreed"]),
+    filesCleaned: num(agg["filesCleaned"]),
+    filesOrganized: num(agg["filesOrganized"]),
   };
 }

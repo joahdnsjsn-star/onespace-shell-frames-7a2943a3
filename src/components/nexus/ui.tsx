@@ -78,7 +78,9 @@ export function SectionHeader({
           <span className="h-3 w-0.5 rounded-full bg-current" aria-hidden />
           {title}
         </div>
-        {hint ? <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{hint}</p> : null}
+        {hint ? (
+          <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{hint}</p>
+        ) : null}
       </div>
       {action}
     </div>
@@ -155,10 +157,19 @@ export function StatTile({
     <div className="group relative rounded-2xl border border-dim/60 bg-surface-2 surface-elevated p-3.5 press hover:border-dim">
       <div className="label-mono text-muted-foreground">{label}</div>
       <div className="mt-1.5 flex items-baseline gap-1">
-        <span className={cn("font-mono text-2xl font-bold leading-none tabular-nums", accentText[accent])}>{value}</span>
+        <span
+          className={cn(
+            "font-mono text-2xl font-bold leading-none tabular-nums",
+            accentText[accent],
+          )}
+        >
+          {value}
+        </span>
         {unit ? <span className="font-mono text-[10px] text-muted-foreground">{unit}</span> : null}
       </div>
-      {sub ? <div className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{sub}</div> : null}
+      {sub ? (
+        <div className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{sub}</div>
+      ) : null}
     </div>
   );
 }
@@ -209,7 +220,6 @@ export function Row({
   );
 }
 
-
 export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("shimmer rounded-md bg-surface-3/80", className)} />;
 }
@@ -251,7 +261,6 @@ export function LoadingStrip({ label = "awaiting host response" }: { label?: str
     </div>
   );
 }
-
 
 export function EmptyState({
   title,
@@ -303,7 +312,9 @@ export function Toggle({
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/60",
         interactive && "cursor-pointer",
         disabled && "opacity-40",
-        on ? "border-cyan/50 bg-cyan/25 shadow-[0_0_16px_-6px_var(--cyan)]" : "border-dim bg-surface-3",
+        on
+          ? "border-cyan/50 bg-cyan/25 shadow-[0_0_16px_-6px_var(--cyan)]"
+          : "border-dim bg-surface-3",
       )}
     >
       <span
@@ -444,7 +455,8 @@ export function ActionButton({
       onClick={
         onClick
           ? () => {
-              variant === "danger" ? fx.warn() : fx.tap();
+              if (variant === "danger") fx.warn();
+              else fx.tap();
               onClick();
             }
           : undefined
@@ -455,8 +467,10 @@ export function ActionButton({
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/60 disabled:opacity-50",
         variant === "primary" &&
           "bg-cyan text-primary-foreground shadow-[0_10px_30px_-14px_var(--cyan)] hover:bg-cyan/90",
-        variant === "ghost" && "border border-dim bg-surface-3 text-foreground hover:bg-surface-3/70",
-        variant === "danger" && "border border-danger/40 bg-danger/15 text-danger hover:bg-danger/25",
+        variant === "ghost" &&
+          "border border-dim bg-surface-3 text-foreground hover:bg-surface-3/70",
+        variant === "danger" &&
+          "border border-danger/40 bg-danger/15 text-danger hover:bg-danger/25",
         className,
       )}
     >
@@ -464,4 +478,3 @@ export function ActionButton({
     </button>
   );
 }
-

@@ -61,7 +61,11 @@ export async function pushToPc(text: string): Promise<RemoteResult<number>> {
   if (!features.has("clipboard")) return { ok: false, error: "Server has no clipboard support" };
   const payload = text.slice(0, 10000);
   try {
-    await bridgeRequest("/api/clipboard", { method: "POST", body: { text: payload }, timeoutMs: 8000 });
+    await bridgeRequest("/api/clipboard", {
+      method: "POST",
+      body: { text: payload },
+      timeoutMs: 8000,
+    });
     log("info", "bridge", `clipboard push · ${payload.length} chars`);
     return { ok: true, value: payload.length };
   } catch (e) {
@@ -101,7 +105,11 @@ export type PowerAction = "sleep" | "shutdown" | "restart";
 export async function powerAction(action: PowerAction): Promise<RemoteResult<true>> {
   if (!features.has("power")) return { ok: false, error: "Server has no power controls" };
   try {
-    await bridgeRequest("/api/power", { method: "POST", body: { action, confirm: true }, timeoutMs: 8000 });
+    await bridgeRequest("/api/power", {
+      method: "POST",
+      body: { action, confirm: true },
+      timeoutMs: 8000,
+    });
     log("warn", "bridge", `power action sent · ${action}`);
     return { ok: true, value: true };
   } catch (e) {

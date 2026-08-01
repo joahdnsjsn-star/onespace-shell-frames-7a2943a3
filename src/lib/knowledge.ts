@@ -86,7 +86,17 @@ const EMPTY: KnowledgeState = {
 
 type Persisted = Pick<
   KnowledgeState,
-  "total" | "session" | "queue" | "workers" | "learning" | "milestone" | "velocity" | "points" | "categories" | "feed" | "lastSync"
+  | "total"
+  | "session"
+  | "queue"
+  | "workers"
+  | "learning"
+  | "milestone"
+  | "velocity"
+  | "points"
+  | "categories"
+  | "feed"
+  | "lastSync"
 >;
 
 let state: KnowledgeState = EMPTY;

@@ -1,8 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-
-
   Wifi,
   Zap,
   ArrowRight,
@@ -24,12 +22,7 @@ import {
   SectionHeader,
   StatTile,
 } from "@/components/nexus/ui";
-import {
-  LiveClock,
-  NeuralCore,
-  RadialGauge,
-  ScanFrame,
-} from "@/components/nexus/Instruments";
+import { LiveClock, NeuralCore, RadialGauge, ScanFrame } from "@/components/nexus/Instruments";
 import mascotArt from "@/assets/butler-mascot.png.asset.json";
 import { Mascot, Wordmark } from "@/components/nexus/Mascot";
 import { butlerSay, BUTLER_TIPS } from "@/lib/voice";
@@ -49,7 +42,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Butler AI NEXUS — Local PC Command Centre" },
       {
         property: "og:description",
-        content: "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing.",
+        content:
+          "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -72,7 +66,8 @@ function Home() {
   const [fired, setFired] = useState<string | null>(null);
 
   const fire = (label: string) => {
-    label === "Shutdown" || label === "Restart" ? fx.warn() : fx.success();
+    if (label === "Shutdown" || label === "Restart") fx.warn();
+    else fx.success();
     setFired(label);
     window.setTimeout(() => setFired((v) => (v === label ? null : v)), 1200);
   };
@@ -95,7 +90,11 @@ function Home() {
         ]}
       />
       <section>
-        <Card accent="cyan" data-coach="home-hero" className="scanline lift relative overflow-hidden">
+        <Card
+          accent="cyan"
+          data-coach="home-hero"
+          className="scanline lift relative overflow-hidden"
+        >
           <img
             src={mascotArt.url}
             alt=""
@@ -154,7 +153,11 @@ function Home() {
       </section>
 
       <section>
-        <SectionHeader title="neural core" hint="Butler bridge status at a glance" accent="neural" />
+        <SectionHeader
+          title="neural core"
+          hint="Butler bridge status at a glance"
+          accent="neural"
+        />
         <ScanFrame title="core online" status="local · secure">
           <div className="flex flex-col items-center gap-4 py-2 min-[430px]:flex-row min-[430px]:justify-center">
             <NeuralCore size={168} value={`${t.cpu.toFixed(0)}%`} label="load" />
@@ -162,7 +165,12 @@ function Home() {
               <RadialGauge value={t.cpu} label="cpu" size={84} />
               <RadialGauge value={(t.mem / 32) * 100} label="ram" size={84} color="var(--neural)" />
               <RadialGauge value={t.disk} label="disk" size={84} color="var(--warn)" />
-              <RadialGauge value={Math.min(100, t.net * 4)} label="net" size={84} color="var(--net)" />
+              <RadialGauge
+                value={Math.min(100, t.net * 4)}
+                label="net"
+                size={84}
+                color="var(--net)"
+              />
             </div>
           </div>
         </ScanFrame>
@@ -171,7 +179,6 @@ function Home() {
       <section>
         <SectionHeader title="live telemetry" hint="Streaming from your own machine" />
         <div className="grid grid-cols-2 gap-3 min-[430px]:grid-cols-4">
-
           <StatTile
             label="cpu load"
             value={t.cpu.toFixed(0)}
@@ -213,7 +220,11 @@ function Home() {
       </section>
 
       <section>
-        <SectionHeader title="quick butler" hint="One-tap actions on the paired PC" accent="neural" />
+        <SectionHeader
+          title="quick butler"
+          hint="One-tap actions on the paired PC"
+          accent="neural"
+        />
         <div className="grid grid-cols-2 gap-3 min-[430px]:grid-cols-3">
           {QUICK.map((a) => (
             <button
@@ -360,4 +371,3 @@ function MiniStat({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
