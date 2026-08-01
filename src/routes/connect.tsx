@@ -180,8 +180,8 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
   }, [reloadKey]);
 
   /** Accepts the QR payload, a deep link, or a raw terminal line. */
-  const importString = () => {
-    const parsed = parseConnection(paste);
+  const importText = (text: string) => {
+    const parsed = parseConnection(text);
     if (!parsed) {
       setNote("Could not read an address from that text.");
       fx.warn();
@@ -193,6 +193,7 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
     setNote(`Imported ${parsed.ip}${parsed.port ? `:${parsed.port}` : ""}${parsed.token ? " with token" : ""}.`);
     fx.success();
   };
+  const importString = () => importText(paste);
 
 
 
