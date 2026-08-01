@@ -317,30 +317,18 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
 }
 
 function Connect() {
+  const [reloadKey, setReloadKey] = useState(0);
   return (
     <AppShell title="LINK" subtitle="pairing & transport" accentLabel="lan only">
       <section>
-        <PairingPanel />
+        <PairingPanel reloadKey={reloadKey} />
       </section>
 
       <section>
         <SectionHeader title="discovered hosts" accent="net" action={<Radar size={14} className="text-faint" />} />
-        <div className="space-y-2">
-          {["DESKTOP-A9F2", "MEDIA-NUC", "WORKSTATION-02"].map((h) => (
-            <Row
-              key={h}
-              title={<span className="font-mono text-xs">{h}</span>}
-              sub="192.168.1.— · port 8770"
-              left={
-                <IconBadge accent="net" size={34}>
-                  <Server size={16} />
-                </IconBadge>
-              }
-              right={<Chip accent="warn">idle</Chip>}
-            />
-          ))}
-        </div>
+        <DiscoveryPanel onLinked={() => setReloadKey((k) => k + 1)} />
       </section>
+
 
       <section>
         <SectionHeader title="transport" accent="cyan" />
