@@ -352,3 +352,188 @@ export async function ollamaStatus(): Promise<OllamaState> {
 export async function setOllamaModel(model: string): Promise<void> {
   await bridgeRequest("/api/ollama/set_model", { method: "POST", body: { model }, timeoutMs: 15000 });
 }
+
+/* ------------------------------------------------------------------ *
+ * KNOWLEDGE BASE / CRAWLER
+ *
+ * The PC owns the crawler, the SQLite knowledge_base table and the ΣNET
+ * growth log. These wrappers mirror the server's endpoints one-for-one and
+ * normalise every field name the server may use, so a version drift on the
+ * PC side degrades into missing numbers instead of a crashed screen.
+ * ------------------------------------------------------------------ */
+
+export type KbArticle = {
+  url: string;
+  title: string;
+  category: string;
+  words: number;
+  at: number;
+};
+
+export type KbPoint = { ts: number; total: number; added: number };
+export type KbCategory = { name: string; count: number };
+
+export type KbFeed = {
+  articles: KbArticle[];
+  total: number;
+  queue: number;
+  learning: boolean;
+  session: number;
+  milestone: number;
+  workers: number;
+};
+
+export type KbGrowth = {
+  points: KbPoint[];
+  total: number;
+  milestone: number;
+  velocity: number;
+  etaHours: number | null;
+  categories: KbCategory[];
+  queue: number;
+  workers: number;
+  learning: boolean;
+  session: number;
+};
+
+const num = (v: unknown, d = 0) => (typeof v === "number" && Number.isFinite(v) ? v : Number(v) || d);
+const str = (v: unknown, d = "") => (typeof v === "string" ? v : v == null ? d : String(v));
+
+/** Server timestamps are unix seconds; the UI works in milliseconds. */
+const toMs = (v: unknown) => {
+  const n = num(v, 0);
+  if (!n) return 0;
+  return n < 1e12 ? Math.round(n * 1000) : Math.round(n);
+};
+
+function toArticle(raw: Json): KbArticle {
+  return {
+    url: str(raw['url']),
+    title: str(raw['title'], "untitled"),
+    category: str(raw['category'] ?? raw['domain'], "General"),
+    words: num(raw['word_count'] ?? raw['wordCount'] ?? raw['words']),
+    at: toMs(raw['crawled_at'] ?? raw['crawledAt'] ?? raw['ts']),
+  };
+}
+
+/** Newly crawled articles since `sinceMs` (server wants unix seconds). */
+export async function kbFeed(sinceMs = 0): Promise<KbFeed> {
+  const since = sinceMs > 0 ? Math.floor(sinceMs / 1000) : 0;
+  const raw = await bridgeRequest<Json>(`/api/kb/feed?since=${since}`, { timeoutMs: 12000 });
+  const list = Array.isArray(raw['articles']) ? (raw['articles'] as Json[]) : [];
+  return {
+    articles: list.map(toArticle).filter((a) => a.url || a.title),
+    total: num(raw['total']),
+    queue: num(raw['queue']),
+    learning: raw['learning'] !== false,
+    session: num(raw['session']),
+    milestone: num(raw['milestone']),
+    workers: num(raw['workers']),
+  };
+}
+
+/** Time-series growth for the graph. `hours` is clamped server-side to 1..168. */
+export async function kbGrowth(hours = 24): Promise<KbGrowth> {
+  const raw = await bridgeRequest<Json>(`/api/kb/growth?hours=${Math.max(1, Math.min(168, Math.round(hours)))}`, {
+    timeoutMs: 15000,
+  });
+  const pts = Array.isArray(raw['points']) ? (raw['points'] as Json[]) : [];
+  const cats = Array.isArray(raw['categories']) ? (raw['categories'] as Json[]) : [];
+  const eta = raw['etaHours'];
+  return {
+    points: pts
+      .map((p) => ({ ts: toMs(p['ts']), total: num(p['total']), added: num(p['added']) }))
+      .filter((p) => p.ts > 0)
+      .sort((a, b) => a.ts - b.ts),
+    total: num(raw['total']),
+    milestone: num(raw['milestone']),
+    velocity: num(raw['velocity']),
+    etaHours: typeof eta === "number" ? eta : null,
+    categories: cats.map((c) => ({ name: str(c['name'], "other"), count: num(c['count']) })).filter((c) => c.count > 0),
+    queue: num(raw['queue']),
+    workers: num(raw['workers']),
+    learning: raw['learning'] !== false,
+    session: num(raw['session']),
+  };
+}
+
+export type KbHit = {
+  title: string;
+  url: string;
+  category: string;
+  snippet: string;
+  score?: number | undefined;
+};
+
+/** Full-text recall over everything the PC has learned. */
+export async function kbSearch(q: string, limit = 12): Promise<KbHit[]> {
+  const raw = await bridgeRequest<Json>("/api/kb/search", {
+    method: "POST",
+    body: { q, query: q, limit },
+    timeoutMs: 20000,
+  });
+  const rows = Array.isArray(raw['results']) ? (raw['results'] as Json[]) : [];
+  return rows.map((r) => ({
+    title: str(r['title'], "untitled"),
+    url: str(r['url']),
+    category: str(r['category'], "General"),
+    snippet: str(r['snippet'] ?? r['clean_text'] ?? r['text'] ?? r['excerpt']).slice(0, 400),
+    score: typeof r['score'] === "number" ? r['score'] : undefined,
+  }));
+}
+
+/** Crawl one page right now and store it. */
+export async function kbCrawl(url: string, domain = "Custom"): Promise<{ ok: boolean; title: string; words: number; error?: string }> {
+  const raw = await bridgeRequest<Json>("/api/crawl", {
+    method: "POST",
+    body: { url, domain, topic: domain },
+    timeoutMs: 60000,
+  });
+  const ok = raw['status'] === "ok" || raw['saved'] === true;
+  return {
+    ok,
+    title: str(raw['title'], url),
+    words: num(raw['wordCount']),
+    ...(ok ? {} : { error: str(raw['error'], "crawl failed") }),
+  };
+}
+
+/** Queue a URL for the background crawler instead of blocking on it. */
+export async function kbQueueUrl(url: string, topic = "General"): Promise<{ queued: boolean; queueSize: number }> {
+  const raw = await bridgeRequest<Json>("/api/kb/feed", {
+    method: "POST",
+    body: { url, topic, source: "app" },
+    timeoutMs: 15000,
+  });
+  return { queued: raw['queued'] !== false, queueSize: num(raw['queueSize']) };
+}
+
+/** Ask the PC to go find more material about a topic. */
+export async function kbExpand(topic: string): Promise<{ queued: number; queueSize: number }> {
+  const raw = await bridgeRequest<Json>("/api/kb/expand", {
+    method: "POST",
+    body: { topic, query: topic },
+    timeoutMs: 20000,
+  });
+  return { queued: num(raw['queued']), queueSize: num(raw['queueSize']) };
+}
+
+/** Save a note straight into the knowledge base. */
+export async function kbSaveNote(title: string, content: string, domain = "App"): Promise<{ total: number }> {
+  const raw = await bridgeRequest<Json>("/api/kb/log", {
+    method: "POST",
+    body: { entry: { title, content, domain } },
+    timeoutMs: 20000,
+  });
+  return { total: num(raw['entryCount']) };
+}
+
+/** Pause the crawler so the whole CPU goes to chat, or resume it. */
+export async function kbSetCrawler(on: boolean): Promise<boolean> {
+  const raw = await bridgeRequest<Json>(on ? "/api/crawler/resume" : "/api/crawler/pause", {
+    method: "POST",
+    body: {},
+    timeoutMs: 10000,
+  });
+  return raw['crawling'] !== false && on;
+}
