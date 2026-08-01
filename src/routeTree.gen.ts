@@ -10,11 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ButlerRouteImport } from './routes/butler'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as ScriptsRouteImport } from './routes/scripts'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ButlerRoute = ButlerRouteImport.update({
+  id: '/butler',
+  path: '/butler',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -22,31 +29,44 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScriptsRoute = ScriptsRouteImport.update({
+  id: '/scripts',
+  path: '/scripts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/butler': typeof ButlerRoute
   '/onboarding': typeof OnboardingRoute
+  '/scripts': typeof ScriptsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/butler': typeof ButlerRoute
   '/onboarding': typeof OnboardingRoute
+  '/scripts': typeof ScriptsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/butler': typeof ButlerRoute
   '/onboarding': typeof OnboardingRoute
+  '/scripts': typeof ScriptsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/onboarding'
+  fullPaths: '/' | '/butler' | '/onboarding' | '/scripts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/onboarding'
-  id: '__root__' | '/' | '/onboarding'
+  to: '/' | '/butler' | '/onboarding' | '/scripts'
+  id: '__root__' | '/' | '/butler' | '/onboarding' | '/scripts'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ButlerRoute: typeof ButlerRoute
   OnboardingRoute: typeof OnboardingRoute
+  ScriptsRoute: typeof ScriptsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +78,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/butler': {
+      id: '/butler'
+      path: '/butler'
+      fullPath: '/butler'
+      preLoaderRoute: typeof ButlerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -65,12 +92,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/scripts': {
+      id: '/scripts'
+      path: '/scripts'
+      fullPath: '/scripts'
+      preLoaderRoute: typeof ScriptsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ButlerRoute: ButlerRoute,
   OnboardingRoute: OnboardingRoute,
+  ScriptsRoute: ScriptsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
