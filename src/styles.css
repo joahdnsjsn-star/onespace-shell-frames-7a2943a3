@@ -681,8 +681,9 @@ html[data-accent="ok"] { --cyan: oklch(0.85 0.19 156.9); }
   animation: nx-mascot-glow 5.6s ease-in-out infinite;
 }
 .mascot-scan {
-  background: linear-gradient(180deg, transparent, color-mix(in oklab, var(--cyan) 22%, transparent), transparent);
-  height: 26%;
+  background: linear-gradient(180deg, transparent, color-mix(in oklab, var(--cyan) 14%, transparent), transparent);
+  height: 18%;
+  opacity: 0.7;
   animation: nx-mascot-scan 4.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   mix-blend-mode: screen;
 }
