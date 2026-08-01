@@ -26,7 +26,7 @@ export interface GrowthEvent {
   ts: number;
   count: number;
   method: GrowthMethod | string;
-  domain?: string;
+  domain?: string | undefined;
 }
 
 export interface ChartBucket {
