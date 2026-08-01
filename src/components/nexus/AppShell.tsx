@@ -53,9 +53,23 @@ const PRIMARY = [
   { to: "/settings", label: "Config", icon: SlidersHorizontal },
 ] as const;
 
-/** Material 3 navigation bar: 5 fixed destinations, sliding active pill. */
+/**
+ * Material 3 navigation bar: 5 fixed destinations, sliding active pill.
+ * Slot 5 is state-aware — while you're on a page that lives behind the hub it
+ * morphs into that page's own icon/label, so the collapsed row never hides
+ * where you actually are.
+ */
 export function TabBar({ onOpenPages, pagesOpen }: { onOpenPages: () => void; pagesOpen: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const onPrimary = PRIMARY.some((t) =>
+    t.to === "/" ? pathname === "/" : pathname.startsWith(t.to),
+  );
+  const hubPage = onPrimary
+    ? undefined
+    : ALL_PAGES.find((p) => p.to !== "/" && pathname.startsWith(p.to));
+  const HubIcon = hubPage?.icon ?? LayoutGrid;
+  const hubActive = pagesOpen || Boolean(hubPage);
 
   return (
     <nav
@@ -85,20 +99,21 @@ export function TabBar({ onOpenPages, pagesOpen }: { onOpenPages: () => void; pa
         <button
           type="button"
           onClick={onOpenPages}
-          aria-label="Open all pages"
-          data-active={pagesOpen}
-          className={cn("nav-slot", pagesOpen ? "text-cyan" : "text-faint")}
+          aria-label={hubPage ? `${hubPage.label} — open all pages` : "Open all pages"}
+          data-active={hubActive}
+          className={cn("nav-slot", hubActive ? "text-cyan" : "text-faint")}
         >
           <span className="nx-pill" aria-hidden="true" />
-          <LayoutGrid size={21} strokeWidth={pagesOpen ? 2.1 : 1.7} className="relative" />
-          <span className="relative text-[10px] font-semibold leading-none tracking-wide">
-            Pages
+          <HubIcon size={21} strokeWidth={hubActive ? 2.1 : 1.7} className="relative" />
+          <span className="relative max-w-full truncate text-[10px] font-semibold leading-none tracking-wide">
+            {hubPage?.label ?? "Pages"}
           </span>
         </button>
       </div>
     </nav>
   );
 }
+
 
 
 
