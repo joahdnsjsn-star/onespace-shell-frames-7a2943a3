@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -11,10 +11,14 @@ import {
   Server,
   Palette,
   SlidersHorizontal,
+  Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Chip } from "./ui";
 import { OfflineBanner } from "./OfflineBanner";
+import { BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
+import { ButlerDock } from "./ButlerDock";
+import { CommandBar } from "./CommandBar";
 
 export const TABS = [
   { to: "/", label: "HOME", icon: LayoutDashboard },
