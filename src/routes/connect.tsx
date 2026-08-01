@@ -305,7 +305,7 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
       </label>
 
       <label className="block space-y-1">
-        <span className="label-mono text-[10px] text-faint">pairing token</span>
+        <span className="label-mono text-[10px] text-faint">pairing code shown on the pc</span>
         <input
           value={token}
           onChange={(e) => setToken(e.target.value)}
@@ -313,7 +313,7 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
-          placeholder="printed in the server terminal"
+          placeholder="6-digit code from the server window"
           className="w-full rounded-xl border border-dim bg-surface-2 px-3 py-2.5 font-mono text-xs outline-none focus:border-net/60"
         />
       </label>
