@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   SlidersHorizontal,
   ShieldCheck,
@@ -27,6 +27,9 @@ import {
   Clock,
   Gauge,
   CheckCircle2,
+  MessageSquareQuote,
+  Mic,
+  Sparkles,
 } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
 import { notifyPrefsChanged } from "@/components/nexus/PreferenceBridge";
@@ -34,6 +37,13 @@ import { PerfReadout } from "@/components/nexus/PerfGuard";
 import { usePerf } from "@/hooks/usePerf";
 import { setPerfMode, type PerfMode } from "@/lib/perf";
 import serverAsset from "@/assets/butler_server.py.asset.json";
+import {
+  butlerSay,
+  listVoices,
+  onVoicesChanged,
+  speakLine,
+  voiceSupported,
+} from "@/lib/voice";
 
 import {
   Card,
@@ -285,6 +295,105 @@ function ServerSection() {
             <Terminal size={16} /> Setup guide
           </Link>
         </div>
+      </Card>
+    </section>
+  );
+}
+
+/** Butler's spoken presence: voice pick, delivery, tips and alerts. */
+function VoiceSection() {
+  const [supported, setSupported] = useState(false);
+  const [names, setNames] = useState<string[]>([]);
+  const { value: chosen, set: setChosen } = useSetting<string>("voice.name", "auto");
+
+  useEffect(() => {
+    setSupported(voiceSupported());
+    const off = onVoicesChanged(() => setNames(listVoices().map((v) => v.name)));
+    return () => off();
+  }, []);
+
+  return (
+    <section>
+      <SectionHeader
+        title="butler voice"
+        hint={supported ? "Speaks on-device, nothing uploaded" : "Not supported on this browser"}
+        accent="neural"
+      />
+      <Card accent="neural" className="space-y-2.5">
+        <SwitchRow
+          id="voice.enabled"
+          title="Butler speaks"
+          sub="Voice lines for boot, onboarding, tips and alerts"
+          icon={<Mic size={16} />}
+          accent="neural"
+          initial
+        />
+        <SwitchRow
+          id="voice.tips"
+          title="Idle tips"
+          sub="A short hint after 45s of inactivity"
+          icon={<Sparkles size={16} />}
+          accent="cyan"
+          initial
+        />
+        <SwitchRow
+          id="voice.alerts"
+          title="Spoken alerts"
+          sub="Say it out loud when something needs attention"
+          icon={<Bell size={16} />}
+          accent="warn"
+          initial
+        />
+
+        {supported && names.length ? (
+          <div className="rounded-xl border border-dim/50 bg-surface-3/50 px-3 py-3">
+            <div className="flex items-center gap-3">
+              <IconBadge accent="neural" size={32}>
+                <MessageSquareQuote size={16} />
+              </IconBadge>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-medium leading-snug">Voice</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  Installed system voices
+                </div>
+              </div>
+            </div>
+            <select
+              value={chosen}
+              onChange={(e) => {
+                setChosen(e.target.value);
+                notifyPrefsChanged();
+              }}
+              aria-label="Butler voice"
+              className="mt-3 h-10 w-full rounded-lg border border-dim bg-surface-2 px-2 font-mono text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-cyan/60"
+            >
+              <option value="auto">auto · best match</option>
+              {names.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
+
+        <RangeRow id="voice.rate" label="Speed" initial={100} min={60} max={150} step={5} unit="%" accent="neural" />
+        <RangeRow id="voice.pitch" label="Pitch" initial={80} min={40} max={140} step={5} unit="%" accent="cyan" />
+        <RangeRow id="voice.volume" label="Volume" initial={70} min={0} max={100} step={5} unit="%" accent="ok" />
+
+        <ActionButton
+          variant="ghost"
+          className="w-full"
+          onClick={() => {
+            speakLine("Butler online. Voice calibrated and ready.", { force: true });
+            butlerSay("Butler online. Voice calibrated and ready.", {
+              tone: "ok",
+              label: "TEST",
+            });
+          }}
+        >
+          <Volume2 size={16} /> Test Butler's voice
+        </ActionButton>
       </Card>
     </section>
   );
@@ -544,6 +653,7 @@ function Settings() {
         </div>
       </section>
 
+      <VoiceSection />
       <PerformanceSection />
       <ServerSection />
 

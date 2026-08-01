@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { PreferenceBridge } from "../components/nexus/PreferenceBridge";
 import { PerfGuard } from "../components/nexus/PerfGuard";
+import { ButlerVoice } from "../components/nexus/ButlerVoice";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -135,6 +136,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <PreferenceBridge />
       <PerfGuard />
+      <ButlerVoice />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
