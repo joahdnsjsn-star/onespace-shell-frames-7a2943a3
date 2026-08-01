@@ -13,6 +13,7 @@ import {
   type PermDef,
   type PermState,
 } from "@/lib/permissions";
+import { usePermissionDisclosure } from "@/components/nexus/Disclosure";
 
 export const Route = createFileRoute("/permissions")({
   head: () => ({
