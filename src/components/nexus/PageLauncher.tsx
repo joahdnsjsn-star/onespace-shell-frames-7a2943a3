@@ -43,7 +43,7 @@ export const PAGE_GROUPS: { group: string; pages: PageEntry[] }[] = [
       { to: "/", label: "Home", desc: "Live telemetry & core", icon: LayoutDashboard, accent: "cyan", keywords: "dashboard start overview status" },
       { to: "/butler", label: "Butler AI", desc: "Chat with your machine", icon: Bot, accent: "neural", keywords: "chat assistant ask voice talk prompt" },
       { to: "/scripts", label: "Scripts", desc: "Automation library", icon: Code2, accent: "ok", keywords: "forge automation macro run command library" },
-      { to: "/knowledge", label: "Brain", desc: "Neural knowledge base", icon: Brain, accent: "neural", keywords: "kb memory notes learn docs" },
+      { to: "/knowledge", label: "Brain", desc: "Crawler graph & recall", icon: Brain, accent: "neural", keywords: "kb memory notes learn docs crawler graph knowledge index search" },
     ],
   },
   {

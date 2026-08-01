@@ -18,6 +18,8 @@ import { TouchInk } from "../components/nexus/TouchInk";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { installLogger } from "../lib/logger";
 import { startAutoConnect } from "../lib/autoconnect";
+import { startKnowledge } from "../lib/knowledge";
+
 
 function NotFoundComponent() {
   return (
@@ -153,8 +155,14 @@ function RootComponent() {
 
   useEffect(() => {
     installLogger();
-    return startAutoConnect();
+    const stopLink = startAutoConnect();
+    const stopBrain = startKnowledge();
+    return () => {
+      stopBrain();
+      stopLink();
+    };
   }, []);
+
 
   return (
     <QueryClientProvider client={queryClient}>
