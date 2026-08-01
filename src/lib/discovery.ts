@@ -20,7 +20,7 @@ import { vaultGet, vaultSet } from "./vault";
  * 1. Connection-string parser
  * ------------------------------------------------------------------ */
 
-export type ParsedConn = { ip: string; port: string; token: string };
+export type ParsedConn = { ip: string; port: string; token: string; appSig?: string };
 
 /** Never throws. Returns null when nothing usable was found. */
 export function parseConnection(raw: string): ParsedConn | null {
@@ -39,10 +39,14 @@ export function parseConnection(raw: string): ParsedConn | null {
       const o = JSON.parse(s.slice(jsonStart)) as Record<string, unknown>;
       const ip = String(o['ip'] ?? o['address'] ?? o['host'] ?? "").trim();
       if (ip) {
+        // `appSig` is the per-PC client secret; without it the server answers
+        // 403 INVALID_APP_SIG once it is locked to a device.
+        const sig = String(o['appSig'] ?? o['app_sig'] ?? o['sig'] ?? "").trim();
         return {
           ip,
           port: String(o['port'] ?? "").trim(),
           token: String(o['pairingCode'] ?? o['code'] ?? o['token'] ?? o['pin'] ?? "").trim(),
+          ...(sig ? { appSig: sig } : {}),
         };
       }
     } catch {

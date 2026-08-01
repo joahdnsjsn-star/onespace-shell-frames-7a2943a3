@@ -6,11 +6,13 @@ import {
   forgetBridge,
   isLocalBridgeUrl,
   loadBridge,
+  pairWithServer,
   saveBridge,
   type HealthReport,
 } from "@/lib/butler-bridge";
 import { parseConnection, rememberGoodHost, scanLan, toBaseUrl, type FoundHost, type ScanProgress } from "@/lib/discovery";
 import { useBridge } from "@/lib/useBridge";
+import { useLink } from "@/lib/useLink";
 import serverAsset from "@/assets/butler_server.py.asset.json";
 import { QrScanner } from "@/components/nexus/QrScanner";
 import { fx } from "@/lib/fx";
@@ -164,6 +166,7 @@ function DiscoveryPanel({ onLinked }: { onLinked: () => void }) {
  */
 function PairingPanel({ reloadKey }: { reloadKey: number }) {
   const { status, lastError, paired, refresh } = useBridge();
+  const link = useLink();
   const [url, setUrl] = useState("");
   const [token, setToken] = useState("");
   const [deviceId, setDeviceId] = useState("");
@@ -191,8 +194,11 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
     }
     setUrl(toBaseUrl(parsed));
     if (parsed.token) setToken(parsed.token);
+    // The app signature travels in the QR payload — store it immediately so the
+    // very first paired request already carries X-Butler-App-Sig.
+    if (parsed.appSig) void saveBridge({ appSig: parsed.appSig });
     setPaste("");
-    setNote(`Imported ${parsed.ip}${parsed.port ? `:${parsed.port}` : ""}${parsed.token ? " with token" : ""}.`);
+    setNote(`Imported ${parsed.ip}${parsed.port ? `:${parsed.port}` : ""}${parsed.token ? " with code" : ""}.`);
     fx.success();
   };
   const importString = () => importText(paste);
@@ -201,17 +207,31 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
 
   const valid = url.trim().length > 0 && isLocalBridgeUrl(url.trim());
 
+  /**
+   * Real handshake: POST /pair exchanges the printed code for a session token
+   * and the machine's app signature, then /api/health confirms the link.
+   */
   const connect = () => {
     if (!valid || busy) return;
     setBusy(true);
     setNote("");
     fx.select();
-    void saveBridge({ baseUrl: url, token })
-      .then(() => checkHealth())
-      .then((h) => {
-        setHealth(h);
-        setNote(h.ollama ? "Linked — local model ready." : "Linked — Ollama not detected on the PC yet.");
-        void rememberGoodHost(url);
+    void pairWithServer(url.trim(), token.trim())
+      .then(async (result) => {
+        if (!result.ok) {
+          setNote(result.message);
+          fx.warn();
+          return;
+        }
+        const h = await checkHealth().catch(() => null);
+        if (h) setHealth(h);
+        setNote(
+          h?.ollama
+            ? "Paired — local model ready."
+            : `${result.message} Ollama not detected on the PC yet.`,
+        );
+        await rememberGoodHost(url.trim());
+        refresh();
         fx.success();
       })
       .catch((err: unknown) => setNote((err as Error).message))
@@ -287,7 +307,7 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
       </label>
 
       <label className="block space-y-1">
-        <span className="label-mono text-[10px] text-faint">pairing token</span>
+        <span className="label-mono text-[10px] text-faint">pairing code shown on the pc</span>
         <input
           value={token}
           onChange={(e) => setToken(e.target.value)}
@@ -295,7 +315,7 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
-          placeholder="printed in the server terminal"
+          placeholder="6-digit code from the server window"
           className="w-full rounded-xl border border-dim bg-surface-2 px-3 py-2.5 font-mono text-xs outline-none focus:border-net/60"
         />
       </label>
@@ -319,15 +339,32 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3 pt-1">
-        <StatTile label="server" value={health?.version ?? "—"} accent={health ? "ok" : "warn"} sub="butler_server" />
+        <StatTile
+          label="server"
+          value={health?.version ?? link.serverVersion ?? "—"}
+          accent={health ? "ok" : "warn"}
+          sub="butler_server"
+        />
         <StatTile
           label="model"
-          value={health?.model ?? (health?.ollama ? "ready" : "—")}
+          value={health?.model ?? link.model ?? (health?.ollama ? "ready" : "—")}
           accent={health?.ollama ? "neural" : "warn"}
           sub="ollama · local"
         />
         <StatTile label="transport" value="lan" accent="net" sub="no cloud relay" />
         <StatTile label="device id" value={deviceId ? deviceId.slice(0, 8) : "—"} accent="system" sub="local only" />
+        <StatTile
+          label="pc cpu"
+          value={link.state === "online" ? `${link.cpu}%` : "—"}
+          accent={link.cpu > 85 ? "danger" : "system"}
+          sub="live from host"
+        />
+        <StatTile
+          label="pc ram"
+          value={link.state === "online" ? `${link.ram}%` : "—"}
+          accent={link.ram > 85 ? "danger" : "system"}
+          sub="live from host"
+        />
       </div>
     </Card>
   );

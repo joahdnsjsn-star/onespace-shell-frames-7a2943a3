@@ -20,10 +20,21 @@ export type BridgeConfig = {
   baseUrl: string;
   token: string;
   deviceId: string;
+  /**
+   * `X-Butler-App-Sig` — the per-PC client secret handed out by the server in
+   * the QR payload / pair response. `butler_server.py` derives it from that
+   * machine's HMAC secret and rejects (403 INVALID_APP_SIG) any request that
+   * does not carry it once the server is locked to a device.
+   */
+  appSig: string;
+  pairedAt: number;
 };
 
 const CFG_KEY = "bridge.config";
-const DEFAULTS: BridgeConfig = { baseUrl: "", token: "", deviceId: "" };
+const DEFAULTS: BridgeConfig = { baseUrl: "", token: "", deviceId: "", appSig: "", pairedAt: 0 };
+
+/** Sent on every request so the PC can tell app builds apart in its audit log. */
+export const APP_VERSION = "5.0.9";
 
 export type BridgeStatus = "idle" | "connecting" | "online" | "offline" | "unauthorized";
 
@@ -154,9 +165,19 @@ export async function bridgeRequest<T = Json>(
       method: opts.method ?? (opts.body ? "POST" : "GET"),
       headers: {
         "Content-Type": "application/json",
-        ...(cfg.token ? { Authorization: `Bearer ${cfg.token}` } : {}),
+        // The server accepts the token as Bearer, X-Session-Token or
+        // X-Fallback-Token; sending all three makes pairing survive a partial
+        // token rotation without a re-scan.
+        ...(cfg.token
+          ? {
+              Authorization: `Bearer ${cfg.token}`,
+              "X-Session-Token": cfg.token,
+              "X-Fallback-Token": cfg.token,
+            }
+          : {}),
+        ...(cfg.appSig ? { "X-Butler-App-Sig": cfg.appSig } : {}),
         "X-Device-Id": cfg.deviceId,
-        "X-App-Version": "5.0.9",
+        "X-App-Version": APP_VERSION,
       },
       ...(opts.body ? { body: JSON.stringify(opts.body) } : {}),
       signal: controller.signal,
@@ -338,14 +359,46 @@ export async function runScript(id: string, signal?: AbortSignal): Promise<RunRe
   };
 }
 
-/** Roll back the last run using the server's undo journal. */
+/**
+ * Roll back a run through the server's undo journal.
+ * The endpoint is `/api/undo/rollback` and it answers `{ ok, message }` —
+ * an older `/api/undo` path does not exist on butler_server.py.
+ */
 export async function undoRun(undoId: string): Promise<RunResult> {
-  const raw = await bridgeRequest<Json>("/api/undo", {
+  const raw = await bridgeRequest<Json>("/api/undo/rollback", {
     method: "POST",
-    body: { id: undoId, undoId },
+    body: { id: undoId, entryId: undoId },
     timeoutMs: 60000,
   });
-  return { ok: raw['status'] === "ok", output: String(raw['output'] ?? raw['error'] ?? "") };
+  const ok = raw['ok'] === true || raw['status'] === "ok";
+  log(ok ? "info" : "warn", "script", `undo ${undoId}`, { ok });
+  return { ok, output: String(raw['message'] ?? raw['output'] ?? raw['error'] ?? "") };
+}
+
+export type UndoEntry = {
+  id: string;
+  at: number;
+  request: string;
+  language: string;
+  status: string;
+  undone: boolean;
+};
+
+/** The rollback journal — what can still be reverted, newest first. */
+export async function undoList(): Promise<{ entries: UndoEntry[]; windowSec: number }> {
+  const raw = await bridgeRequest<Json>("/api/undo/list", { timeoutMs: 12000 });
+  const rows = Array.isArray(raw['entries']) ? (raw['entries'] as Json[]) : [];
+  return {
+    entries: rows.map((r) => ({
+      id: String(r['id'] ?? ""),
+      at: toMs(r['ts'] ?? r['at']),
+      request: String(r['user_req'] ?? r['userRequest'] ?? r['request'] ?? ""),
+      language: String(r['language'] ?? "python"),
+      status: String(r['status'] ?? ""),
+      undone: Boolean(r['undone']),
+    })),
+    windowSec: Number(raw['undoWindow'] ?? 0) || 0,
+  };
 }
 
 export type OllamaState = {
@@ -553,4 +606,205 @@ export async function kbSetCrawler(on: boolean): Promise<boolean> {
     timeoutMs: 10000,
   });
   return raw['crawling'] !== false && on;
+}
+
+/* ------------------------------------------------------------------ *
+ * PAIRING
+ *
+ * `butler_server.py` exposes `POST /pair` (no /api prefix). It answers with a
+ * session token plus the machine's app signature, both of which every later
+ * request must carry. A 403 means the server is already locked to another
+ * device — with a real code typed in we clear that lock through
+ * `/api/reset_pair` and retry once, exactly like the native client does.
+ * ------------------------------------------------------------------ */
+
+export type PairResult = { ok: boolean; message: string; token: string };
+
+export async function pairWithServer(baseUrl: string, pairingCode: string): Promise<PairResult> {
+  const url = baseUrl.trim().replace(/\/+$/, "");
+  if (!isLocalBridgeUrl(url)) throw new BridgeError("Bridge address is not on your local network.", "unsafe-url");
+  const cfg = await loadBridge();
+  const started = performance.now();
+
+  const post = async (path: string, body: Json, timeoutMs: number) => {
+    const controller = new AbortController();
+    const t = window.setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+        cache: "no-store",
+        credentials: "omit",
+        referrerPolicy: "no-referrer",
+      });
+      const text = await res.text();
+      return { res, data: (text ? JSON.parse(text) : {}) as Json };
+    } finally {
+      window.clearTimeout(t);
+    }
+  };
+
+  const payload = { pairingCode, deviceId: cfg.deviceId, platform: "android" };
+
+  try {
+    setStatus("connecting");
+    let { res, data } = await post("/pair", payload, 12000);
+
+    // Locked to a different phone — a typed code proves physical access.
+    if (res.status === 403 && pairingCode.trim().length >= 4) {
+      await post("/api/reset_pair", { pairingCode }, 6000).catch(() => undefined);
+      await new Promise((r) => window.setTimeout(r, 400));
+      ({ res, data } = await post("/pair", payload, 12000));
+    }
+
+    const token = String(data['sessionToken'] ?? data['token'] ?? "");
+    const appSig = String(data['appSig'] ?? "");
+
+    if (res.ok && token) {
+      await saveBridge({ baseUrl: url, token, ...(appSig ? { appSig } : {}), pairedAt: Date.now() });
+      log("info", "bridge", "paired with pc", { ms: Math.round(performance.now() - started) });
+      // Fire-and-forget confirmation so the server marks the device seen.
+      void bridgeRequest("/api/verify", { method: "POST", body: { deviceId: cfg.deviceId }, timeoutMs: 6000 }).catch(
+        () => undefined,
+      );
+      setStatus("online");
+      return { ok: true, message: "Paired. Credentials stored encrypted on this device.", token };
+    }
+
+    // Some builds run with auth off entirely: a 2xx with no token still links.
+    if (res.ok && !token) {
+      await saveBridge({ baseUrl: url, ...(appSig ? { appSig } : {}), pairedAt: Date.now() });
+      setStatus("online");
+      return { ok: true, message: "Linked (server has pairing disabled).", token: "" };
+    }
+
+    if (res.status === 403) {
+      setStatus("unauthorized", "Server is locked to another device.");
+      return { ok: false, message: "That PC is paired to another device. Enter the code shown on its screen.", token: "" };
+    }
+    if (res.status === 401) {
+      setStatus("unauthorized", "Wrong pairing code.");
+      return { ok: false, message: "Wrong pairing code — check the server terminal.", token: "" };
+    }
+    return { ok: false, message: String(data['error'] ?? data['message'] ?? `Server returned ${res.status}`), token: "" };
+  } catch (err) {
+    const aborted = (err as Error)?.name === "AbortError";
+    setStatus("offline", aborted ? "Pairing timed out." : "Bridge unreachable on this network.");
+    log("error", "bridge", "pairing failed", { aborted });
+    return { ok: false, message: aborted ? "Pairing timed out." : "Could not reach that address.", token: "" };
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * STATUS / TELEMETRY
+ * ------------------------------------------------------------------ */
+
+export type ServerStatus = {
+  online: boolean;
+  version: string;
+  uptimeSec: number;
+  locked: boolean;
+  ollama: boolean;
+  model: string;
+  kbTotal: number;
+  kbQueue: number;
+  host: string;
+  os: string;
+  features: string[];
+};
+
+/**
+ * One call instead of three. `/api/status/full` is the server's own
+ * consolidated endpoint; if it is unavailable (older build, or not paired yet)
+ * we fall back to the unauthenticated handshake.
+ */
+export async function statusFull(): Promise<ServerStatus> {
+  let raw: Json;
+  try {
+    raw = await bridgeRequest<Json>("/api/status/full", { timeoutMs: 9000 });
+  } catch (err) {
+    if (err instanceof BridgeError && (err.code === "offline" || err.code === "timeout")) throw err;
+    raw = await bridgeRequest<Json>("/api/handshake", { timeoutMs: 9000 });
+  }
+  return {
+    online: true,
+    version: str(raw['serverVersion'] ?? raw['version']),
+    uptimeSec: num(raw['uptime']),
+    locked: Boolean(raw['locked']),
+    ollama: Boolean(raw['ollama'] ?? raw['ollamaReady'] ?? raw['modelAlive']),
+    model: str(raw['ollamaModel'] ?? raw['model'] ?? raw['activeModel']),
+    kbTotal: num(raw['kbTotal']),
+    kbQueue: num(raw['kbQueue']),
+    host: str(raw['hostname']),
+    os: [str(raw['os']), str(raw['osVersion'])].filter(Boolean).join(" "),
+    features: Array.isArray(raw['features']) ? (raw['features'] as string[]) : [],
+  };
+}
+
+export type PcMetrics = { cpu: number; ram: number; disk: number; at: number };
+
+/** Live CPU / RAM / disk from the PC. Both flat and nested shapes are handled. */
+export async function serverMetrics(): Promise<PcMetrics> {
+  const raw = await bridgeRequest<Json>("/api/metrics", { timeoutMs: 8000 });
+  const nested = (raw['metrics'] as Json | undefined) ?? raw;
+  const pct = (v: unknown): number => {
+    if (typeof v === "number") return v;
+    if (v && typeof v === "object") return num((v as Json)['percent']);
+    return 0;
+  };
+  return {
+    cpu: pct(nested['cpu']),
+    ram: pct(nested['ram'] ?? nested['memory']),
+    disk: pct(nested['disk']),
+    at: toMs(raw['timestamp']) || Date.now(),
+  };
+}
+
+/** Installed Ollama models for the picker — this route needs no pairing. */
+export async function listModels(): Promise<{ models: string[]; active: string }> {
+  const raw = await bridgeRequest<Json>("/api/ollama/models", { timeoutMs: 10000 });
+  const list = Array.isArray(raw['models']) ? (raw['models'] as unknown[]) : [];
+  return {
+    models: list.map((m) => (typeof m === "string" ? m : str((m as Json)['name']))).filter(Boolean),
+    active: str(raw['active']),
+  };
+}
+
+/** Stop a chat that is still generating on the PC. */
+export async function abortChat(requestId: string): Promise<boolean> {
+  try {
+    const raw = await bridgeRequest<Json>("/api/butler/abort", {
+      method: "POST",
+      body: { requestId },
+      timeoutMs: 6000,
+    });
+    return raw['ok'] === true;
+  } catch {
+    return false;
+  }
+}
+
+export type OutcomeSummary = {
+  runs: number;
+  ok: number;
+  errors: number;
+  bytesFreed: number;
+  filesCleaned: number;
+  filesOrganized: number;
+};
+
+/** Aggregated results of everything Butler has actually done on the PC. */
+export async function scriptOutcomes(): Promise<OutcomeSummary> {
+  const raw = await bridgeRequest<Json>("/api/scripts/outcome", { timeoutMs: 12000 });
+  const agg = ((raw['aggregate'] ?? raw['agg'] ?? raw) as Json) ?? {};
+  return {
+    runs: num(agg['runs']),
+    ok: num(agg['ok']),
+    errors: num(agg['errors']),
+    bytesFreed: num(agg['bytesFreed']),
+    filesCleaned: num(agg['filesCleaned']),
+    filesOrganized: num(agg['filesOrganized']),
+  };
 }
