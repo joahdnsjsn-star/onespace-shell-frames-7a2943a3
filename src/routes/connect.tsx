@@ -390,14 +390,11 @@ function Connect() {
         </Card>
       </section>
 
-      <div className="grid grid-cols-2 gap-3">
-        <ActionButton variant="ghost">
-          <RefreshCw size={16} /> Rescan
-        </ActionButton>
-        <ActionButton>
-          <QrCode size={16} /> Scan QR
-        </ActionButton>
-      </div>
+      <p className="px-1 pb-1 text-[11px] text-muted-foreground">
+        <QrCode size={13} className="mr-1 inline text-cyan" />
+        No camera needed — paste the QR payload above, or let the LAN sweep find the machine for you.
+      </p>
+
     </AppShell>
   );
 }
