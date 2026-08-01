@@ -47,6 +47,25 @@ let state: PerfState = {
 const listeners = new Set<(s: PerfState) => void>();
 let started = false;
 
+/**
+ * Quiet window: while active the governor keeps measuring but never changes
+ * tier, so short, expected bursts (route transitions, deferred chunks mounting,
+ * splash teardown) can never trigger a "performance mode engaged" popup.
+ */
+let quietUntil = 0;
+
+/** Silences automatic tier changes for `ms`. Safe to call from anywhere. */
+export function perfQuiet(ms = 1200) {
+  if (typeof performance === "undefined") return;
+  quietUntil = Math.max(quietUntil, performance.now() + ms);
+}
+
+/** True while automatic tier changes are suppressed. */
+export function isPerfQuiet() {
+  return typeof performance !== "undefined" && performance.now() < quietUntil;
+}
+
+
 function emit(patch: Partial<PerfState>) {
   const next = { ...state, ...patch };
   if (
