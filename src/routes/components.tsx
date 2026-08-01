@@ -34,7 +34,7 @@ const ACCENTS = ["cyan", "ok", "warn", "danger", "neural", "system", "net"] as c
 
 function Kit() {
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background sm:max-w-xl lg:max-w-2xl">
       <header className="sticky top-0 z-20 border-b border-dim bg-surface/95 px-4 py-3 backdrop-blur">
         <Link to="/" className="flex items-center gap-1 label-mono text-muted-foreground hover:text-cyan">
           <ChevronLeft size={14} /> home

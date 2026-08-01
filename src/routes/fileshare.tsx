@@ -24,7 +24,7 @@ function FileShare() {
   return (
     <AppShell title="FILES" subtitle="lan transfer bridge" accentLabel="encrypted">
       <section>
-        <div className="flex items-center gap-1 overflow-x-auto rounded-xl border border-dim bg-surface-2 px-3 py-2.5 font-mono text-xs text-muted-foreground">
+        <div className="flex items-center gap-1 scroll-x rounded-xl border border-dim bg-surface-2 px-3 py-2.5 font-mono text-xs text-muted-foreground">
           <span className="text-cyan">C:</span>
           <ChevronRight size={12} />
           <span>Users</span>

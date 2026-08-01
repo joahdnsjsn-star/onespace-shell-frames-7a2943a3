@@ -27,7 +27,7 @@ const LEVELS = [
 function Logs() {
   return (
     <AppShell title="LOGS" subtitle="event stream · telemetry" accentLabel="live">
-      <section className="grid grid-cols-3 gap-3">
+      <section className="grid grid-cols-2 gap-3 min-[400px]:grid-cols-3">
         <StatTile label="info" value="—" accent="system" />
         <StatTile label="warn" value="—" accent="warn" />
         <StatTile label="error" value="—" accent="danger" />

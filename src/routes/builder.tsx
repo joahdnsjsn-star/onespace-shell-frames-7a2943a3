@@ -69,7 +69,7 @@ function Builder() {
       <section>
         <SectionHeader title="test run" accent="warn" />
         <Card>
-          <pre className="overflow-x-auto rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-faint">
+          <pre className="scroll-x rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-faint">
 {`> no dry-run executed yet`}
           </pre>
         </Card>
