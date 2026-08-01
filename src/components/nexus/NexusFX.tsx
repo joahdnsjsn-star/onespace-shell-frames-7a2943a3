@@ -58,23 +58,21 @@ export function NexusLogo({
       fill="none"
       className={cn("shrink-0 overflow-visible", className)}
       role="img"
-      aria-label="Butler AI NEXUS"
+      aria-label="Butler AI — PC Automation"
     >
       <defs>
         <linearGradient id="nxMark" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="var(--cyan)" />
           <stop offset="100%" stopColor="var(--neural)" />
         </linearGradient>
-        <radialGradient id="nxCore" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="var(--cyan)" stopOpacity="0.55" />
+        <radialGradient id="nxCore" cx="50%" cy="42%" r="55%">
+          <stop offset="0%" stopColor="var(--cyan)" stopOpacity="0.5" />
           <stop offset="100%" stopColor="var(--cyan)" stopOpacity="0" />
         </radialGradient>
       </defs>
 
       {/* status pulse ring */}
       <circle cx="24" cy="24" r="21" stroke={ring} strokeWidth="1" opacity="0.5" className="nx-ring" />
-
-      {/* energy core */}
       <circle cx="24" cy="24" r="17" fill="url(#nxCore)" />
 
       {/* hex frame */}
@@ -85,35 +83,46 @@ export function NexusLogo({
         strokeLinejoin="round"
         fill="color-mix(in oklab, var(--cyan) 8%, transparent)"
       />
-      {/* inner hex hairline */}
-      <path
-        d="M24 9.5 36.5 16.75v14.5L24 38.5 11.5 31.25v-14.5Z"
-        stroke="color-mix(in oklab, var(--cyan) 26%, transparent)"
-        strokeWidth="0.9"
-        fill="none"
-      />
 
-      {/* orbiting nodes */}
-      <g className="nx-spin-slow" style={{ transformOrigin: "24px 24px" }}>
-        <circle cx="24" cy="6" r="1.9" fill="var(--cyan)" />
-        <circle cx="40" cy="33" r="1.5" fill="var(--neural)" />
-        <circle cx="8" cy="33" r="1.5" fill="var(--net)" />
-      </g>
-
-      {/* the N */}
-      <path
-        d="M18 32V16l12 16V16"
+      {/* butler bot head */}
+      <rect
+        x="14.5"
+        y="13"
+        width="19"
+        height="15"
+        rx="5"
         stroke="var(--cyan)"
-        strokeWidth="2.6"
-        strokeLinecap="round"
+        strokeWidth="1.8"
+        fill="color-mix(in oklab, var(--cyan) 12%, transparent)"
+      />
+      {/* antenna */}
+      <path d="M24 13V9.2" stroke="var(--cyan)" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="24" cy="8" r="1.7" fill="var(--neural)" className="pulse-dot" />
+      {/* visor eyes */}
+      <circle cx="20" cy="20.2" r="1.9" fill="var(--cyan)" />
+      <circle cx="28" cy="20.2" r="1.9" fill="var(--cyan)" />
+      {/* bow tie — the butler tell */}
+      <path
+        d="M24 32.6 18.4 29.8v5.6L24 32.6Zm0 0 5.6-2.8v5.6L24 32.6Z"
+        fill="url(#nxMark)"
+        stroke="var(--neural)"
+        strokeWidth="0.9"
         strokeLinejoin="round"
+      />
+      <circle cx="24" cy="32.6" r="1.5" fill="var(--background)" stroke="var(--cyan)" strokeWidth="1" />
+      {/* collar */}
+      <path
+        d="M17 29.5 24 34l7-4.5"
+        stroke="color-mix(in oklab, var(--cyan) 45%, transparent)"
+        strokeWidth="1.2"
+        strokeLinecap="round"
         fill="none"
       />
     </svg>
   );
 }
 
-/** Header wordmark: gradient sweep title + optional caret-style subtitle. */
+/** Header wordmark: eyebrow + gradient sweep title. */
 export function AnimatedTitle({
   title,
   subtitle,
@@ -125,20 +134,20 @@ export function AnimatedTitle({
 }) {
   return (
     <div className="min-w-0">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <span
-          className={cn(
-            "size-2 shrink-0 rounded-full pulse-dot",
-            online ? "bg-ok" : "bg-danger",
-          )}
+          className={cn("size-1.5 shrink-0 rounded-full pulse-dot", online ? "bg-ok" : "bg-danger")}
           aria-hidden
         />
-        <h1 className="nx-title font-mono text-fluid-sm font-bold tracking-[0.08em] min-[400px]:text-fluid-lg min-[400px]:tracking-[0.12em]">
-          {title}
-        </h1>
+        <span className="truncate font-mono text-[9px] font-semibold uppercase tracking-[0.34em] text-cyan/70">
+          Butler AI
+        </span>
       </div>
+      <h1 className="nx-title truncate font-mono text-fluid-sm font-bold uppercase leading-tight tracking-[0.1em] min-[400px]:text-fluid-lg">
+        {title}
+      </h1>
       {subtitle ? (
-        <p className="mt-1 text-fluid-xs leading-snug text-muted-foreground">
+        <p className="mt-0.5 truncate text-fluid-xs leading-snug text-muted-foreground">
           <span className="text-cyan/70">›</span> {subtitle}
         </p>
       ) : null}
