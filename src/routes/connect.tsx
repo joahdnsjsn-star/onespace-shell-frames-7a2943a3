@@ -184,7 +184,7 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
     const parsed = parseConnection(paste);
     if (!parsed) {
       setNote("Could not read an address from that text.");
-      fx.error?.();
+      fx.warn();
       return;
     }
     setUrl(toBaseUrl(parsed));
