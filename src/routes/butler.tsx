@@ -1,10 +1,14 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Bot, Paperclip, SendHorizonal, Undo2, User, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
 import { Chip, IconBadge } from "@/components/nexus/ui";
 import { Coach } from "@/components/nexus/Coach";
 import { fx } from "@/lib/fx";
+import { askButler, BridgeError } from "@/lib/butler-bridge";
+import { useBridge } from "@/lib/useBridge";
+import { vaultGet, vaultSet } from "@/lib/vault";
+
 
 export const Route = createFileRoute("/butler")({
   head: () => ({
