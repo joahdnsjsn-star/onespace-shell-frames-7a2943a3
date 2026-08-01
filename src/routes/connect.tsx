@@ -337,15 +337,32 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3 pt-1">
-        <StatTile label="server" value={health?.version ?? "—"} accent={health ? "ok" : "warn"} sub="butler_server" />
+        <StatTile
+          label="server"
+          value={health?.version ?? link.serverVersion ?? "—"}
+          accent={health ? "ok" : "warn"}
+          sub="butler_server"
+        />
         <StatTile
           label="model"
-          value={health?.model ?? (health?.ollama ? "ready" : "—")}
+          value={health?.model ?? link.model ?? (health?.ollama ? "ready" : "—")}
           accent={health?.ollama ? "neural" : "warn"}
           sub="ollama · local"
         />
         <StatTile label="transport" value="lan" accent="net" sub="no cloud relay" />
         <StatTile label="device id" value={deviceId ? deviceId.slice(0, 8) : "—"} accent="system" sub="local only" />
+        <StatTile
+          label="pc cpu"
+          value={link.state === "online" ? `${link.cpu}%` : "—"}
+          accent={link.cpu > 85 ? "danger" : "system"}
+          sub="live from host"
+        />
+        <StatTile
+          label="pc ram"
+          value={link.state === "online" ? `${link.ram}%` : "—"}
+          accent={link.ram > 85 ? "danger" : "system"}
+          sub="live from host"
+        />
       </div>
     </Card>
   );
