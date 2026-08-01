@@ -41,10 +41,10 @@ export function Mascot({
 }
 
 const LINES = [
-  "core.link ......... ok",
-  "telemetry ......... ok",
-  "butler.mind ....... ok",
-  "vault.seal ........ ok",
+  "vault.seal ........ sealed",
+  "link.engine ....... armed",
+  "butler.mind ....... online",
+  "telemetry ......... streaming",
 ];
 
 /**
