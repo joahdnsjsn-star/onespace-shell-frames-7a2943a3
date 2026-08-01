@@ -233,6 +233,29 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
       </div>
 
       <label className="block space-y-1">
+        <span className="label-mono text-[10px] text-faint">paste qr / terminal line</span>
+        <div className="flex gap-2">
+          <input
+            value={paste}
+            onChange={(e) => setPaste(e.target.value)}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            placeholder='{"ip":"192.168.1.20","port":8770,…}'
+            className="min-w-0 flex-1 rounded-xl border border-dim bg-surface-2 px-3 py-2.5 font-mono text-xs outline-none focus:border-net/60"
+          />
+          <button
+            type="button"
+            onClick={importString}
+            disabled={!paste.trim()}
+            className="shrink-0 rounded-xl border border-net/40 px-3 text-[11px] font-semibold text-net active:scale-95 disabled:opacity-40"
+          >
+            <Zap size={14} className="inline" /> read
+          </button>
+        </div>
+      </label>
+
+      <label className="block space-y-1">
         <span className="label-mono text-[10px] text-faint">bridge address</span>
         <input
           value={url}
