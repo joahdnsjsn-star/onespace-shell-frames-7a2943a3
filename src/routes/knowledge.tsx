@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import {
-  Activity,
   Brain,
   Database,
   Globe,
@@ -12,7 +11,6 @@ import {
   RefreshCw,
   Search,
   Sparkles,
-  Target,
 } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
 import { ActionButton, Card, Chip, EmptyState, IconBadge, Row, SectionHeader, Segmented, StatTile, Toggle } from "@/components/nexus/ui";
@@ -384,7 +382,7 @@ function SourcesTab({ queue }: { queue: number }) {
 
   const feedback = useCallback((ok: boolean, text: string) => {
     setMsg({ ok, text });
-    ok ? fx.success?.() ?? fx.tap() : fx.warn();
+    ok ? fx.success() : fx.warn();
     setTimeout(() => setMsg(null), 6000);
   }, []);
 
