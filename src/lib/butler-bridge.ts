@@ -139,7 +139,7 @@ export async function bridgeRequest<T = Json>(
         "X-Device-Id": cfg.deviceId,
         "X-App-Version": "5.0.9",
       },
-      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      ...(opts.body ? { body: JSON.stringify(opts.body) } : {}),
       signal: controller.signal,
       cache: "no-store",
       credentials: "omit",
@@ -182,10 +182,10 @@ export async function bridgeRequest<T = Json>(
 
 export type HealthReport = {
   online: boolean;
-  version?: string;
-  ollama?: boolean;
-  model?: string;
-  raw?: Json;
+  version?: string | undefined;
+  ollama?: boolean | undefined;
+  model?: string | undefined;
+  raw?: Json | undefined;
 };
 
 export async function checkHealth(): Promise<HealthReport> {
@@ -203,7 +203,7 @@ export async function checkHealth(): Promise<HealthReport> {
 export type ChatReply = {
   text: string;
   degraded: boolean;
-  model?: string;
+  model?: string | undefined;
   ollama: boolean;
 };
 
@@ -242,8 +242,8 @@ export type LibraryScript = {
   desc: string;
   category: string;
   tags: string[];
-  icon?: string;
-  popularity?: number;
+  icon?: string | undefined;
+  popularity?: number | undefined;
 };
 
 /** The PC's own script library, fuzzy-filtered server-side when `q` is set. */
@@ -285,9 +285,9 @@ export async function fetchLibrary(q = "", category = ""): Promise<LibraryScript
 export type RunResult = {
   ok: boolean;
   output: string;
-  exitCode?: number;
-  undoId?: string;
-  generated?: boolean;
+  exitCode?: number | undefined;
+  undoId?: string | undefined;
+  generated?: boolean | undefined;
 };
 
 /** Run a library script on the PC. The server writes an undo journal entry. */
@@ -320,7 +320,7 @@ export async function undoRun(undoId: string): Promise<RunResult> {
 export type OllamaState = {
   running: boolean;
   models: string[];
-  active?: string;
+  active?: string | undefined;
 };
 
 export async function ollamaStatus(): Promise<OllamaState> {
