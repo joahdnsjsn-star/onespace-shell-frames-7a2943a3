@@ -1,16 +1,14 @@
-import { useCallback, useEffect, useSyncExternalStore } from "react";
-import {
-  bridgeSnapshot,
-  checkHealth,
-  loadBridge,
-  subscribeBridge,
-  type BridgeStatus,
-} from "./butler-bridge";
+import { useSyncExternalStore } from "react";
+import { bridgeSnapshot, subscribeBridge, type BridgeStatus } from "./butler-bridge";
+import { pokeLink } from "./autoconnect";
 
 /**
- * Live view of the bridge connection. Loads the encrypted config once, then
- * probes health on mount, on reconnect and whenever the app returns to the
- * foreground — so the UI always tells the truth about the PC link.
+ * Live view of the bridge connection.
+ *
+ * This hook is a pure reader: the auto-connect engine (started once from the
+ * root) owns every probe, timer and reconnect. Screens that need a fresh read
+ * call `refresh()`, which just nudges that single engine instead of starting a
+ * competing poll loop.
  */
 export function useBridge(): {
   status: BridgeStatus;
@@ -24,29 +22,10 @@ export function useBridge(): {
     () => bridgeSnapshot(),
   );
 
-  const refresh = useCallback(() => {
-    void loadBridge().then((cfg) => {
-      if (cfg.baseUrl) void checkHealth().catch(() => undefined);
-    });
-  }, []);
-
-  useEffect(() => {
-    refresh();
-    const onVisible = () => {
-      if (document.visibilityState === "visible") refresh();
-    };
-    document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("online", refresh);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("online", refresh);
-    };
-  }, [refresh]);
-
   return {
     status: snap.status,
     lastError: snap.lastError,
     paired: Boolean(snap.config.baseUrl),
-    refresh,
+    refresh: pokeLink,
   };
 }
