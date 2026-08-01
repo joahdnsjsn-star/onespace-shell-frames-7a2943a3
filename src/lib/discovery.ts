@@ -88,7 +88,13 @@ export function toBaseUrl(c: ParsedConn): string {
  * 2. LAN sweep
  * ------------------------------------------------------------------ */
 
-export type FoundHost = { ip: string; port: number; latencyMs: number; version?: string; ollama?: boolean };
+export type FoundHost = {
+  ip: string;
+  port: number;
+  latencyMs: number;
+  version?: string | undefined;
+  ollama?: boolean | undefined;
+};
 export type ScanProgress = {
   phase: "known" | "subnet" | "done";
   scanned: number;
