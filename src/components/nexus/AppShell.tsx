@@ -193,10 +193,14 @@ export function AppShell({
   return (
     <div
       className={cn(
-        "relative mx-auto flex w-full max-w-lg flex-col sm:max-w-xl lg:max-w-2xl",
+        // Phone-only form factor: one fixed handset column, never a desktop
+        // page. On anything wider than a phone the column is framed instead
+        // of stretched, so every layout is the layout that ships on Android.
+        "device-column relative mx-auto flex w-full flex-col",
         fill ? "h-dvh overflow-hidden" : "min-h-dvh",
       )}
     >
+
       <Defer timeout={1800} skipOnLowTier>
         <BackdropFX />
       </Defer>
