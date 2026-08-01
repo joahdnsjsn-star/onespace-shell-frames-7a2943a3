@@ -125,8 +125,8 @@ function ChoiceRow<T extends string>({
           {icon}
         </IconBadge>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-medium leading-tight">{title}</div>
-          {sub ? <div className="mt-0.5 truncate text-xs text-muted-foreground">{sub}</div> : null}
+          <div className="text-sm font-medium leading-snug">{title}</div>
+          {sub ? <div className="mt-0.5 text-xs text-muted-foreground">{sub}</div> : null}
         </div>
       </div>
       <Segmented options={options} value={value} onChange={set} className="mt-3 flex w-full" />

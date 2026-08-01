@@ -147,7 +147,7 @@ function Home() {
               <IconBadge accent={a.accent} size={34}>
                 <a.icon size={16} />
               </IconBadge>
-              <span className="min-w-0 flex-1 truncate text-sm font-medium">
+              <span className="min-w-0 flex-1 text-sm font-medium">
                 {fired === a.label ? <span className="text-cyan">sent…</span> : a.label}
               </span>
             </button>
