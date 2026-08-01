@@ -176,7 +176,11 @@ export function startPerfGovernor(): () => void {
       const heap = readHeap();
       emit({ fps, heap, longTasks: longTaskStamps.length });
 
-      if (state.mode === "auto") {
+      if (state.mode === "auto" && isPerfQuiet()) {
+        // Expected burst in progress — measure, but never re-tier or popup.
+        goodStreak = 0;
+      } else if (state.mode === "auto") {
+
         const heavyHeap = heap !== null && heap > 0.86;
         const janky = fps < 34 || longTaskStamps.length >= 6 || heavyHeap;
         if (janky) {
