@@ -409,7 +409,7 @@ function Connect() {
 
       <p className="px-1 pb-1 text-[11px] text-muted-foreground">
         <QrCode size={13} className="mr-1 inline text-cyan" />
-        No camera needed — paste the QR payload above, or let the LAN sweep find the machine for you.
+        Scan the QR above, paste the payload, or let the LAN sweep find the machine for you.
       </p>
 
     </AppShell>
