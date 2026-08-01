@@ -1,28 +1,37 @@
 {
   "$comment": "Build contract for OnSpace.ai. This project is the Android-focused web shell of Butler AI. It targets a phone-like web experience and a Node SSR production build. OnSpace should wrap it as a Trusted Web Activity / PWA-style Android app. Keep in sync with package.json scripts and docs/ONSPACE_SYNC.md.",
-  "name": "Butler AI NEXUS",
+  "name": "Butler AI",
+  "slug": "butler-ai",
+  "version": "5.0.9",
   "target": "android",
 
   "formFactor": "phone",
   "framework": "vite-tanstack-start",
+  "expo": false,
+  "wrapAs": "trusted-web-activity",
   "node": "22",
   "packageManager": "bun",
   "install": "bun install",
   "build": "bun run build:node",
+  "verify": "bun run onspace:verify",
   "start": "bun run start",
   "serverEntry": "dist/server/index.mjs",
   "staticDir": "dist/client",
   "port": "$PORT (default 3000)",
   "healthCheck": "/api/health",
+  "readFirst": "CODEBASE_INDEX.md",
   "android": {
     "package": "com.butlerai.pc.automation",
     "scheme": "butlerai",
+    "versionCode": 1784400005,
     "orientation": "portrait",
+    "userInterfaceStyle": "dark",
     "minSdk": 24,
     "targetSdk": 35,
     "displayMode": "standalone",
     "themeColor": "#070a10"
   },
+
   "env": {
     "required": [],
     "optional": ["VITE_APP_NAME", "VITE_API_BASE_URL", "VITE_WS_URL", "VITE_ENABLE_ANALYTICS"]
