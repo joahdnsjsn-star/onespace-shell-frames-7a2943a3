@@ -1,29 +1,98 @@
-# Welcome to your Lovable project
+# Butler AI — NEXUS (Web Shell)
 
-This project was built with [Lovable](https://lovable.dev).
+A dark, HUD-style command-centre UI shell for **Butler AI NEXUS** — a local-PC assistant.
+This repository contains the **visual shell only**: every screen, component and interaction
+state is built, but nothing is wired to a backend.
 
-## Build with Lovable
+Built with **TanStack Start (React 19) + Vite + Tailwind CSS v4 + TypeScript**.
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+---
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+## Quick start
 
-## Development
+```bash
+# install (npm, pnpm, bun or yarn all work)
+npm install
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+# dev server -> http://localhost:8080
 npm run dev
+
+# production build
+npm run build
+
+# preview the production build
+npm run preview
+
+# lint
+npm run lint
 ```
 
-## Built with
+Node **20+** is required (see `.nvmrc`).
 
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+## Deploying / importing
+
+This project is a standard Vite + TanStack Start app, so it imports cleanly into
+GitHub, OnSpace.ai, Vercel, Netlify, Cloudflare or any Node host.
+
+| Setting        | Value           |
+| -------------- | --------------- |
+| Install        | `npm install`   |
+| Build          | `npm run build` |
+| Output dir     | `dist`          |
+| Dev command    | `npm run dev`   |
+| Node version   | `20`            |
+
+No environment variables are required to run the shell. Copy `.env.example` to
+`.env` if you later add keys.
+
+## Routes
+
+| Route | Screen |
+| --- | --- |
+| `/` | Home telemetry dashboard |
+| `/onboarding` | 10-step initialisation flow |
+| `/butler` | Butler AI chat |
+| `/scripts` | Automation script library + console |
+| `/knowledge` | Neural knowledge base |
+| `/logs` | Event stream + filters |
+| `/builder` | Visual automation composer |
+| `/fileshare` | LAN file bridge |
+| `/connect` | Device pairing / QR |
+| `/cosmetic` | Theme + HUD density |
+| `/settings` | Configuration hub |
+| `/components` | Full component gallery |
+| `/privacy-policy`, `/terms`, `/data-safety`, `/security-trust`, `/crash-report` | Legal & utility docs |
+
+## Project structure
+
+```
+src/
+  routes/                 # file-based routes (TanStack Router)
+  components/
+    nexus/
+      AppShell.tsx        # header, tab bar, backdrop, dock, palette
+      NexusFX.tsx         # animated SVG logo, ambient backdrop, scroll meter
+      ButlerDock.tsx      # floating AI chat dock
+      CommandBar.tsx      # Cmd/Ctrl+K command palette
+      OfflineBanner.tsx
+      LegalDoc.tsx
+      ui.tsx              # design-system primitives
+    ui/                   # shadcn primitives
+  styles.css              # design tokens, utilities, animations
+```
+
+## Design system
+
+All colour, elevation and motion values live as tokens in `src/styles.css`
+(OKLCH). Never hardcode colours in components — use the semantic tokens
+(`cyan`, `ok`, `warn`, `danger`, `neural`, `system`, `net`, `surface*`, `dim`, `faint`).
+
+## Keyboard
+
+- `Cmd/Ctrl + K` — command palette
+- `Esc` — close palette / chat dock
+- `Enter` — send in Butler dock (`Shift+Enter` for newline)
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
