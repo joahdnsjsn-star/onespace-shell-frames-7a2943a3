@@ -33,15 +33,25 @@ export function BackdropFX() {
   );
 }
 
-/** Animated hexagon "N" mark — pure SVG, scales with font-size. */
-export function NexusLogo({ size = 26, className }: { size?: number; className?: string }) {
+/** Animated hexagon "N" mark — layered SVG: pulse ring, orbiting nodes, energy core. */
+export function NexusLogo({
+  size = 26,
+  className,
+  status = "online",
+}: {
+  size?: number;
+  className?: string;
+  status?: "online" | "offline" | "busy";
+}) {
+  const ring =
+    status === "online" ? "var(--ok)" : status === "busy" ? "var(--warn)" : "var(--danger)";
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 48 48"
       fill="none"
-      className={cn("shrink-0", className)}
+      className={cn("shrink-0 overflow-visible", className)}
       role="img"
       aria-label="Butler AI NEXUS"
     >
@@ -50,22 +60,87 @@ export function NexusLogo({ size = 26, className }: { size?: number; className?:
           <stop offset="0%" stopColor="var(--cyan)" />
           <stop offset="100%" stopColor="var(--neural)" />
         </linearGradient>
+        <radialGradient id="nxCore" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="var(--cyan)" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="var(--cyan)" stopOpacity="0" />
+        </radialGradient>
       </defs>
+
+      {/* status pulse ring */}
+      <circle cx="24" cy="24" r="21" stroke={ring} strokeWidth="1" opacity="0.5" className="nx-ring" />
+
+      {/* energy core */}
+      <circle cx="24" cy="24" r="17" fill="url(#nxCore)" />
+
+      {/* hex frame */}
       <path
         d="M24 3.5 41.7 13.75v20.5L24 44.5 6.3 34.25v-20.5Z"
         stroke="url(#nxMark)"
         strokeWidth="2"
+        strokeLinejoin="round"
         fill="color-mix(in oklab, var(--cyan) 8%, transparent)"
       />
+      {/* inner hex hairline */}
+      <path
+        d="M24 9.5 36.5 16.75v14.5L24 38.5 11.5 31.25v-14.5Z"
+        stroke="color-mix(in oklab, var(--cyan) 26%, transparent)"
+        strokeWidth="0.9"
+        fill="none"
+      />
+
+      {/* orbiting nodes */}
       <g className="nx-spin-slow" style={{ transformOrigin: "24px 24px" }}>
-        <circle cx="24" cy="8" r="1.8" fill="var(--cyan)" />
-        <circle cx="40" cy="32" r="1.4" fill="var(--neural)" />
-        <circle cx="8" cy="32" r="1.4" fill="var(--net)" />
+        <circle cx="24" cy="6" r="1.9" fill="var(--cyan)" />
+        <circle cx="40" cy="33" r="1.5" fill="var(--neural)" />
+        <circle cx="8" cy="33" r="1.5" fill="var(--net)" />
       </g>
-      <path d="M18 32V16l12 16V16" stroke="var(--cyan)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+
+      {/* the N */}
+      <path
+        d="M18 32V16l12 16V16"
+        stroke="var(--cyan)"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
     </svg>
   );
 }
+
+/** Header wordmark: gradient sweep title + optional caret-style subtitle. */
+export function AnimatedTitle({
+  title,
+  subtitle,
+  online = true,
+}: {
+  title: string;
+  subtitle?: string | undefined;
+  online?: boolean;
+}) {
+  return (
+    <div className="min-w-0">
+      <div className="flex items-center gap-2">
+        <span
+          className={cn(
+            "size-2 shrink-0 rounded-full pulse-dot",
+            online ? "bg-ok" : "bg-danger",
+          )}
+          aria-hidden
+        />
+        <h1 className="nx-title truncate font-mono text-fluid-sm font-bold tracking-[0.08em] min-[400px]:text-fluid-lg min-[400px]:tracking-[0.12em]">
+          {title}
+        </h1>
+      </div>
+      {subtitle ? (
+        <p className="mt-1 truncate text-fluid-xs leading-snug text-muted-foreground">
+          <span className="text-cyan/70">›</span> {subtitle}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 
 /** Thin scroll-progress meter for the sticky header. */
 export function ScrollProgress() {

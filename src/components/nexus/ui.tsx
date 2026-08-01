@@ -265,11 +265,31 @@ export function EmptyState({
   );
 }
 
-export function Toggle({ on }: { on?: boolean }) {
+export function Toggle({
+  on,
+  onChange,
+  label,
+  disabled,
+}: {
+  on?: boolean;
+  onChange?: (next: boolean) => void;
+  label?: string;
+  disabled?: boolean;
+}) {
+  const interactive = typeof onChange === "function";
   return (
-    <span
+    <button
+      type="button"
+      role="switch"
+      aria-checked={!!on}
+      aria-label={label ?? "toggle"}
+      disabled={disabled || !interactive}
+      onClick={interactive ? () => onChange!(!on) : undefined}
       className={cn(
         "inline-flex h-6 w-11 shrink-0 items-center rounded-full border p-0.5 transition-colors duration-300",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/60",
+        interactive && "cursor-pointer",
+        disabled && "opacity-40",
         on ? "border-cyan/50 bg-cyan/25 shadow-[0_0_16px_-6px_var(--cyan)]" : "border-dim bg-surface-3",
       )}
     >
@@ -279,7 +299,91 @@ export function Toggle({ on }: { on?: boolean }) {
           on ? "translate-x-5 bg-cyan" : "translate-x-0 bg-faint",
         )}
       />
-    </span>
+    </button>
+  );
+}
+
+/** Segmented control for enum-style settings. */
+export function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+  className,
+}: {
+  options: readonly T[];
+  value: T;
+  onChange: (next: T) => void;
+  className?: string;
+}) {
+  return (
+    <div
+      role="tablist"
+      className={cn(
+        "inline-flex shrink-0 gap-0.5 rounded-xl border border-dim/70 bg-surface-3/60 p-0.5 [&>*]:flex-1",
+        className,
+      )}
+    >
+      {options.map((o) => (
+        <button
+          key={o}
+          type="button"
+          role="tab"
+          aria-selected={o === value}
+          onClick={() => onChange(o)}
+          className={cn(
+            "press rounded-[0.6rem] px-2.5 py-1 label-mono text-[10px] transition-colors duration-200",
+            o === value
+              ? "bg-cyan/18 text-cyan shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--cyan)_30%,transparent)]"
+              : "text-faint hover:text-foreground",
+          )}
+        >
+          {o}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Labelled range slider that matches the HUD styling. */
+export function SliderRow({
+  label,
+  value,
+  onChange,
+  min = 0,
+  max = 100,
+  step = 1,
+  unit,
+  accent = "cyan",
+}: {
+  label: string;
+  value: number;
+  onChange: (next: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string;
+  accent?: Accent;
+}) {
+  return (
+    <div className="rounded-xl border border-dim/50 bg-surface-3/50 px-3 py-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium">{label}</span>
+        <span className={cn("label-mono", accentText[accent])}>
+          {value}
+          {unit}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        aria-label={label}
+        className="mt-3 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-surface-3 accent-[var(--cyan)] outline-none ring-1 ring-inset ring-dim/60"
+      />
+    </div>
   );
 }
 
@@ -287,15 +391,25 @@ export function ActionButton({
   children,
   variant = "primary",
   className,
+  onClick,
+  disabled,
+  type = "button",
 }: {
   children: ReactNode;
   variant?: "primary" | "ghost" | "danger";
   className?: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  type?: "button" | "submit";
 }) {
   return (
-    <span
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
       className={cn(
         "press inline-flex h-11 cursor-pointer select-none items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold tracking-tight",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/60 disabled:opacity-50",
         variant === "primary" &&
           "bg-cyan text-primary-foreground shadow-[0_10px_30px_-14px_var(--cyan)] hover:bg-cyan/90",
         variant === "ghost" && "border border-dim bg-surface-3 text-foreground hover:bg-surface-3/70",
@@ -304,6 +418,7 @@ export function ActionButton({
       )}
     >
       {children}
-    </span>
+    </button>
   );
 }
+

@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Chip } from "./ui";
 import { OfflineBanner } from "./OfflineBanner";
-import { BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
+import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
 import { ButlerDock } from "./ButlerDock";
 import { CommandBar } from "./CommandBar";
 
@@ -77,16 +77,9 @@ export function AppShell({
       <BackdropFX />
       <header className="sticky top-0 z-20 border-b border-dim/70 glass pt-[env(safe-area-inset-top)]">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 px-4 py-3 sm:px-6">
-          <NexusLogo size={28} className="press" />
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="size-2 shrink-0 rounded-full bg-ok pulse-dot" aria-hidden />
-              <h1 className="truncate font-mono text-fluid-lg font-bold tracking-[0.12em]">{title}</h1>
-            </div>
-            {subtitle ? (
-              <p className="mt-1 truncate text-fluid-xs leading-snug text-muted-foreground">{subtitle}</p>
-            ) : null}
-          </div>
+          <NexusLogo size={30} className="press" status={offline ? "offline" : "online"} />
+          <AnimatedTitle title={title} subtitle={subtitle} online={!offline} />
+
           <div className="flex shrink-0 items-center gap-2">
             {accentLabel ? <Chip accent="cyan">{accentLabel}</Chip> : null}
             <button
@@ -106,7 +99,7 @@ export function AppShell({
       <main
         key={title}
         className={cn(
-          "rise-in nexus-grid flex-1 space-y-5 px-4 pb-24 pt-5 sm:space-y-6 sm:px-6 sm:pt-6",
+          "rise-in nx-stagger nexus-grid flex-1 space-y-5 px-4 pb-24 pt-5 sm:space-y-6 sm:px-6 sm:pt-6",
         )}
       >
         {children}
