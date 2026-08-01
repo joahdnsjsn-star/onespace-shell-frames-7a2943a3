@@ -34,12 +34,14 @@ class FeatureGate {
   setFromStatus(j: Record<string, unknown>) {
     if (!j) return;
     // schema:2 means server supports typed feature flags
-    this._schema = j["schema"] ?? 1;
-    this._version = j["serverVersion"] ?? j["version"] ?? "";
+    const rawSchema = j["schema"];
+    this._schema = typeof rawSchema === "number" ? rawSchema : 1;
+    const rawVersion = j["serverVersion"] ?? j["version"];
+    this._version = typeof rawVersion === "string" ? rawVersion : "";
 
     // Explicit feature list (schema:2+)
     if (Array.isArray(j["features"])) {
-      this._features = new Set(j["features"] as string[]);
+      this._features = new Set(j["features"].filter((f): f is string => typeof f === "string"));
     } else {
       // Infer from schema + version for older servers
       this._features.clear();
