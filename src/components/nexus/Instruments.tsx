@@ -6,6 +6,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+/** Round SVG coordinates so SSR and client emit byte-identical markup. */
+const r = (n: number) => Math.round(n * 1000) / 1000;
+
 /* ------------------------------------------------------------------ gauge */
 
 export function RadialGauge({
@@ -46,10 +49,10 @@ export function RadialGauge({
           return (
             <line
               key={i}
-              x1={cx + rInner * Math.cos(a)}
-              y1={cy + rInner * Math.sin(a)}
-              x2={cx + rOuter * Math.cos(a)}
-              y2={cy + rOuter * Math.sin(a)}
+              x1={r(cx + rInner * Math.cos(a))}
+              y1={r(cy + rInner * Math.sin(a))}
+              x2={r(cx + rOuter * Math.cos(a))}
+              y2={r(cy + rOuter * Math.sin(a))}
               stroke={on ? color : "color-mix(in oklab, var(--foreground) 12%, transparent)"}
               strokeWidth={2.4}
               strokeLinecap="round"
@@ -96,7 +99,7 @@ export function NeuralCore({
   const rings: [number, number, number] = [size * 0.42, size * 0.32, size * 0.22];
   const nodes = Array.from({ length: 8 }, (_, i) => {
     const a = (i / 8) * Math.PI * 2;
-    return { x: cx + rings[0] * Math.cos(a), y: cy + rings[0] * Math.sin(a), d: (i % 3) * 0.6 };
+    return { x: r(cx + rings[0] * Math.cos(a)), y: r(cy + rings[0] * Math.sin(a)), d: (i % 3) * 0.6 };
   });
 
   return (
@@ -127,10 +130,10 @@ export function NeuralCore({
             return (
               <line
                 key={i}
-                x1={cx + r1 * Math.cos(a)}
-                y1={cy + r1 * Math.sin(a)}
-                x2={cx + r2 * Math.cos(a)}
-                y2={cy + r2 * Math.sin(a)}
+                x1={r(cx + r1 * Math.cos(a))}
+                y1={r(cy + r1 * Math.sin(a))}
+                x2={r(cx + r2 * Math.cos(a))}
+                y2={r(cy + r2 * Math.sin(a))}
                 opacity={i % 5 === 0 ? 0.9 : 0.35}
               />
             );
