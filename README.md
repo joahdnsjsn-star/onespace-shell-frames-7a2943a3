@@ -125,6 +125,43 @@ Activity (TWA)** or PWA-style Android app using the phone form factor settings b
 If you need a true native Android APK/AAB built with Expo, use the separate Expo
 native repo (`butler-ai-final`) instead of this web shell.
 
+### 4.2.1 Expo Android APK / AAB (EAS Build)
+
+This repo includes `src/app/` Expo Router screens and an `eas.json` build configuration.
+To build a native Android APK or AAB:
+
+```bash
+# Install EAS CLI once
+npm install -g eas-cli
+
+# Authenticate with Expo
+eas login
+
+# Configure the project (first time)
+eas build:configure
+
+# Build a preview APK (installable side-load)
+bun run eas:build:preview
+# or: eas build --platform android --profile preview
+
+# Build a production AAB (Play Store upload)
+bun run eas:build:production
+# or: eas build --platform android --profile production
+```
+
+#### OnSpace URL
+
+The native screen opens **`https://onspace.ai`** by default.
+Override it by setting the `EXPO_PUBLIC_ONSPACE_URL` environment variable
+in your EAS project secrets or a local `.env` file:
+
+```
+EXPO_PUBLIC_ONSPACE_URL=https://your-custom-deployment.onspace.ai
+```
+
+The app validates the URL with `Linking.canOpenURL` before opening it and shows
+an actionable alert if the URL cannot be reached.
+
 
 ### 4.3 Docker / container run
 
