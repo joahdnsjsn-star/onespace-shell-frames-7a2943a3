@@ -12,6 +12,7 @@ import {
 } from "@/lib/butler-bridge";
 import { parseConnection, rememberGoodHost, scanLan, toBaseUrl, type FoundHost, type ScanProgress } from "@/lib/discovery";
 import { useBridge } from "@/lib/useBridge";
+import { useLink } from "@/lib/useLink";
 import serverAsset from "@/assets/butler_server.py.asset.json";
 import { QrScanner } from "@/components/nexus/QrScanner";
 import { fx } from "@/lib/fx";
@@ -165,6 +166,7 @@ function DiscoveryPanel({ onLinked }: { onLinked: () => void }) {
  */
 function PairingPanel({ reloadKey }: { reloadKey: number }) {
   const { status, lastError, paired, refresh } = useBridge();
+  const link = useLink();
   const [url, setUrl] = useState("");
   const [token, setToken] = useState("");
   const [deviceId, setDeviceId] = useState("");
