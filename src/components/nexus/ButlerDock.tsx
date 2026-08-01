@@ -46,7 +46,10 @@ export function ButlerDock() {
     setTyping(true);
     window.setTimeout(() => {
       setTyping(false);
-      setMsgs((m) => [...m, { id: id + 1, role: "butler", text: CANNED[m.length % CANNED.length] }]);
+      setMsgs((m) => [
+        ...m,
+        { id: id + 1, role: "butler", text: CANNED[m.length % CANNED.length] ?? CANNED[0]! },
+      ]);
     }, 900);
   };
 
