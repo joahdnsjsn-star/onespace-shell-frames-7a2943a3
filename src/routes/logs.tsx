@@ -9,7 +9,6 @@ import {
   clearLogs,
   downloadBundle,
   getLogs,
-  logCounts,
   subscribeLogs,
   type LogChannel,
   type LogEntry,
@@ -45,12 +44,23 @@ const LEVEL_META: Record<LogLevel, { accent: "system" | "warn" | "danger" | "net
 const clock = (t: number) =>
   new Date(t).toLocaleTimeString(undefined, { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
+/** Stable empty snapshot: the recorder only exists in the browser, so the
+ *  server (and the hydration pass) must render an empty list or React tears
+ *  the tree down with a hydration mismatch. */
+const NO_LOGS: readonly never[] = [];
+
 function Logs() {
-  const entries = useSyncExternalStore(subscribeLogs, getLogs, getLogs);
+  const entries = useSyncExternalStore(subscribeLogs, getLogs, () => NO_LOGS);
   const [channel, setChannel] = useState<LogChannel | "all">("all");
   const [level, setLevel] = useState<LogLevel | "all">("all");
 
-  const counts = useMemo(() => logCounts(), [entries]);
+  // Derived from the same snapshot the list renders, so SSR and hydration
+  // always agree (reading the live buffer here would diverge).
+  const counts = useMemo(() => {
+    const c = { debug: 0, info: 0, warn: 0, error: 0 } as Record<LogLevel, number>;
+    for (const e of entries) c[e.level] = (c[e.level] ?? 0) + 1;
+    return c;
+  }, [entries]);
 
   const visible = useMemo(
     () =>
