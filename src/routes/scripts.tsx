@@ -68,6 +68,11 @@ function Scripts() {
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [lastUndoId, setLastUndoId] = useState<string | null>(null);
+  const recent = useSyncExternalStore(subscribeHistory, historySnapshot, historySnapshot).slice(0, 6);
+
+  useEffect(() => {
+    void loadHistory();
+  }, []);
 
   const log = useCallback((...lines: string[]) => {
     setOut((o) => [...o, ...lines].slice(-80));
