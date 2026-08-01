@@ -54,6 +54,8 @@ type BackEntry = { handler: () => void };
 const backStack: BackEntry[] = [];
 let parked = false;
 let popBound = false;
+let selfPop = false;
+
 
 function park() {
   if (parked || typeof window === "undefined") return;
