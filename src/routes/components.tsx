@@ -16,6 +16,7 @@ import {
   SkeletonCard,
   LoadingStrip,
 } from "@/components/nexus/ui";
+import { OfflineBanner } from "@/components/nexus/OfflineBanner";
 
 export const Route = createFileRoute("/components")({
   head: () => ({
