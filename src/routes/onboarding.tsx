@@ -215,7 +215,11 @@ function Onboarding() {
         </div>
       </header>
 
-      <main className="nexus-grid flex-1 px-4 py-6">
+      <main
+        className="nexus-grid flex-1 px-4 py-6"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <Card key={s.label} accent={s.accent} className="scanline rise-in">
           <div className="flex items-center gap-3">
             <IconBadge accent={s.accent} size={52} glow>
