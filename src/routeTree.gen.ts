@@ -12,11 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as ButlerRouteImport } from './routes/butler'
+import { Route as ConnectRouteImport } from './routes/connect'
+import { Route as CosmeticRouteImport } from './routes/cosmetic'
 import { Route as FileshareRouteImport } from './routes/fileshare'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ScriptsRouteImport } from './routes/scripts'
+import { Route as SettingsRouteImport } from './routes/settings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,6 +34,16 @@ const BuilderRoute = BuilderRouteImport.update({
 const ButlerRoute = ButlerRouteImport.update({
   id: '/butler',
   path: '/butler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectRoute = ConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CosmeticRoute = CosmeticRouteImport.update({
+  id: '/cosmetic',
+  path: '/cosmetic',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FileshareRoute = FileshareRouteImport.update({
@@ -58,37 +71,51 @@ const ScriptsRoute = ScriptsRouteImport.update({
   path: '/scripts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
+  '/connect': typeof ConnectRoute
+  '/cosmetic': typeof CosmeticRoute
   '/fileshare': typeof FileshareRoute
   '/knowledge': typeof KnowledgeRoute
   '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
   '/scripts': typeof ScriptsRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
+  '/connect': typeof ConnectRoute
+  '/cosmetic': typeof CosmeticRoute
   '/fileshare': typeof FileshareRoute
   '/knowledge': typeof KnowledgeRoute
   '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
   '/scripts': typeof ScriptsRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
+  '/connect': typeof ConnectRoute
+  '/cosmetic': typeof CosmeticRoute
   '/fileshare': typeof FileshareRoute
   '/knowledge': typeof KnowledgeRoute
   '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
   '/scripts': typeof ScriptsRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,42 +123,54 @@ export interface FileRouteTypes {
     | '/'
     | '/builder'
     | '/butler'
+    | '/connect'
+    | '/cosmetic'
     | '/fileshare'
     | '/knowledge'
     | '/logs'
     | '/onboarding'
     | '/scripts'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/builder'
     | '/butler'
+    | '/connect'
+    | '/cosmetic'
     | '/fileshare'
     | '/knowledge'
     | '/logs'
     | '/onboarding'
     | '/scripts'
+    | '/settings'
   id:
     | '__root__'
     | '/'
     | '/builder'
     | '/butler'
+    | '/connect'
+    | '/cosmetic'
     | '/fileshare'
     | '/knowledge'
     | '/logs'
     | '/onboarding'
     | '/scripts'
+    | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BuilderRoute: typeof BuilderRoute
   ButlerRoute: typeof ButlerRoute
+  ConnectRoute: typeof ConnectRoute
+  CosmeticRoute: typeof CosmeticRoute
   FileshareRoute: typeof FileshareRoute
   KnowledgeRoute: typeof KnowledgeRoute
   LogsRoute: typeof LogsRoute
   OnboardingRoute: typeof OnboardingRoute
   ScriptsRoute: typeof ScriptsRoute
+  SettingsRoute: typeof SettingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -155,6 +194,20 @@ declare module '@tanstack/react-router' {
       path: '/butler'
       fullPath: '/butler'
       preLoaderRoute: typeof ButlerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connect': {
+      id: '/connect'
+      path: '/connect'
+      fullPath: '/connect'
+      preLoaderRoute: typeof ConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cosmetic': {
+      id: '/cosmetic'
+      path: '/cosmetic'
+      fullPath: '/cosmetic'
+      preLoaderRoute: typeof CosmeticRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fileshare': {
@@ -192,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScriptsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -199,11 +259,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BuilderRoute: BuilderRoute,
   ButlerRoute: ButlerRoute,
+  ConnectRoute: ConnectRoute,
+  CosmeticRoute: CosmeticRoute,
   FileshareRoute: FileshareRoute,
   KnowledgeRoute: KnowledgeRoute,
   LogsRoute: LogsRoute,
   OnboardingRoute: OnboardingRoute,
   ScriptsRoute: ScriptsRoute,
+  SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
