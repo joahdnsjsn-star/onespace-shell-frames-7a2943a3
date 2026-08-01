@@ -128,12 +128,12 @@ export function AnimatedTitle({
           )}
           aria-hidden
         />
-        <h1 className="nx-title truncate font-mono text-fluid-sm font-bold tracking-[0.08em] min-[400px]:text-fluid-lg min-[400px]:tracking-[0.12em]">
+        <h1 className="nx-title font-mono text-fluid-sm font-bold tracking-[0.08em] min-[400px]:text-fluid-lg min-[400px]:tracking-[0.12em]">
           {title}
         </h1>
       </div>
       {subtitle ? (
-        <p className="mt-1 truncate text-fluid-xs leading-snug text-muted-foreground">
+        <p className="mt-1 text-fluid-xs leading-snug text-muted-foreground">
           <span className="text-cyan/70">›</span> {subtitle}
         </p>
       ) : null}

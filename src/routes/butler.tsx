@@ -92,7 +92,7 @@ function Butler() {
           <IconBadge accent="cyan" size={36}>
             <Paperclip size={16} />
           </IconBadge>
-          <span className="flex-1 truncate px-1 text-sm text-muted-foreground">
+          <span className="min-w-0 flex-1 px-1 text-sm text-muted-foreground">
             Message Butler…
           </span>
           <IconBadge accent="neural" size={36}>
