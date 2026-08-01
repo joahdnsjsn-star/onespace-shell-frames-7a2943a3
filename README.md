@@ -119,7 +119,7 @@ Activity (TWA)** or PWA-style Android app using the phone form factor settings b
 | Health check | `/api/health` |
 | Env vars | none required |
 | Form factor | phone (portrait) |
-| Android package | `com.butlerai.package.automation` |
+| Android package | `com.butlerai.pc.automation` |
 | URL scheme | `butlerai` |
 
 If you need a true native Android APK/AAB built with Expo, use the separate Expo
@@ -208,7 +208,7 @@ wrapper loads. There is no separate website build.
 ## 6. Project structure
 
 ```
-.github/workflows/     ci.yml (typecheck + build), deploy-pages.yml
+.github/workflows/     ci.yml (typecheck + build)
 src/
   routes/              file-based routes (TanStack Router)
   components/
