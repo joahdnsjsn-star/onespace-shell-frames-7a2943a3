@@ -63,6 +63,7 @@ export const PAGE_GROUPS: { group: string; pages: PageEntry[] }[] = [
   {
     group: "legal & trust",
     pages: [
+      { to: "/permissions", label: "Permissions", desc: "What the app may touch", icon: ShieldCheck, accent: "ok" },
       { to: "/security-trust", label: "Security & trust", desc: "How data is protected", icon: ShieldCheck, accent: "ok" },
       { to: "/privacy-policy", label: "Privacy policy", desc: "What we never collect", icon: Lock, accent: "system" },
       { to: "/terms", label: "Terms", desc: "Terms of service", icon: FileText, accent: "system" },
