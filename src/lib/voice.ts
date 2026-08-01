@@ -34,7 +34,7 @@ function pref<T>(key: string, fallback: T): T {
 }
 
 export const voicePrefs = {
-  enabled: () => pref("voice.enabled", true),
+  enabled: () => pref("voice.enabled", false),
   tips: () => pref("voice.tips", true),
   alerts: () => pref("voice.alerts", true),
   name: () => pref<string>("voice.name", "auto"),

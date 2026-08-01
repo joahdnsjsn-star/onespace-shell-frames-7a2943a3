@@ -318,18 +318,19 @@ function VoiceSection() {
     <section>
       <SectionHeader
         title="butler voice"
-        hint={supported ? "Speaks on-device, nothing uploaded" : "Not supported on this browser"}
+        hint={supported ? "Muted by default · captions always show" : "Not supported on this browser"}
         accent="neural"
       />
       <Card accent="neural" className="space-y-2.5">
         <SwitchRow
           id="voice.enabled"
-          title="Butler speaks"
-          sub="Voice lines for boot, onboarding, tips and alerts"
+          title="Butler speaks out loud"
+          sub="Off by default. Captions still appear with voice muted."
           icon={<Mic size={16} />}
           accent="neural"
-          initial
+          initial={false}
         />
+
         <SwitchRow
           id="voice.tips"
           title="Idle tips"
