@@ -196,7 +196,7 @@ export function QrScanner({ open, onClose, onResult }: Props) {
     const track = streamRef.current?.getVideoTracks()[0];
     if (!track) return;
     try {
-      await track.applyConstraints({ advanced: [{ torch: !torch }] } as MediaTrackConstraints);
+      await track.applyConstraints({ advanced: [{ torch: !torch }] } as unknown as MediaTrackConstraints);
       setTorch((t) => !t);
     } catch {
       setDetail("This camera has no torch.");
