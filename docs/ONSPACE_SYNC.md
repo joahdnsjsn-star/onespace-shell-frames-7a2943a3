@@ -154,3 +154,17 @@ bunx tsgo --noEmit # type check
 bun run build      # production build → dist/
 bun run preview    # serve the production build locally
 ```
+
+## Adaptive performance (v17)
+
+The app ships a client-side performance governor (`src/lib/perf.ts`):
+
+- samples real FPS, long tasks (>50ms) and JS heap once per second on a single rAF loop;
+- writes `high | balanced | low` to `<html data-perf>`, which CSS uses to shed starfield,
+  orbs, backdrop blur and infinite animations progressively;
+- steps back up automatically after 8 healthy seconds;
+- Settings → Performance lets users pin a tier (`auto/high/balanced/low`).
+
+Host CPU/RAM pressure raises `nexus:host-alert`, shown as a rate-limited toast.
+The PC bridge (`butler_server.py`) is offered as an in-app download on Link and in
+Settings → PC Server. It has no web console by design — this app is the only UI.
