@@ -30,7 +30,9 @@ import {
   RadialGauge,
   ScanFrame,
 } from "@/components/nexus/Instruments";
+import mascotArt from "@/assets/butler-mascot.png.asset.json";
 import { Mascot, Wordmark } from "@/components/nexus/Mascot";
+import { butlerSay, BUTLER_TIPS } from "@/lib/voice";
 import { fx } from "@/lib/fx";
 import { useTelemetry } from "@/hooks/useTelemetry";
 
@@ -78,8 +80,26 @@ function Home() {
     <AppShell title="NEXUS CORE" subtitle="workstation · DESKTOP-A9F2" accentLabel="linked">
       <section>
         <Card accent="cyan" className="scanline lift relative overflow-hidden">
-          <div className="flex items-center gap-3">
-            <Mascot size={104} eager className="-my-2" />
+          <img
+            src={mascotArt.url}
+            alt=""
+            aria-hidden
+            className="mascot-watermark pointer-events-none absolute -right-6 -top-8 w-40 select-none"
+          />
+          <div className="relative flex items-center gap-3">
+            <button
+              type="button"
+              aria-label="Ask Butler for a tip"
+              onClick={() =>
+                butlerSay(BUTLER_TIPS[Math.floor(Math.random() * BUTLER_TIPS.length)]!, {
+                  tone: "tip",
+                  label: "TIP",
+                })
+              }
+              className="press -my-2 shrink-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/60"
+            >
+              <Mascot size={104} eager />
+            </button>
             <div className="min-w-0 flex-1">
               <Wordmark size="md" />
               <p className="mt-2 text-sm text-muted-foreground">
