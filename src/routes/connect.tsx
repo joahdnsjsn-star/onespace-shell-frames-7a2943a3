@@ -383,6 +383,11 @@ function Connect() {
         <DiscoveryPanel onLinked={() => setReloadKey((k) => k + 1)} />
       </section>
 
+      <section>
+        <SectionHeader title="link diagnostics" accent="warn" action={<Activity size={14} className="text-faint" />} />
+        <DiagnosticsPanel />
+      </section>
+
 
       <section>
         <SectionHeader title="transport" accent="cyan" />
