@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Chip } from "./ui";
 import { OfflineBanner } from "./OfflineBanner";
-import { BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
+import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
 import { ButlerDock } from "./ButlerDock";
 import { CommandBar } from "./CommandBar";
 
@@ -99,7 +99,7 @@ export function AppShell({
       <main
         key={title}
         className={cn(
-          "rise-in nexus-grid flex-1 space-y-5 px-4 pb-24 pt-5 sm:space-y-6 sm:px-6 sm:pt-6",
+          "rise-in nx-stagger nexus-grid flex-1 space-y-5 px-4 pb-24 pt-5 sm:space-y-6 sm:px-6 sm:pt-6",
         )}
       >
         {children}
