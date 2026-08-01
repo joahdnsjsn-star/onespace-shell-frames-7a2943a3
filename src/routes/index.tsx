@@ -33,6 +33,7 @@ import {
 import mascotArt from "@/assets/butler-mascot.png.asset.json";
 import { Mascot, Wordmark } from "@/components/nexus/Mascot";
 import { butlerSay, BUTLER_TIPS } from "@/lib/voice";
+import { Coach } from "@/components/nexus/Coach";
 import { fx } from "@/lib/fx";
 import { useTelemetry } from "@/hooks/useTelemetry";
 
@@ -78,8 +79,23 @@ function Home() {
 
   return (
     <AppShell title="NEXUS CORE" subtitle="workstation · DESKTOP-A9F2" accentLabel="linked">
+      <Coach
+        id="home"
+        steps={[
+          {
+            target: "home-hero",
+            title: "meet butler",
+            body: "This is your command deck. Tap Butler any time and he'll speak a tip out loud.",
+          },
+          {
+            target: "nav-bar",
+            title: "getting around",
+            body: "Five core screens live down here. The right-hand button opens the full page launcher with everything else.",
+          },
+        ]}
+      />
       <section>
-        <Card accent="cyan" className="scanline lift relative overflow-hidden">
+        <Card accent="cyan" data-coach="home-hero" className="scanline lift relative overflow-hidden">
           <img
             src={mascotArt.url}
             alt=""
