@@ -1,5 +1,7 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "onspace-app",
+  "displayName": "Butler AI",
+  "version": "5.0.9",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -12,10 +14,12 @@
     "healthcheck": "node -e \"fetch('http://localhost:' + (process.env.PORT || 3000) + '/api/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))\"",
     "typecheck": "tsc --noEmit",
     "verify": "npm run typecheck && npm run parity && npm run build",
+    "onspace:verify": "npm run typecheck && npm run lint && npm run parity && npm run build:node",
     "lint": "eslint .",
     "format": "prettier --write .",
     "parity": "node scripts/check-native-parity.mjs"
   },
+
 
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
