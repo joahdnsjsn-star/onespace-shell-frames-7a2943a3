@@ -5,47 +5,50 @@ Verified on 2026-08-01 against the real OnSpace project archive
 
 ## The one fact that decides everything
 
-**OnSpace.ai is an Expo / React Native platform, not a web host.**
+**OnSpace.ai is primarily an Expo / React Native platform.** Its native build
+pipeline expects `expo-router`, Metro, EAS, and Gradle. A generic TanStack Start
+web repo cannot be imported as a native Expo project and will be rejected if it
+claims to be one.
 
-Evidence from the OnSpace project itself:
+This repo is therefore a **Vite + TanStack Start web shell that targets the
+Android phone form factor**. OnSpace.ai can wrap it as a **Trusted Web Activity
+(TWA)** or PWA-style Android app: the web shell is the UI, the PC automation
+engine stays a separate self-hosted Python server on the user's local network.
 
-| Signal | Value |
-| --- | --- |
-| `package.json` name | `onspace-app` (OnSpace's own scaffold name) |
-| Entry point | `expo-router/entry` |
-| Runtime | Expo SDK 53, React Native 0.79.3, Metro bundler |
-| Build pipeline | EAS (`eas.json`, APK / AAB, Gradle) |
-| Preview | `react-native-web` + Metro web bundler |
-| Store submit | `eas.json` → `submit.production.ios.appleId: contact@onspace.ai` |
-| Its own docs | "The GitHub JSON is for the Lovable.dev web version (React + TanStack + Cloudflare Workers) — a completely different stack. **It cannot be directly imported into this React Native OnSpace.ai app.**" (`CODEWORD.md`) |
+What this repo is **100 % compatible on** is the shared product contract:
 
-So there is no configuration, build flag, or adapter that makes a TanStack
-Start web repo *import* into OnSpace as an app. Anyone promising "100 %
-compatible" in that sense is wrong. What this repo can be is **100 % parity-
-compatible**: the same product, same contracts, same paperwork, deployable as
-the web/PWA face of Butler AI, with every shared value machine-checked so the
-two repos cannot drift.
+- Same Android package id, scheme, and version
+- Same Android permission request / block lists
+- Same legal / Data Safety disclosures
+- Same Play Store identity and assets
+- Same health-check endpoint for OnSpace deploy verification
+
+Those values are machine-checked by `bun run parity` so the two repos cannot drift.
+
 
 ## What "compatible" means here, concretely
 
 | Layer | Web repo (this one) | OnSpace/Expo repo | Enforced by |
 | --- | --- | --- | --- |
-| Android permissions | `app.permissions.json` | `expo.android.permissions` | `npm run parity` |
-| Blocked permissions | `app.permissions.json` | `expo.android.blockedPermissions` | `npm run parity` |
-| Package id | `com.butlerai.pc.automation` | `expo.android.package` | `npm run parity` |
-| Deep-link scheme | `butlerai` | `expo.scheme` | `npm run parity` |
-| Play listing link | `related_applications` in the PWA manifest | Play Console listing | `npm run parity` |
+| Android target | `onspace.json target: android` | `expo.android` | `bun run parity` |
+| Android permissions | `app.permissions.json` | `expo.android.permissions` | `bun run parity` |
+| Blocked permissions | `app.permissions.json` | `expo.android.blockedPermissions` | `bun run parity` |
+| Package id | `com.butlerai.pc.automation` | `expo.android.package` | `bun run parity` |
+| Deep-link scheme | `butlerai` | `expo.scheme` | `bun run parity` |
+| Play listing link | `related_applications` in the PWA manifest | Play Console listing | `bun run parity` |
+| Health check | `/api/health` server route | n/a (OnSpace verification) | CI + manual |
 | Runtime permission UI | `/permissions` route | Permission screens | manual |
 | Legal text | `/privacy-policy`, `/terms`, `/data-safety`, `/security-trust` | `PRIVACY_POLICY.md`, `DATA_SAFETY_FORM.md` | manual |
 
 Run it any time:
 
 ```bash
-npm run parity                                   # internal consistency
+bun run parity                                   # internal consistency
 node scripts/check-native-parity.mjs ../butler-ai-final/app.json   # vs native
 ```
 
-CI runs the internal check on every push.
+CI runs the internal check plus the Node SSR build on every push.
+
 
 ## Findings from the native archive (action needed there, not here)
 
@@ -85,7 +88,9 @@ and changing it would be a visual rewrite, not a compatibility fix.
 
 ## Deploying this repo
 
-This repo is the web/PWA face. See `docs/ONSPACE_SYNC.md` for the three build
-modes (static / Node SSR / edge) and `docs/PLAYSTORE.md` for the Trusted Web
-Activity route if you ever want a store build from the web code instead of the
-Expo one.
+This repo is the Android-focused web shell. See `docs/ONSPACE_SYNC.md` for the
+build commands and `docs/PLAYSTORE.md` for the Trusted Web Activity / PWA route
+if you want a store build from the web code instead of the Expo one. The
+`Dockerfile` in the repo root also gives you a reproducible container for any
+host that supports Docker.
+

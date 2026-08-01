@@ -9,12 +9,14 @@
     "build:dev": "vite build --mode development",
     "build:node": "NITRO_PRESET=node-server vite build",
     "start": "node dist/server/index.mjs",
+    "healthcheck": "node -e \"fetch('http://localhost:' + (process.env.PORT || 3000) + '/api/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))\"",
     "typecheck": "tsc --noEmit",
     "verify": "npm run typecheck && npm run parity && npm run build",
     "lint": "eslint .",
     "format": "prettier --write .",
     "parity": "node scripts/check-native-parity.mjs"
   },
+
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",

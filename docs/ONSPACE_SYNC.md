@@ -1,7 +1,10 @@
 # GitHub → OnSpace.ai Sync Checklist
 
-Butler AI NEXUS — web shell. Follow top to bottom; each step lists the
-expected outcome so you can confirm before moving on.
+Butler AI: PC Automation — Android-focused web shell for OnSpace.ai. This is a
+Vite + TanStack Start project that builds a Node SSR bundle; OnSpace wraps it as a
+Trusted Web Activity (TWA) / PWA-style Android phone app. Follow top to bottom;
+each step lists the expected outcome so you can confirm before moving on.
+
 
 ---
 
@@ -36,11 +39,20 @@ named `CI` automatically (`.github/workflows/ci.yml`).
 `.github/workflows/ci.yml` runs on every push and PR:
 
 1. `bun install --frozen-lockfile`
-2. `bunx tsgo --noEmit` (type check)
-3. `bun run build` (production build)
+2. `bunx tsc --noEmit` (type check)
+3. `bun run parity` (Android permission / build-contract parity)
+4. `bun run build:node` (Node SSR bundle)
+5. Start the bundle and verify `/api/health` responds
 
-**Expected:** green check next to the commit. If it fails, fix locally with
-the same three commands before continuing — OnSpace imports the same code.
+**Expected:** green check next to the commit. If it fails, fix locally with the
+same commands before continuing — OnSpace imports the same code.
+
+> **Note:** The `build:node` script forces the Nitro `node-server` preset via the
+> `NITRO_PRESET` environment variable and `vite.config.ts`. The Lovable editor
+> sandbox always builds the Cloudflare Worker preset, so `bun run build:node` can
+> only be verified inside a real Linux/Node environment (GitHub Actions, OnSpace,
+> or Docker). CI is the authoritative test.
+
 
 ---
 
@@ -65,7 +77,8 @@ build settings below.
 
 ## 5. Build settings
 
-This project builds **one target: the Android phone app**. There is no website
+This project builds **one target: the Android phone app bundle** as a Node SSR
+server that OnSpace wraps into a TWA/PWA-style Android build. There is no website
 or desktop mode. `onspace.json` at the root is the machine-readable version of
 this table.
 
@@ -73,15 +86,24 @@ this table.
 | --- | --- |
 | Target | Android phone (portrait, `com.butlerai.pc.automation`) |
 | Framework preset | Vite / TanStack Start |
+| Form factor | phone |
 | Install command | `bun install` (or `npm install`) |
 | Build command | `bun run build:node` |
 | Output | `dist/server` (entry `dist/server/index.mjs`) + `dist/client` |
 | Start command | `bun run start` (reads `$PORT`) |
 | Node version | `22` (pinned in `.nvmrc`, `.node-version`, `engines`) |
+| Health check | `/api/health` (required for OnSpace deploy verification) |
 | Permissions contract | `app.permissions.json` (checked in CI by `bun run parity`) |
 
 **Expected:** first deploy finishes in ~1–2 min and OnSpace returns a live URL,
 and every route deep-links correctly on reload.
+
+> **Build environment note:** `vite.config.ts` reads `process.env.NITRO_PRESET`
+> (default `cloudflare-module`). `build:node` sets `NITRO_PRESET=node-server` so
+> the SSR bundle can be started with `bun run start`. In the Lovable editor the
+> sandbox always overrides the preset back to Cloudflare, so use GitHub Actions or
+> Docker as the source of truth for the OnSpace build.
+
 
 
 ---

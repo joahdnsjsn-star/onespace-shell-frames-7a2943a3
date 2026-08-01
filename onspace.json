@@ -1,7 +1,8 @@
 {
-  "$comment": "Build contract for OnSpace.ai. This project is an Android phone app only — there is no website/desktop target. Keep in sync with package.json scripts and docs/ONSPACE_SYNC.md.",
+  "$comment": "Build contract for OnSpace.ai. This project is the Android-focused web shell of Butler AI. It targets a phone-like web experience and a Node SSR production build. OnSpace should wrap it as a Trusted Web Activity / PWA-style Android app. Keep in sync with package.json scripts and docs/ONSPACE_SYNC.md.",
   "name": "Butler AI NEXUS",
   "target": "android",
+
   "formFactor": "phone",
   "framework": "vite-tanstack-start",
   "node": "22",
@@ -12,6 +13,7 @@
   "serverEntry": "dist/server/index.mjs",
   "staticDir": "dist/client",
   "port": "$PORT (default 3000)",
+  "healthCheck": "/api/health",
   "android": {
     "package": "com.butlerai.pc.automation",
     "scheme": "butlerai",
@@ -28,3 +30,4 @@
   "permissions": "app.permissions.json",
   "manifest": "public/manifest.webmanifest"
 }
+
