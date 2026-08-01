@@ -154,8 +154,16 @@ export function startPerfGovernor(): () => void {
     observer = null;
   }
 
+  // Hysteresis: never re-tier more than once every 20s, so a single heavy
+  // second cannot start a downgrade/upgrade ping-pong.
+  let lastStepAt = 0;
+  let jankStreak = 0;
+
   const step = (dir: -1 | 1, reason: string) => {
     if (state.mode !== "auto") return;
+    const now = performance.now();
+    if (now - lastStepAt < 20_000) return;
+    lastStepAt = now;
     const idx = ORDER.indexOf(state.tier);
     const capped = ORDER.indexOf(state.ceiling);
     const nextIdx = Math.max(0, Math.min(dir > 0 ? capped : ORDER.length - 1, idx + dir));
@@ -185,21 +193,26 @@ export function startPerfGovernor(): () => void {
         const janky = fps < 34 || longTaskStamps.length >= 6 || heavyHeap;
         if (janky) {
           goodStreak = 0;
-          step(
+          jankStreak += 1;
+          // Three bad seconds in a row before shedding anything.
+          if (jankStreak >= 3)
+            step(
             -1,
             heavyHeap
               ? "memory pressure high"
               : fps < 34
                 ? `frame rate dropped to ${fps} fps`
                 : "main thread blocked",
-          );
+            );
         } else if (fps >= 52 && longTaskStamps.length === 0) {
+          jankStreak = 0;
           goodStreak += 1;
           if (goodStreak >= 8) {
             goodStreak = 0;
             step(1, "headroom recovered");
           }
         } else {
+          jankStreak = 0;
           goodStreak = 0;
         }
       }
