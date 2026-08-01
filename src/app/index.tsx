@@ -1,11 +1,21 @@
 import { useCallback } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Alert, Linking, Pressable, Text, View } from "react-native";
 
-const FALLBACK_URL = "https://onspace.ai";
+const ONSPACE_URL =
+  (process.env["EXPO_PUBLIC_ONSPACE_URL"] as string | undefined)?.trim() || "https://onspace.ai";
 
 export default function IndexScreen() {
-  const openOnSpace = useCallback(() => {
-    void Linking.openURL(FALLBACK_URL);
+  const openOnSpace = useCallback(async () => {
+    const canOpen = await Linking.canOpenURL(ONSPACE_URL);
+    if (!canOpen) {
+      Alert.alert(
+        "Cannot open link",
+        `The URL "${ONSPACE_URL}" cannot be opened on this device.\n\nSet EXPO_PUBLIC_ONSPACE_URL to a reachable address and rebuild.`,
+        [{ text: "OK" }],
+      );
+      return;
+    }
+    await Linking.openURL(ONSPACE_URL);
   }, []);
 
   return (
@@ -24,7 +34,7 @@ export default function IndexScreen() {
         Native preview route is active. Open the deployed web shell from OnSpace.
       </Text>
       <Pressable
-        onPress={openOnSpace}
+        onPress={() => void openOnSpace()}
         style={{
           backgroundColor: "#ff6a1f",
           borderRadius: 999,

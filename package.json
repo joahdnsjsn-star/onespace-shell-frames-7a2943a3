@@ -5,6 +5,7 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "main": "expo-router/entry",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -17,9 +18,17 @@
     "onspace:verify": "npm run typecheck && npm run lint && npm run parity && npm run build:node",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "parity": "node scripts/check-native-parity.mjs"
+    "parity": "node scripts/check-native-parity.mjs",
+    "android": "expo run:android",
+    "eas:build:preview": "eas build --platform android --profile preview",
+    "eas:build:production": "eas build --platform android --profile production"
   },
   "dependencies": {
+    "expo": "~57.0.9",
+    "expo-router": "~57.0.9",
+    "react-native": "0.86.2",
+    "react-native-safe-area-context": "^5.8.0",
+    "react-native-screens": "^4.26.2",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",

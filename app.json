@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Butler AI",
+    "slug": "butler-ai",
+    "scheme": "butlerai",
+    "version": "5.0.9",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0C0E14",
+    "splash": {
+      "backgroundColor": "#070a10"
+    },
+    "plugins": ["expo-router"],
+    "android": {
+      "package": "com.butlerai.pc.automation",
+      "versionCode": 1784400005,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.CAMERA",
+        "android.permission.VIBRATE"
+      ],
+      "blockedPermissions": [
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.MEDIA_PROJECTION",
+        "android.permission.PHONE_CALL",
+        "android.permission.READ_PHONE_STATE",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.ACTIVITY_RECOGNITION",
+        "com.google.android.gms.permission.ACTIVITY_RECOGNITION",
+        "android.permission.BODY_SENSORS"
+      ]
+    },
+    "ios": {
+      "bundleIdentifier": "com.butlerai.pc.automation",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Butler AI uses the camera once to scan the pairing QR code shown by your PC. Nothing is recorded or uploaded."
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "butler-ai"
+      }
+    }
+  }
+}
