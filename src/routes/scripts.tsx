@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Code2, Play, Plus, Search, Terminal, Trash2, Undo2 } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
