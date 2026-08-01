@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  Cpu,
-  HardDrive,
+
+
   Wifi,
   Zap,
   ArrowRight,
@@ -283,4 +283,3 @@ function MiniStat({ label, value }: { label: string; value: string }) {
   );
 }
 
-export { Cpu, HardDrive };
