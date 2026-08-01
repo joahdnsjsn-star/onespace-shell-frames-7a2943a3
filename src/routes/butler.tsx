@@ -286,9 +286,16 @@ function Butler() {
         </div>
 
         <div data-coach="chat-undo" className="flex items-center justify-between gap-2">
-          <Chip accent={typing ? "warn" : "ok"} dot>
-            {typing ? "thinking" : "bridge idle"}
+          <Chip accent={typing ? "warn" : status === "online" ? "ok" : paired ? "warn" : "danger"} dot>
+            {typing
+              ? "thinking"
+              : status === "online"
+                ? "bridge online"
+                : paired
+                  ? "bridge offline"
+                  : "no pc paired"}
           </Chip>
+
           <div className="flex gap-2">
             {undone.length ? (
               <button
