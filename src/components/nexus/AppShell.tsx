@@ -109,7 +109,11 @@ export function AppShell({
       )}
     >
       <BackdropFX />
+      <a href="#nexus-main" className="skip-link">
+        Skip to content
+      </a>
       <header className="sticky top-0 z-20 border-b border-dim/70 glass hull-plate pt-[env(safe-area-inset-top)]">
+
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 px-4 py-3 sm:px-6">
           <NexusLogo size={30} className="press" status={offline ? "offline" : "online"} />
           <AnimatedTitle title={title} subtitle={subtitle} online={!offline} />
@@ -131,7 +135,9 @@ export function AppShell({
       </header>
 
       <main
+        id="nexus-main"
         key={title}
+
         className={cn(
           "rise-in nexus-grid px-4 sm:px-6",
           fill
