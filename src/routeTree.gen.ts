@@ -10,7 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as ButlerRouteImport } from './routes/butler'
+import { Route as FileshareRouteImport } from './routes/fileshare'
+import { Route as KnowledgeRouteImport } from './routes/knowledge'
+import { Route as LogsRouteImport } from './routes/logs'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ScriptsRouteImport } from './routes/scripts'
 
@@ -19,9 +23,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BuilderRoute = BuilderRouteImport.update({
+  id: '/builder',
+  path: '/builder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ButlerRoute = ButlerRouteImport.update({
   id: '/butler',
   path: '/butler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FileshareRoute = FileshareRouteImport.update({
+  id: '/fileshare',
+  path: '/fileshare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeRoute = KnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogsRoute = LogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -37,34 +61,75 @@ const ScriptsRoute = ScriptsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
+  '/fileshare': typeof FileshareRoute
+  '/knowledge': typeof KnowledgeRoute
+  '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
   '/scripts': typeof ScriptsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
+  '/fileshare': typeof FileshareRoute
+  '/knowledge': typeof KnowledgeRoute
+  '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
   '/scripts': typeof ScriptsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/builder': typeof BuilderRoute
   '/butler': typeof ButlerRoute
+  '/fileshare': typeof FileshareRoute
+  '/knowledge': typeof KnowledgeRoute
+  '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
   '/scripts': typeof ScriptsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/butler' | '/onboarding' | '/scripts'
+  fullPaths:
+    | '/'
+    | '/builder'
+    | '/butler'
+    | '/fileshare'
+    | '/knowledge'
+    | '/logs'
+    | '/onboarding'
+    | '/scripts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/butler' | '/onboarding' | '/scripts'
-  id: '__root__' | '/' | '/butler' | '/onboarding' | '/scripts'
+  to:
+    | '/'
+    | '/builder'
+    | '/butler'
+    | '/fileshare'
+    | '/knowledge'
+    | '/logs'
+    | '/onboarding'
+    | '/scripts'
+  id:
+    | '__root__'
+    | '/'
+    | '/builder'
+    | '/butler'
+    | '/fileshare'
+    | '/knowledge'
+    | '/logs'
+    | '/onboarding'
+    | '/scripts'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BuilderRoute: typeof BuilderRoute
   ButlerRoute: typeof ButlerRoute
+  FileshareRoute: typeof FileshareRoute
+  KnowledgeRoute: typeof KnowledgeRoute
+  LogsRoute: typeof LogsRoute
   OnboardingRoute: typeof OnboardingRoute
   ScriptsRoute: typeof ScriptsRoute
 }
@@ -78,11 +143,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/builder': {
+      id: '/builder'
+      path: '/builder'
+      fullPath: '/builder'
+      preLoaderRoute: typeof BuilderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/butler': {
       id: '/butler'
       path: '/butler'
       fullPath: '/butler'
       preLoaderRoute: typeof ButlerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fileshare': {
+      id: '/fileshare'
+      path: '/fileshare'
+      fullPath: '/fileshare'
+      preLoaderRoute: typeof FileshareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge': {
+      id: '/knowledge'
+      path: '/knowledge'
+      fullPath: '/knowledge'
+      preLoaderRoute: typeof KnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logs': {
+      id: '/logs'
+      path: '/logs'
+      fullPath: '/logs'
+      preLoaderRoute: typeof LogsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -104,7 +197,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BuilderRoute: BuilderRoute,
   ButlerRoute: ButlerRoute,
+  FileshareRoute: FileshareRoute,
+  KnowledgeRoute: KnowledgeRoute,
+  LogsRoute: LogsRoute,
   OnboardingRoute: OnboardingRoute,
   ScriptsRoute: ScriptsRoute,
 }
