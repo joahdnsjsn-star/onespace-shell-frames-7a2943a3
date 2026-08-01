@@ -57,7 +57,7 @@ function Cosmetic() {
               <Sparkles size={20} />
             </IconBadge>
             <div>
-              <div className="font-mono text-sm font-bold tracking-widest">NEXUS CORE</div>
+              <div className="font-mono text-sm font-bold tracking-widest">PC AUTOMATION</div>
               <div className="text-[11px] text-muted-foreground">preview of current theme</div>
             </div>
           </div>
