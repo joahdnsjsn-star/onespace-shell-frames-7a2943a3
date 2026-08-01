@@ -10,12 +10,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: bun install --frozen-lockfile
       - name: Typecheck
-        run: npx tsc --noEmit
-      - name: Build
-        run: npm run build
+        run: bunx tsc --noEmit
+      - name: Lint
+        run: bun run lint
+      - name: Build (edge / default target)
+        run: bun run build
+      - name: Build static export (OnSpace / Pages compatible)
+        run: bun run build:static
+      - name: Verify every route rendered
+        run: |
+          test -f dist/static/index.html
+          for r in onboarding butler scripts knowledge builder components connect \
+                   cosmetic fileshare logs settings permissions crash-report \
+                   data-safety privacy-policy security-trust terms; do
+            test -f "dist/static/$r/index.html" || { echo "missing $r"; exit 1; }
+          done
+          echo "all routes prerendered"
+      - name: Upload static build
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: dist/static
+          retention-days: 7

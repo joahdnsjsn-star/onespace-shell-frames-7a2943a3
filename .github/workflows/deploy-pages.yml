@@ -19,22 +19,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run build
-      - name: Locate build output
-        id: out
-        run: |
-          for d in dist/client .output/public dist; do
-            if [ -d "$d" ]; then echo "dir=$d" >> "$GITHUB_OUTPUT"; break; fi
-          done
+          node-version-file: .nvmrc
+      - run: bun install --frozen-lockfile
+      # Real HTML for every route (no blank page, deep links work).
+      - run: bun run build:static
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ steps.out.outputs.dir }}
+          path: dist/static
 
   deploy:
     needs: build

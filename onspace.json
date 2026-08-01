@@ -1,0 +1,35 @@
+{
+  "$comment": "Build contract for OnSpace.ai / any CI importing this repo from GitHub. Keep in sync with package.json scripts and docs/ONSPACE_SYNC.md.",
+  "name": "Butler AI NEXUS",
+  "framework": "vite-tanstack-start",
+  "node": "22",
+  "packageManager": "bun",
+  "install": "bun install",
+  "modes": {
+    "ssr": {
+      "description": "Recommended. Real server-side rendering on Node.",
+      "build": "bun run build:node",
+      "start": "bun run start",
+      "serverEntry": "dist/server/index.mjs",
+      "staticDir": "dist/client",
+      "port": "$PORT (default 3000)"
+    },
+    "static": {
+      "description": "Zero-server hosting. Every route pre-rendered to real HTML.",
+      "build": "bun run build:static",
+      "output": "dist/static",
+      "spaFallback": "404.html + _redirects (/* -> /index.html 200)"
+    },
+    "edge": {
+      "description": "Cloudflare Workers / Pages Functions.",
+      "build": "bun run build",
+      "output": "dist/server (wrangler.json emitted) + dist/client"
+    }
+  },
+  "env": {
+    "required": [],
+    "optional": ["VITE_APP_NAME", "VITE_API_BASE_URL", "VITE_WS_URL", "VITE_ENABLE_ANALYTICS"]
+  },
+  "permissions": "app.permissions.json",
+  "pwa": "public/manifest.webmanifest"
+}
