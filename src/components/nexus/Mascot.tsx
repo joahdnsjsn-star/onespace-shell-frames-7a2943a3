@@ -128,7 +128,6 @@ export function Wordmark({
         </div>
       </div>
     </div>
-    </div>
   );
 }
 
