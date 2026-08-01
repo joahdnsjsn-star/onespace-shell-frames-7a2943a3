@@ -148,8 +148,8 @@ export function growthBuckets(hours = 24, bucketMinutes = CHUNK_MINS): ChartBuck
 }
 
 /** Chart-ready points for GrowthChart / IntakeBars. */
-export function growthPoints(hours = 24): { t: number; v: number }[] {
-  return growthBuckets(hours).map((b) => ({ t: b.ts, v: b.total }));
+export function growthPoints(hours = 24): { ts: number; total: number; added: number }[] {
+  return growthBuckets(hours).map((b) => ({ ts: b.ts, total: b.total, added: b.delta }));
 }
 
 export function growthTotal(): number {
