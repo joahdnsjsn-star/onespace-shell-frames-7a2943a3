@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { PreferenceBridge } from "../components/nexus/PreferenceBridge";
 import { PerfGuard } from "../components/nexus/PerfGuard";
 import { ButlerVoice } from "../components/nexus/ButlerVoice";
+import { TouchInk } from "../components/nexus/TouchInk";
+
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
