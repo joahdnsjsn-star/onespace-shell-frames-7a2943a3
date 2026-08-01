@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+import { raiseHostAlert } from "./usePerf";
+
 export type Telemetry = {
   cpu: number;
   mem: number;
@@ -40,6 +42,9 @@ export function useTelemetry(active = true) {
     let raf = 0;
     let last = performance.now();
     let sinceDrift = 0;
+    let sinceCommit = 0;
+    let sinceAlert = 6000;
+    let live = { ...START };
 
     const tick = (now: number) => {
       const dt = Math.min(64, now - last);
@@ -59,18 +64,36 @@ export function useTelemetry(active = true) {
         };
       }
 
-      setData((prev) => {
-        const k = 1 - Math.pow(0.006, dt / 1000);
-        const t = target.current;
-        return {
-          cpu: prev.cpu + (t.cpu - prev.cpu) * k,
-          mem: prev.mem + (t.mem - prev.mem) * k,
-          disk: prev.disk + (t.disk - prev.disk) * k,
-          net: prev.net + (t.net - prev.net) * k,
-          uptime: prev.uptime + (t.uptime - prev.uptime) * k,
-          latency: prev.latency + (t.latency - prev.latency) * k,
-        };
-      });
+      const k = 1 - Math.pow(0.006, dt / 1000);
+      const t = target.current;
+      live = {
+        cpu: live.cpu + (t.cpu - live.cpu) * k,
+        mem: live.mem + (t.mem - live.mem) * k,
+        disk: live.disk + (t.disk - live.disk) * k,
+        net: live.net + (t.net - live.net) * k,
+        uptime: live.uptime + (t.uptime - live.uptime) * k,
+        latency: live.latency + (t.latency - live.latency) * k,
+      };
+
+      // Commit at ~12Hz instead of every frame: identical motion, a fraction
+      // of the React work.
+      sinceCommit += dt;
+      if (sinceCommit >= 80) {
+        sinceCommit = 0;
+        setData(live);
+      }
+
+      // Host pressure warnings (rate-limited inside PerfGuard as well).
+      sinceAlert += dt;
+      if (sinceAlert > 8000) {
+        if (live.cpu > 82) {
+          sinceAlert = 0;
+          raiseHostAlert({ kind: "cpu", value: live.cpu, label: `CPU at ${live.cpu.toFixed(0)}%` });
+        } else if (live.mem > 28) {
+          sinceAlert = 0;
+          raiseHostAlert({ kind: "ram", value: live.mem, label: `RAM at ${live.mem.toFixed(1)} GB` });
+        }
+      }
 
       raf = requestAnimationFrame(tick);
     };
