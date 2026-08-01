@@ -140,9 +140,7 @@ export async function queryPermission(def: PermDef): Promise<PermState> {
     case "haptics":
       return "vibrate" in navigator ? "granted" : "unsupported";
     case "storage":
-      return typeof window.showOpenFilePicker === "function" || "FileReader" in window
-        ? "prompt"
-        : "unsupported";
+      return "showOpenFilePicker" in window || "FileReader" in window ? "prompt" : "unsupported";
     case "wakelock":
       return "wakeLock" in navigator ? "prompt" : "unsupported";
     default:
