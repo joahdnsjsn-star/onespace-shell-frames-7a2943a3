@@ -61,8 +61,18 @@ if (nativePath) {
     if (!sameSet(a.permissions ?? [], contract.android.permissions)) {
       problems.push("expo.android.permissions differs from app.permissions.json");
     }
-    if (!sameSet(a.blockedPermissions ?? [], contract.android.blockedPermissions)) {
-      problems.push("expo.android.blockedPermissions differs from app.permissions.json");
+    // Blocked list: the contract may be a strict superset (blocking more is
+    // always safe), but the native app must never block LESS than we promise.
+    const nativeBlocked = new Set(a.blockedPermissions ?? []);
+    const missing = contract.android.blockedPermissions.filter((p) => !nativeBlocked.has(p));
+    const extra = [...nativeBlocked].filter(
+      (p) => !contract.android.blockedPermissions.includes(p),
+    );
+    if (missing.length) {
+      problems.push(`native app.json does not block: ${missing.join(", ")}`);
+    }
+    if (extra.length) {
+      problems.push(`native app.json blocks extras not in the contract: ${extra.join(", ")}`);
     }
     if (a.package && a.package !== contract.native.androidPackage) {
       problems.push(`expo.android.package "${a.package}" != contract "${contract.native.androidPackage}"`);
