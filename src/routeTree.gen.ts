@@ -14,12 +14,16 @@ import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as ButlerRouteImport } from './routes/butler'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as CosmeticRouteImport } from './routes/cosmetic'
+import { Route as DataSafetyRouteImport } from './routes/data-safety'
 import { Route as FileshareRouteImport } from './routes/fileshare'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ScriptsRouteImport } from './routes/scripts'
+import { Route as SecurityTrustRouteImport } from './routes/security-trust'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as TermsRouteImport } from './routes/terms'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +50,11 @@ const CosmeticRoute = CosmeticRouteImport.update({
   path: '/cosmetic',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DataSafetyRoute = DataSafetyRouteImport.update({
+  id: '/data-safety',
+  path: '/data-safety',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FileshareRoute = FileshareRouteImport.update({
   id: '/fileshare',
   path: '/fileshare',
@@ -66,14 +75,29 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ScriptsRoute = ScriptsRouteImport.update({
   id: '/scripts',
   path: '/scripts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SecurityTrustRoute = SecurityTrustRouteImport.update({
+  id: '/security-trust',
+  path: '/security-trust',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -83,12 +107,16 @@ export interface FileRoutesByFullPath {
   '/butler': typeof ButlerRoute
   '/connect': typeof ConnectRoute
   '/cosmetic': typeof CosmeticRoute
+  '/data-safety': typeof DataSafetyRoute
   '/fileshare': typeof FileshareRoute
   '/knowledge': typeof KnowledgeRoute
   '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/scripts': typeof ScriptsRoute
+  '/security-trust': typeof SecurityTrustRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -96,12 +124,16 @@ export interface FileRoutesByTo {
   '/butler': typeof ButlerRoute
   '/connect': typeof ConnectRoute
   '/cosmetic': typeof CosmeticRoute
+  '/data-safety': typeof DataSafetyRoute
   '/fileshare': typeof FileshareRoute
   '/knowledge': typeof KnowledgeRoute
   '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/scripts': typeof ScriptsRoute
+  '/security-trust': typeof SecurityTrustRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -110,12 +142,16 @@ export interface FileRoutesById {
   '/butler': typeof ButlerRoute
   '/connect': typeof ConnectRoute
   '/cosmetic': typeof CosmeticRoute
+  '/data-safety': typeof DataSafetyRoute
   '/fileshare': typeof FileshareRoute
   '/knowledge': typeof KnowledgeRoute
   '/logs': typeof LogsRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/scripts': typeof ScriptsRoute
+  '/security-trust': typeof SecurityTrustRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -125,12 +161,16 @@ export interface FileRouteTypes {
     | '/butler'
     | '/connect'
     | '/cosmetic'
+    | '/data-safety'
     | '/fileshare'
     | '/knowledge'
     | '/logs'
     | '/onboarding'
+    | '/privacy-policy'
     | '/scripts'
+    | '/security-trust'
     | '/settings'
+    | '/terms'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,12 +178,16 @@ export interface FileRouteTypes {
     | '/butler'
     | '/connect'
     | '/cosmetic'
+    | '/data-safety'
     | '/fileshare'
     | '/knowledge'
     | '/logs'
     | '/onboarding'
+    | '/privacy-policy'
     | '/scripts'
+    | '/security-trust'
     | '/settings'
+    | '/terms'
   id:
     | '__root__'
     | '/'
@@ -151,12 +195,16 @@ export interface FileRouteTypes {
     | '/butler'
     | '/connect'
     | '/cosmetic'
+    | '/data-safety'
     | '/fileshare'
     | '/knowledge'
     | '/logs'
     | '/onboarding'
+    | '/privacy-policy'
     | '/scripts'
+    | '/security-trust'
     | '/settings'
+    | '/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -165,12 +213,16 @@ export interface RootRouteChildren {
   ButlerRoute: typeof ButlerRoute
   ConnectRoute: typeof ConnectRoute
   CosmeticRoute: typeof CosmeticRoute
+  DataSafetyRoute: typeof DataSafetyRoute
   FileshareRoute: typeof FileshareRoute
   KnowledgeRoute: typeof KnowledgeRoute
   LogsRoute: typeof LogsRoute
   OnboardingRoute: typeof OnboardingRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ScriptsRoute: typeof ScriptsRoute
+  SecurityTrustRoute: typeof SecurityTrustRoute
   SettingsRoute: typeof SettingsRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -210,6 +262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CosmeticRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/data-safety': {
+      id: '/data-safety'
+      path: '/data-safety'
+      fullPath: '/data-safety'
+      preLoaderRoute: typeof DataSafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fileshare': {
       id: '/fileshare'
       path: '/fileshare'
@@ -238,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/scripts': {
       id: '/scripts'
       path: '/scripts'
@@ -245,11 +311,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScriptsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/security-trust': {
+      id: '/security-trust'
+      path: '/security-trust'
+      fullPath: '/security-trust'
+      preLoaderRoute: typeof SecurityTrustRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -261,12 +341,16 @@ const rootRouteChildren: RootRouteChildren = {
   ButlerRoute: ButlerRoute,
   ConnectRoute: ConnectRoute,
   CosmeticRoute: CosmeticRoute,
+  DataSafetyRoute: DataSafetyRoute,
   FileshareRoute: FileshareRoute,
   KnowledgeRoute: KnowledgeRoute,
   LogsRoute: LogsRoute,
   OnboardingRoute: OnboardingRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   ScriptsRoute: ScriptsRoute,
+  SecurityTrustRoute: SecurityTrustRoute,
   SettingsRoute: SettingsRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
