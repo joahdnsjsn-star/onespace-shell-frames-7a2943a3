@@ -15,6 +15,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 import { Chip } from "./ui";
 import { OfflineBanner } from "./OfflineBanner";
 import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
@@ -54,6 +55,7 @@ export function TabBar({ onOpenPages }: { onOpenPages: () => void }) {
             key={t.to}
             to={t.to}
             className={item}
+            onClick={() => haptic("tap")}
             activeOptions={{ exact: t.to === "/" }}
             activeProps={{
               className:
@@ -122,7 +124,10 @@ export function AppShell({
             {accentLabel ? <Chip accent="cyan">{accentLabel}</Chip> : null}
             <button
               type="button"
-              onClick={() => setCmdOpen(true)}
+              onClick={() => {
+                haptic("select");
+                setCmdOpen(true);
+              }}
               aria-label="Open command palette"
               className="press grid size-9 place-items-center rounded-xl border border-dim/70 bg-surface-2/60 text-faint hover:border-cyan/40 hover:text-cyan"
             >
