@@ -597,3 +597,53 @@
 @media (prefers-reduced-motion: reduce) {
   .starfield, .starfield-far, .canopy { animation: none !important; }
 }
+
+/* ==== v15: user preference bridge (html[data-*] set from Settings) ======= */
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+html[data-scanlines="off"] .scanlines,
+html[data-scanlines="off"] .scanlines::after {
+  background-image: none !important;
+}
+html[data-mono="off"] .label-mono,
+html[data-mono="off"] [class*="label-mono"] {
+  font-family: inherit;
+  letter-spacing: 0.02em;
+}
+html[data-density="cozy"] { --nx-density: 1.08; }
+html[data-density="dense"] { --nx-density: 0.9; }
+html[data-density="cozy"] body { font-size: 1.03rem; }
+html[data-density="dense"] body { font-size: 0.95rem; }
+html[data-density="dense"] .space-y-3 > * + * { margin-top: 0.6rem; }
+html[data-density="cozy"] .space-y-3 > * + * { margin-top: 1rem; }
+html[data-accent="neural"] { --cyan: oklch(0.72 0.24 314.8); }
+html[data-accent="ok"] { --cyan: oklch(0.85 0.19 156.9); }
+
+/* Keyboard focus: always visible, never on mouse press. */
+:where(a, button, [role="button"], input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--cyan) 70%, transparent);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Skip link — visible only when focused. */
+.skip-link {
+  position: fixed;
+  left: 50%;
+  top: -100px;
+  z-index: 100;
+  translate: -50% 0;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.75rem;
+  background: var(--surface-3, #12161f);
+  color: var(--foreground);
+  border: 1px solid color-mix(in oklab, var(--cyan) 40%, transparent);
+  transition: top 0.16s ease;
+}
+.skip-link:focus-visible { top: 0.6rem; }
