@@ -128,7 +128,7 @@ export function AnimatedTitle({
           )}
           aria-hidden
         />
-        <h1 className="nx-title truncate font-mono text-fluid-lg font-bold tracking-[0.14em]">
+        <h1 className="nx-title truncate font-mono text-fluid-sm font-bold tracking-[0.08em] min-[400px]:text-fluid-lg min-[400px]:tracking-[0.12em]">
           {title}
         </h1>
       </div>
