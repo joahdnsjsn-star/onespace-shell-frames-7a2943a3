@@ -370,7 +370,109 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
   );
 }
 
+/** Live connection health: monitor stats, diagnosis, and the latency tripwire. */
+function DiagnosticsPanel() {
+  const [, bump] = useState(0);
+  const [wire, setWire] = useState<TripwireState | null>(null);
+
+  useEffect(() => {
+    networkMonitor.load();
+    neuralTripwire.load();
+    setWire(neuralTripwire.getState());
+    const offNet = networkMonitor.subscribe(() => bump((n) => n + 1));
+    const offWire = neuralTripwire.subscribe((s) => setWire(s));
+    return () => {
+      offNet();
+      offWire();
+    };
+  }, []);
+
+  const report = networkMonitor.getDiagnosticReport();
+  const stats = networkMonitor.getStats();
+  const timeline = networkMonitor.getConnectionTimeline(6);
+  const healthAccent = report.healthScore >= 80 ? "ok" : report.healthScore >= 50 ? "warn" : "danger";
+  const alert = wire?.alertLevel && wire.alertLevel !== "NONE";
+
+  return (
+    <Card accent={healthAccent}>
+      <div className="grid grid-cols-3 gap-2">
+        <StatTile label="health" value={`${report.healthScore}`} accent={healthAccent} />
+        <StatTile label="avg ping" value={`${report.avgLatencyMs}ms`} accent="cyan" />
+        <StatTile label="fail rate" value={`${Math.round(report.failRate * 100)}%`} accent="net" />
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        <Chip accent="cyan">{stats.totalSuccesses} ok</Chip>
+        <Chip accent="danger">{stats.totalFailures} fail</Chip>
+        {report.bestPort ? <Chip accent="ok">best port {report.bestPort}</Chip> : null}
+        {stats.failStreak > 0 ? <Chip accent="warn">streak {stats.failStreak}</Chip> : null}
+      </div>
+
+      <div className="mt-3 rounded-lg border border-dim/60 bg-background p-3">
+        <div className="mb-1.5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
+          <ShieldCheck size={12} className={alert ? "text-danger" : "text-ok"} />
+          neural tripwire · {wire?.status ?? "idle"}
+        </div>
+        {alert ? (
+          <p className="text-[11px] leading-snug text-danger">{wire?.alertMessage}</p>
+        ) : wire?.baseline ? (
+          <p className="text-[11px] leading-snug text-muted-foreground">
+            Baseline {Math.round(wire.baseline.meanMs)}ms ±{Math.round(wire.baseline.stddevMs)}ms · live{" "}
+            {wire.liveMeanMs}ms ({wire.deviationSigma.toFixed(1)}σ). No routing anomalies.
+          </p>
+        ) : (
+          <p className="text-[11px] leading-snug text-muted-foreground">
+            Learning your link — {wire?.samplesCollected ?? 0}/{wire?.samplesNeeded ?? 20} pings sampled.
+          </p>
+        )}
+      </div>
+
+      {report.issues.length ? (
+        <ul className="mt-3 space-y-1">
+          {report.issues.slice(0, 3).map((i) => (
+            <li key={i} className="text-[11px] leading-snug text-warn">• {i}</li>
+          ))}
+        </ul>
+      ) : null}
+      {report.recommendations.length ? (
+        <ul className="mt-2 space-y-1">
+          {report.recommendations.slice(0, 3).map((r) => (
+            <li key={r} className="text-[11px] leading-snug text-muted-foreground">› {r}</li>
+          ))}
+        </ul>
+      ) : null}
+
+      {timeline.length ? (
+        <pre className="mt-3 max-h-32 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-dim/60 bg-background p-3 font-mono text-[10px] leading-relaxed text-muted-foreground">
+{timeline.map((e) => networkMonitor.formatEntry(e)).join("\n")}
+        </pre>
+      ) : null}
+
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <ActionButton
+          onClick={() => {
+            networkMonitor.clear();
+            fx.tap();
+            bump((n) => n + 1);
+          }}
+        >
+          <RefreshCw size={16} /> Reset log
+        </ActionButton>
+        <ActionButton
+          onClick={() => {
+            neuralTripwire.reset();
+            fx.tap();
+          }}
+        >
+          <ShieldCheck size={16} /> Relearn link
+        </ActionButton>
+      </div>
+    </Card>
+  );
+}
+
 function Connect() {
+
   const [reloadKey, setReloadKey] = useState(0);
   return (
     <AppShell title="LINK" subtitle="pairing & transport" accentLabel="lan only">
