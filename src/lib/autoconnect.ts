@@ -92,14 +92,9 @@ export function linkSnapshot(): LinkSnapshot {
 
 function set(next: Partial<LinkSnapshot>) {
   const merged = { ...snap, ...next };
-  if (
-    merged.state === snap.state &&
-    merged.latencyMs === snap.latencyMs &&
-    merged.message === snap.message &&
-    merged.quality === snap.quality
-  ) {
-    return;
-  }
+  // Bail out when nothing observable changed — subscribers re-render otherwise.
+  const same = (Object.keys(merged) as (keyof LinkSnapshot)[]).every((k) => merged[k] === snap[k]);
+  if (same) return;
   snap = merged;
   for (const l of listeners) l();
 }
