@@ -208,6 +208,7 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
       .then((h) => {
         setHealth(h);
         setNote(h.ollama ? "Linked — local model ready." : "Linked — Ollama not detected on the PC yet.");
+        void rememberGoodHost(url);
         fx.success();
       })
       .catch((err: unknown) => setNote((err as Error).message))
