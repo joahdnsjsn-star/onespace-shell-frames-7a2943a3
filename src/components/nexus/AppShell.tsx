@@ -154,12 +154,20 @@ export function AppShell({
   }, []);
   const [pagesOpen, setPagesOpen] = useState(false);
   const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   // Route swap = an expected burst of work. Silence the governor briefly so a
   // normal page transition can never fire a false "performance mode" toast.
   useEffect(() => {
     perfQuiet(900);
   }, [title]);
+
+  // Adaptive recents: every visit feeds the hub's "recent" chip row, so the
+  // routes you actually use get faster to reach over time.
+  useEffect(() => {
+    rememberPage(pathname);
+  }, [pathname]);
+
 
   // Hardware / gesture back closes the top-most sheet before it ever leaves
   // the app — exactly how an Android activity stack behaves.
