@@ -389,3 +389,60 @@
     transform: scale(0.975);
   }
 }
+
+/* ==== v7: motion + FX layer ============================================= */
+@keyframes nx-drift {
+  0%   { transform: translate3d(0,0,0) scale(1); }
+  50%  { transform: translate3d(3%, -4%, 0) scale(1.08); }
+  100% { transform: translate3d(0,0,0) scale(1); }
+}
+@keyframes nx-dash {
+  to { stroke-dashoffset: -240; }
+}
+@keyframes nx-sheen {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(220%); }
+}
+@keyframes nx-typing {
+  0%, 60%, 100% { opacity: .25; transform: translateY(0); }
+  30%           { opacity: 1;   transform: translateY(-2px); }
+}
+@keyframes nx-spin-slow { to { transform: rotate(360deg); } }
+@keyframes nx-pop {
+  from { opacity: 0; transform: translateY(8px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@utility nx-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  opacity: .28;
+  animation: nx-drift 18s ease-in-out infinite;
+  will-change: transform;
+}
+@utility nx-dash {
+  stroke-dasharray: 6 10;
+  animation: nx-dash 6s linear infinite;
+}
+@utility nx-spin-slow { animation: nx-spin-slow 14s linear infinite; }
+@utility nx-pop { animation: nx-pop .22s cubic-bezier(.2,.8,.2,1) both; }
+@utility nx-sheen {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, color-mix(in oklab, var(--cyan) 16%, transparent) 50%, transparent 70%);
+    animation: nx-sheen 3.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+@utility nx-typing-dot {
+  animation: nx-typing 1.1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-orb, .nx-dash, .nx-spin-slow, .nx-sheen::after, .nx-typing-dot { animation: none !important; }
+}
