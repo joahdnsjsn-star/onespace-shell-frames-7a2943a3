@@ -138,14 +138,6 @@ export const PAGE_GROUPS: { group: string; pages: PageEntry[] }[] = [
         accent: "ok",
         keywords: "setup tutorial walkthrough intro tips",
       },
-      {
-        to: "/components",
-        label: "Component kit",
-        desc: "UI primitive gallery",
-        icon: Boxes,
-        accent: "system",
-        keywords: "design kit gallery primitives",
-      },
     ],
   },
   {
