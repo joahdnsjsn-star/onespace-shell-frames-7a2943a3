@@ -153,8 +153,14 @@ function RootComponent() {
 
   useEffect(() => {
     installLogger();
-    return startAutoConnect();
+    const stopLink = startAutoConnect();
+    const stopBrain = startKnowledge();
+    return () => {
+      stopBrain();
+      stopLink();
+    };
   }, []);
+
 
   return (
     <QueryClientProvider client={queryClient}>
