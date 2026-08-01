@@ -15,6 +15,7 @@
  */
 
 import {
+import { recordGrowth, trackTotal } from "@/lib/kb-growth";
   BridgeError,
   kbCrawl,
   kbExpand,
@@ -256,6 +257,7 @@ export function syncKnowledge(force = false): Promise<void> {
         stale: false,
       });
       failures = 0;
+      trackTotal(total, "crawler");
 
       const due = force || Date.now() - lastGrowth > GROWTH_MS;
       if (due) {
@@ -339,6 +341,7 @@ export async function addSource(url: string, topic = "General", immediate = fals
   if (!/^https?:\/\//i.test(clean)) throw new Error("Enter a full http(s) address.");
   const res = immediate ? await kbCrawl(clean, topic) : await kbQueueUrl(clean, topic);
   log("info", "app", immediate ? "kb crawl" : "kb queue", { url: clean, topic });
+  recordGrowth(1, "source", new URL(clean).hostname);
   void syncKnowledge(true);
   return res;
 }
@@ -348,12 +351,14 @@ export async function expandTopic(topic: string) {
   if (!clean) throw new Error("Type a topic first.");
   const res = await kbExpand(clean);
   log("info", "app", "kb expand", { topic: clean, queued: res.queued });
+  recordGrowth(res.queued || 1, "topic", clean);
   void syncKnowledge(true);
   return res;
 }
 
 export async function saveNote(title: string, content: string) {
   const res = await kbSaveNote(title.trim() || "App note", content.trim());
+  recordGrowth(1, "note");
   void syncKnowledge(true);
   return res;
 }
