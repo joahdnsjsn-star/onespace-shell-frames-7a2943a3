@@ -41,9 +41,7 @@ class FeatureGate {
 
     // Explicit feature list (schema:2+)
     if (Array.isArray(j["features"])) {
-      this._features = new Set(
-        j["features"].filter((f): f is string => typeof f === "string"),
-      );
+      this._features = new Set(j["features"].filter((f): f is string => typeof f === "string"));
     } else {
       // Infer from schema + version for older servers
       this._features.clear();
