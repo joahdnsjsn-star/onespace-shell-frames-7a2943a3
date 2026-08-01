@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Card, Chip, IconBadge, ProgressBar, Row, ActionButton } from "@/components/nexus/ui";
 import { butlerSay } from "@/lib/voice";
+import butlerHero from "@/assets/butler-hero.png";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
