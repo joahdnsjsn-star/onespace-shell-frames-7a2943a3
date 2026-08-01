@@ -60,7 +60,13 @@ const PRIMARY = [
  * morphs into that page's own icon/label, so the collapsed row never hides
  * where you actually are.
  */
-export function TabBar({ onOpenPages, pagesOpen }: { onOpenPages: () => void; pagesOpen: boolean }) {
+export function TabBar({
+  onOpenPages,
+  pagesOpen,
+}: {
+  onOpenPages: () => void;
+  pagesOpen: boolean;
+}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const onPrimary = PRIMARY.some((t) =>
@@ -115,9 +121,6 @@ export function TabBar({ onOpenPages, pagesOpen }: { onOpenPages: () => void; pa
   );
 }
 
-
-
-
 export function AppShell({
   title,
   subtitle,
@@ -169,7 +172,6 @@ export function AppShell({
     rememberPage(pathname);
   }, [pathname]);
 
-
   // Hardware / gesture back closes the top-most sheet before it ever leaves
   // the app — exactly how an Android activity stack behaves.
   useAndroidBack(cmdOpen, () => setCmdOpen(false));
@@ -201,7 +203,6 @@ export function AppShell({
         fill ? "h-dvh overflow-hidden" : "min-h-dvh",
       )}
     >
-
       <Defer timeout={1800} skipOnLowTier>
         <BackdropFX />
       </Defer>
@@ -315,5 +316,3 @@ export function AppShell({
     </div>
   );
 }
-
-

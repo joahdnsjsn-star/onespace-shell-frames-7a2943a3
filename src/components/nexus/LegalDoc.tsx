@@ -17,7 +17,10 @@ export function LegalDoc({
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg sm:max-w-xl lg:max-w-2xl flex-col bg-background">
       <header className="sticky top-0 z-20 border-b border-dim/70 glass px-4 py-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] sm:px-6">
-        <Link to="/settings" className="flex items-center gap-1 label-mono text-muted-foreground hover:text-cyan">
+        <Link
+          to="/settings"
+          className="flex items-center gap-1 label-mono text-muted-foreground hover:text-cyan"
+        >
           <ChevronLeft size={14} /> back
         </Link>
         <h1 className="mt-2 font-mono text-fluid-lg font-bold tracking-widest">{title}</h1>

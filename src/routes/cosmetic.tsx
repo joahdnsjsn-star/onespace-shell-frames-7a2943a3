@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Palette, Type, Sparkles, Waves, Check } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
-import { Card, Chip, IconBadge, Row, SectionHeader, Toggle, ActionButton } from "@/components/nexus/ui";
+import {
+  Card,
+  Chip,
+  IconBadge,
+  Row,
+  SectionHeader,
+  Toggle,
+  ActionButton,
+} from "@/components/nexus/ui";
 
 export const Route = createFileRoute("/cosmetic")({
   head: () => ({
@@ -9,7 +17,8 @@ export const Route = createFileRoute("/cosmetic")({
       { title: "Appearance — Butler AI NEXUS" },
       {
         name: "description",
-        content: "Accent themes, HUD density, motion presets and typography for the NEXUS interface.",
+        content:
+          "Accent themes, HUD density, motion presets and typography for the NEXUS interface.",
       },
       { property: "og:title", content: "Appearance — NEXUS" },
       { property: "og:description", content: "Tune the look of your command centre." },
@@ -62,7 +71,9 @@ function Cosmetic() {
             </div>
           </div>
           <div className="mt-3 flex gap-2">
-            <Chip accent="ok" dot>online</Chip>
+            <Chip accent="ok" dot>
+              online
+            </Chip>
             <Chip accent="warn">pending</Chip>
             <Chip accent="danger">alert</Chip>
           </div>
@@ -76,7 +87,9 @@ function Cosmetic() {
             <div
               key={d}
               className={`rounded-xl border px-3 py-4 text-center text-xs ${
-                i === 1 ? "border-cyan/50 bg-cyan/10 text-cyan" : "border-dim bg-surface-2 text-muted-foreground"
+                i === 1
+                  ? "border-cyan/50 bg-cyan/10 text-cyan"
+                  : "border-dim bg-surface-2 text-muted-foreground"
               }`}
             >
               {d}
@@ -91,25 +104,41 @@ function Cosmetic() {
           <Row
             title="Scanline overlay"
             sub="Animated HUD sweep"
-            left={<IconBadge accent="cyan" size={32}><Waves size={14} /></IconBadge>}
+            left={
+              <IconBadge accent="cyan" size={32}>
+                <Waves size={14} />
+              </IconBadge>
+            }
             right={<Toggle on />}
           />
           <Row
             title="Circuit grid"
             sub="Background lattice"
-            left={<IconBadge accent="net" size={32}><Palette size={14} /></IconBadge>}
+            left={
+              <IconBadge accent="net" size={32}>
+                <Palette size={14} />
+              </IconBadge>
+            }
             right={<Toggle on />}
           />
           <Row
             title="Monospace headings"
             sub="Terminal typography"
-            left={<IconBadge accent="neural" size={32}><Type size={14} /></IconBadge>}
+            left={
+              <IconBadge accent="neural" size={32}>
+                <Type size={14} />
+              </IconBadge>
+            }
             right={<Toggle on />}
           />
           <Row
             title="Reduced motion"
             sub="Disable pulses and sweeps"
-            left={<IconBadge accent="warn" size={32}><Sparkles size={14} /></IconBadge>}
+            left={
+              <IconBadge accent="warn" size={32}>
+                <Sparkles size={14} />
+              </IconBadge>
+            }
             right={<Toggle />}
           />
         </div>

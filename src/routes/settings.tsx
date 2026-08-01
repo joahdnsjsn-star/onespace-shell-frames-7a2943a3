@@ -39,13 +39,7 @@ import { PerfReadout } from "@/components/nexus/PerfGuard";
 import { usePerf } from "@/hooks/usePerf";
 import { setPerfMode, type PerfMode } from "@/lib/perf";
 import serverAsset from "@/assets/butler_server.py.asset.json";
-import {
-  butlerSay,
-  listVoices,
-  onVoicesChanged,
-  speakLine,
-  voiceSupported,
-} from "@/lib/voice";
+import { butlerSay, listVoices, onVoicesChanged, speakLine, voiceSupported } from "@/lib/voice";
 
 import {
   Card,
@@ -123,7 +117,6 @@ function SwitchRow({
           label={title}
         />
       }
-
     />
   );
 }
@@ -167,7 +160,6 @@ function ChoiceRow<T extends string>({
         }}
         className="mt-3 flex w-full"
       />
-
     </div>
   );
 }
@@ -318,7 +310,9 @@ function VoiceSection() {
     <section>
       <SectionHeader
         title="butler voice"
-        hint={supported ? "Muted by default · captions always show" : "Not supported on this browser"}
+        hint={
+          supported ? "Muted by default · captions always show" : "Not supported on this browser"
+        }
         accent="neural"
       />
       <Card accent="neural" className="space-y-2.5">
@@ -356,9 +350,7 @@ function VoiceSection() {
               </IconBadge>
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-medium leading-snug">Voice</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">
-                  Installed system voices
-                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">Installed system voices</div>
               </div>
             </div>
             <select
@@ -380,9 +372,36 @@ function VoiceSection() {
           </div>
         ) : null}
 
-        <RangeRow id="voice.rate" label="Speed" initial={100} min={60} max={150} step={5} unit="%" accent="neural" />
-        <RangeRow id="voice.pitch" label="Pitch" initial={80} min={40} max={140} step={5} unit="%" accent="cyan" />
-        <RangeRow id="voice.volume" label="Volume" initial={70} min={0} max={100} step={5} unit="%" accent="ok" />
+        <RangeRow
+          id="voice.rate"
+          label="Speed"
+          initial={100}
+          min={60}
+          max={150}
+          step={5}
+          unit="%"
+          accent="neural"
+        />
+        <RangeRow
+          id="voice.pitch"
+          label="Pitch"
+          initial={80}
+          min={40}
+          max={140}
+          step={5}
+          unit="%"
+          accent="cyan"
+        />
+        <RangeRow
+          id="voice.volume"
+          label="Volume"
+          initial={70}
+          min={0}
+          max={100}
+          step={5}
+          unit="%"
+          accent="ok"
+        />
 
         <ActionButton
           variant="ghost"
@@ -497,7 +516,15 @@ function Settings() {
             options={["mdns", "scan", "manual"] as const}
             initial="mdns"
           />
-          <RangeRow id="conn.timeout" label="Request timeout" initial={15} min={5} max={60} unit="s" accent="net" />
+          <RangeRow
+            id="conn.timeout"
+            label="Request timeout"
+            initial={15}
+            min={5}
+            max={60}
+            unit="s"
+            accent="net"
+          />
         </div>
       </section>
 
@@ -554,7 +581,15 @@ function Settings() {
             initial
           />
           <RangeRow id="ai.temperature" label="Creativity" initial={40} unit="%" accent="neural" />
-          <RangeRow id="ai.contextTurns" label="Context window" initial={12} min={2} max={40} unit=" turns" accent="neural" />
+          <RangeRow
+            id="ai.contextTurns"
+            label="Context window"
+            initial={12}
+            min={2}
+            max={40}
+            unit=" turns"
+            accent="neural"
+          />
         </div>
       </section>
 
@@ -666,7 +701,11 @@ function Settings() {
         <div className="space-y-2">
           <Link to="/permissions" className="block">
             <Row
-              left={<IconBadge accent="ok"><ShieldCheck size={14} /></IconBadge>}
+              left={
+                <IconBadge accent="ok">
+                  <ShieldCheck size={14} />
+                </IconBadge>
+              }
               title="Permission centre"
               sub="Live status, reasons, fallbacks and the build-time block list"
               right={<ChevronRight size={16} className="text-muted-foreground" />}
@@ -746,7 +785,12 @@ function Settings() {
             sub="Feedback on actions"
             icon={<SlidersHorizontal size={14} />}
           />
-          <SwitchRow id="notif.sound" title="Sound" sub="Low-volume UI cues and alerts" icon={<Volume2 size={14} />} />
+          <SwitchRow
+            id="notif.sound"
+            title="Sound"
+            sub="Low-volume UI cues and alerts"
+            icon={<Volume2 size={14} />}
+          />
           <SwitchRow
             id="notif.quiet"
             title="Quiet hours"
@@ -754,7 +798,15 @@ function Settings() {
             icon={<Moonish />}
             accent="system"
           />
-          <RangeRow id="notif.cpuThreshold" label="CPU alert threshold" initial={85} min={50} max={99} unit="%" accent="warn" />
+          <RangeRow
+            id="notif.cpuThreshold"
+            label="CPU alert threshold"
+            initial={85}
+            min={50}
+            max={99}
+            unit="%"
+            accent="warn"
+          />
         </div>
       </section>
 
@@ -800,7 +852,15 @@ function Settings() {
             accent="ok"
             initial
           />
-          <RangeRow id="sec.autoLockMinutes" label="Auto-lock after" initial={5} min={1} max={60} unit=" min" accent="ok" />
+          <RangeRow
+            id="sec.autoLockMinutes"
+            label="Auto-lock after"
+            initial={5}
+            min={1}
+            max={60}
+            unit=" min"
+            accent="ok"
+          />
         </div>
       </section>
 
@@ -839,7 +899,16 @@ function Settings() {
             options={["7d", "30d", "90d"] as const}
             initial="30d"
           />
-          <RangeRow id="store.cacheLimit" label="Cache limit" initial={250} min={50} max={2000} step={50} unit=" mb" accent="neural" />
+          <RangeRow
+            id="store.cacheLimit"
+            label="Cache limit"
+            initial={250}
+            min={50}
+            max={2000}
+            step={50}
+            unit=" mb"
+            accent="neural"
+          />
           <ActionButton
             variant="ghost"
             className="w-full"

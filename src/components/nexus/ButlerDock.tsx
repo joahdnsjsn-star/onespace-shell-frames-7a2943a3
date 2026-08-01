@@ -63,7 +63,11 @@ export function ButlerDock() {
         type="button"
         onClick={() =>
           setOpen((o) => {
-            o ? fx.close() : fx.open();
+            if (o) {
+              fx.close();
+            } else {
+              fx.open();
+            }
             return !o;
           })
         }
@@ -74,7 +78,9 @@ export function ButlerDock() {
         )}
       >
         {open ? <X size={20} /> : <Bot size={21} />}
-        {!open && <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-ok pulse-dot" />}
+        {!open && (
+          <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-ok pulse-dot" />
+        )}
       </button>
 
       {open ? (
@@ -91,7 +97,10 @@ export function ButlerDock() {
 
             <div className="scroll-y flex-1 space-y-2 px-3 py-3">
               {msgs.map((m) => (
-                <div key={m.id} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
+                <div
+                  key={m.id}
+                  className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
+                >
                   <div
                     className={cn(
                       "nx-pop max-w-[80%] rounded-xl px-3 py-2 text-fluid-sm leading-relaxed",
@@ -141,7 +150,11 @@ export function ButlerDock() {
               }}
               className="flex items-end gap-2 border-t border-dim/60 px-3 py-2"
             >
-              <button type="button" aria-label="Attach" className="press grid size-8 shrink-0 place-items-center rounded-lg text-faint hover:text-cyan">
+              <button
+                type="button"
+                aria-label="Attach"
+                className="press grid size-8 shrink-0 place-items-center rounded-lg text-faint hover:text-cyan"
+              >
                 <Paperclip size={16} />
               </button>
               <textarea
@@ -158,7 +171,11 @@ export function ButlerDock() {
                 placeholder="Ask Butler anything…"
                 className="max-h-24 min-h-9 flex-1 resize-none bg-transparent py-2 text-fluid-sm leading-snug text-foreground outline-none placeholder:text-faint"
               />
-              <button type="button" aria-label="Voice" className="press grid size-8 shrink-0 place-items-center rounded-lg text-faint hover:text-neural">
+              <button
+                type="button"
+                aria-label="Voice"
+                className="press grid size-8 shrink-0 place-items-center rounded-lg text-faint hover:text-neural"
+              >
                 <Mic size={16} />
               </button>
               <button

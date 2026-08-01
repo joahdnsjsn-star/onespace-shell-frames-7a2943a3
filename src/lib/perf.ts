@@ -65,7 +65,6 @@ export function isPerfQuiet() {
   return typeof performance !== "undefined" && performance.now() < quietUntil;
 }
 
-
 function emit(patch: Partial<PerfState>) {
   const next = { ...state, ...patch };
   if (
@@ -116,9 +115,11 @@ function readMode(): PerfMode {
 }
 
 function readHeap(): number | null {
-  const mem = (performance as Performance & {
-    memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number };
-  }).memory;
+  const mem = (
+    performance as Performance & {
+      memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number };
+    }
+  ).memory;
   if (!mem || !mem.jsHeapSizeLimit) return null;
   return mem.usedJSHeapSize / mem.jsHeapSizeLimit;
 }
@@ -188,7 +189,6 @@ export function startPerfGovernor(): () => void {
         // Expected burst in progress — measure, but never re-tier or popup.
         goodStreak = 0;
       } else if (state.mode === "auto") {
-
         const heavyHeap = heap !== null && heap > 0.86;
         const janky = fps < 34 || longTaskStamps.length >= 6 || heavyHeap;
         if (janky) {
@@ -197,12 +197,12 @@ export function startPerfGovernor(): () => void {
           // Three bad seconds in a row before shedding anything.
           if (jankStreak >= 3)
             step(
-            -1,
-            heavyHeap
-              ? "memory pressure high"
-              : fps < 34
-                ? `frame rate dropped to ${fps} fps`
-                : "main thread blocked",
+              -1,
+              heavyHeap
+                ? "memory pressure high"
+                : fps < 34
+                  ? `frame rate dropped to ${fps} fps`
+                  : "main thread blocked",
             );
         } else if (fps >= 52 && longTaskStamps.length === 0) {
           jankStreak = 0;

@@ -13,7 +13,11 @@ export function BackdropFX() {
       <div className="nx-orb left-[-15%] top-[-10%] size-[55vmax] bg-cyan/40" />
       <div className="nx-orb right-[-20%] top-[25%] size-[45vmax] bg-neural/35 [animation-delay:-6s]" />
       <div className="nx-orb bottom-[-18%] left-[10%] size-[50vmax] bg-net/30 [animation-delay:-11s]" />
-      <svg className="absolute inset-0 size-full opacity-[0.16]" preserveAspectRatio="none" viewBox="0 0 400 800">
+      <svg
+        className="absolute inset-0 size-full opacity-[0.16]"
+        preserveAspectRatio="none"
+        viewBox="0 0 400 800"
+      >
         <defs>
           <linearGradient id="nxLine" x1="0" x2="1">
             <stop offset="0%" stopColor="var(--cyan)" stopOpacity="0" />
@@ -72,7 +76,15 @@ export function NexusLogo({
       </defs>
 
       {/* status pulse ring */}
-      <circle cx="24" cy="24" r="21" stroke={ring} strokeWidth="1" opacity="0.5" className="nx-ring" />
+      <circle
+        cx="24"
+        cy="24"
+        r="21"
+        stroke={ring}
+        strokeWidth="1"
+        opacity="0.5"
+        className="nx-ring"
+      />
       <circle cx="24" cy="24" r="17" fill="url(#nxCore)" />
 
       {/* hex frame */}
@@ -109,7 +121,14 @@ export function NexusLogo({
         strokeWidth="0.9"
         strokeLinejoin="round"
       />
-      <circle cx="24" cy="32.6" r="1.5" fill="var(--background)" stroke="var(--cyan)" strokeWidth="1" />
+      <circle
+        cx="24"
+        cy="32.6"
+        r="1.5"
+        fill="var(--background)"
+        stroke="var(--cyan)"
+        strokeWidth="1"
+      />
       {/* collar */}
       <path
         d="M17 29.5 24 34l7-4.5"
@@ -154,7 +173,6 @@ export function AnimatedTitle({
     </div>
   );
 }
-
 
 /** Thin scroll-progress meter for the sticky header. */
 export function ScrollProgress() {

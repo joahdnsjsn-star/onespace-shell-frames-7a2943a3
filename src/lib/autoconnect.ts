@@ -105,9 +105,14 @@ function set(next: Partial<LinkSnapshot>) {
 /** Latency + jitter + loss folded into one human label. */
 function recompute() {
   const hits = samples.filter((s) => s >= 0);
-  const loss = samples.length ? Math.round(((samples.length - hits.length) / samples.length) * 100) : 0;
+  const loss = samples.length
+    ? Math.round(((samples.length - hits.length) / samples.length) * 100)
+    : 0;
   const avg = hits.length ? hits.reduce((a, b) => a + b, 0) / hits.length : 0;
-  const jitter = hits.length > 1 ? Math.round(Math.sqrt(hits.reduce((a, b) => a + (b - avg) ** 2, 0) / hits.length)) : 0;
+  const jitter =
+    hits.length > 1
+      ? Math.round(Math.sqrt(hits.reduce((a, b) => a + (b - avg) ** 2, 0) / hits.length))
+      : 0;
   let quality: Quality = "down";
   if (hits.length) {
     if (loss > 40) quality = "poor";
@@ -187,7 +192,9 @@ async function refreshVitals(): Promise<void> {
   if (!metrics && !status) return;
   set({
     ...(metrics ? { cpu: Math.round(metrics.cpu), ram: Math.round(metrics.ram) } : {}),
-    ...(status ? { model: status.model, serverVersion: status.version, kbTotal: status.kbTotal } : {}),
+    ...(status
+      ? { model: status.model, serverVersion: status.version, kbTotal: status.kbTotal }
+      : {}),
   });
 }
 

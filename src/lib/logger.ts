@@ -41,11 +41,16 @@ function safeData(input: unknown): unknown {
     if (input == null) return undefined;
     if (typeof input === "string") return input.length > 400 ? `${input.slice(0, 400)}…` : input;
     if (typeof input !== "object") return input;
-    if (input instanceof Error) return { name: input.name, message: input.message, stack: input.stack?.slice(0, 800) };
+    if (input instanceof Error)
+      return { name: input.name, message: input.message, stack: input.stack?.slice(0, 800) };
     if (Array.isArray(input)) return input.slice(0, 20).map(safeData);
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(input as Record<string, unknown>).slice(0, 24)) {
-      out[k] = REDACT.test(k) ? "«redacted»" : typeof v === "object" && v !== null ? "[object]" : safeData(v);
+      out[k] = REDACT.test(k)
+        ? "«redacted»"
+        : typeof v === "object" && v !== null
+          ? "[object]"
+          : safeData(v);
     }
     return out;
   } catch {
@@ -64,7 +69,13 @@ function emit() {
   }
 }
 
-export function log(level: LogLevel, channel: LogChannel, msg: string, data?: unknown, ms?: number): LogEntry {
+export function log(
+  level: LogLevel,
+  channel: LogChannel,
+  msg: string,
+  data?: unknown,
+  ms?: number,
+): LogEntry {
   const entry: LogEntry = { id: ++seq, t: Date.now(), level, channel, msg };
   const clean = safeData(data);
   if (clean !== undefined) entry.data = clean;
@@ -125,7 +136,9 @@ export function exportBundle(): string {
       exportedAt: new Date().toISOString(),
       userAgent: typeof navigator === "undefined" ? "" : navigator.userAgent,
       viewport:
-        typeof window === "undefined" ? "" : `${window.innerWidth}x${window.innerHeight}@${window.devicePixelRatio}`,
+        typeof window === "undefined"
+          ? ""
+          : `${window.innerWidth}x${window.innerHeight}@${window.devicePixelRatio}`,
       counts: logCounts(),
       entries: buffer,
     },

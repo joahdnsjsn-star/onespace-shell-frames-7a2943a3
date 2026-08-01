@@ -215,9 +215,14 @@ class NetworkMonitorService {
       s.failStreak++;
       s.successStreak = 0;
       if (
-        ["CONNECT_FAIL", "PING_FAIL", "RECONNECT_FAIL", "DISCONNECT", "TIMEOUT", "FIREWALL_BLOCK"].includes(
-          e.type,
-        )
+        [
+          "CONNECT_FAIL",
+          "PING_FAIL",
+          "RECONNECT_FAIL",
+          "DISCONNECT",
+          "TIMEOUT",
+          "FIREWALL_BLOCK",
+        ].includes(e.type)
       ) {
         if (!this._lastDisconnectTs) this._lastDisconnectTs = e.ts;
       }
@@ -234,25 +239,64 @@ class NetworkMonitorService {
   }
 
   // ── Convenience helpers ──────────────────────────────────────
-  connectOk(ip: string, port: string, ms: number) { this.log("CONNECT_OK", true, { ip, port, ms }); }
-  connectFail(ip: string, port: string, error: string) { this.log("CONNECT_FAIL", false, { ip, port, error }); }
-  pingOk(ip: string, port: string, ms: number) { this.log("PING_OK", true, { ip, port, ms }); }
-  pingFail(ip: string, port: string, error?: string) { this.log("PING_FAIL", false, { ip, port, ...(error ? { error } : {}) }); }
-  scanStart() { this.log("SCAN_START", true, {}); }
-  scanFound(ip: string, port: string, ms: number) { this.log("SCAN_FOUND", true, { ip, port, ms }); }
-  scanEmpty() { this.log("SCAN_EMPTY", false, {}); }
-  reconnectOk(ip: string, port: string, ms: number) { this.log("RECONNECT_OK", true, { ip, port, ms }); }
-  reconnectFail(ip: string, port: string, error: string) { this.log("RECONNECT_FAIL", false, { ip, port, error }); }
-  disconnect(ip: string, port: string) { this.log("DISCONNECT", false, { ip, port }); this._lastDisconnectTs = Date.now(); }
-  pairOk(ip: string, port: string) { this.log("PAIR_OK", true, { ip, port }); }
-  pairFail(ip: string, port: string, error: string) { this.log("PAIR_FAIL", false, { ip, port, error }); }
-  portDiscovered(ip: string, port: string, ms: number) { this.log("PORT_DISCOVERED", true, { ip, port, ms }); }
-  timeout(ip: string, port: string) { this.log("TIMEOUT", false, { ip, port, error: "Timeout" }); }
-  firewallBlock(ip: string, port: string) { this.log("FIREWALL_BLOCK", false, { ip, port, error: "Firewall likely blocking port" }); }
-  engineStart() { this.log("ENGINE_START", true, {}); }
-  engineStop() { this.log("ENGINE_STOP", true, {}); }
-  appResume() { this.log("APP_RESUME", true, {}); }
-  appBackground() { this.log("APP_BACKGROUND", true, {}); }
+  connectOk(ip: string, port: string, ms: number) {
+    this.log("CONNECT_OK", true, { ip, port, ms });
+  }
+  connectFail(ip: string, port: string, error: string) {
+    this.log("CONNECT_FAIL", false, { ip, port, error });
+  }
+  pingOk(ip: string, port: string, ms: number) {
+    this.log("PING_OK", true, { ip, port, ms });
+  }
+  pingFail(ip: string, port: string, error?: string) {
+    this.log("PING_FAIL", false, { ip, port, ...(error ? { error } : {}) });
+  }
+  scanStart() {
+    this.log("SCAN_START", true, {});
+  }
+  scanFound(ip: string, port: string, ms: number) {
+    this.log("SCAN_FOUND", true, { ip, port, ms });
+  }
+  scanEmpty() {
+    this.log("SCAN_EMPTY", false, {});
+  }
+  reconnectOk(ip: string, port: string, ms: number) {
+    this.log("RECONNECT_OK", true, { ip, port, ms });
+  }
+  reconnectFail(ip: string, port: string, error: string) {
+    this.log("RECONNECT_FAIL", false, { ip, port, error });
+  }
+  disconnect(ip: string, port: string) {
+    this.log("DISCONNECT", false, { ip, port });
+    this._lastDisconnectTs = Date.now();
+  }
+  pairOk(ip: string, port: string) {
+    this.log("PAIR_OK", true, { ip, port });
+  }
+  pairFail(ip: string, port: string, error: string) {
+    this.log("PAIR_FAIL", false, { ip, port, error });
+  }
+  portDiscovered(ip: string, port: string, ms: number) {
+    this.log("PORT_DISCOVERED", true, { ip, port, ms });
+  }
+  timeout(ip: string, port: string) {
+    this.log("TIMEOUT", false, { ip, port, error: "Timeout" });
+  }
+  firewallBlock(ip: string, port: string) {
+    this.log("FIREWALL_BLOCK", false, { ip, port, error: "Firewall likely blocking port" });
+  }
+  engineStart() {
+    this.log("ENGINE_START", true, {});
+  }
+  engineStop() {
+    this.log("ENGINE_STOP", true, {});
+  }
+  appResume() {
+    this.log("APP_RESUME", true, {});
+  }
+  appBackground() {
+    this.log("APP_BACKGROUND", true, {});
+  }
 
   // ── Read API ─────────────────────────────────────────────────
   getLog(limit = 50): NetLogEntry[] {
@@ -267,7 +311,10 @@ class NetworkMonitorService {
 
   getRecentFailures(limit = 10): NetLogEntry[] {
     this.load();
-    return this._log.filter((e) => !e.success).slice(-limit).reverse();
+    return this._log
+      .filter((e) => !e.success)
+      .slice(-limit)
+      .reverse();
   }
 
   getConnectionTimeline(limit = 30): NetLogEntry[] {
@@ -285,7 +332,10 @@ class NetworkMonitorService {
       "ENGINE_START",
       "APP_RESUME",
     ];
-    return this._log.filter((e) => TIMELINE_TYPES.includes(e.type)).slice(-limit).reverse();
+    return this._log
+      .filter((e) => TIMELINE_TYPES.includes(e.type))
+      .slice(-limit)
+      .reverse();
   }
 
   /** Health score + plain-language issues and fixes. */
@@ -312,17 +362,24 @@ class NetworkMonitorService {
     if (s.avgLatencyMs > 200) score -= 5;
     score = Math.max(0, Math.min(100, score));
 
-    if (failRate > 0.5) issues.push(`High failure rate: ${Math.round(failRate * 100)}% of connections fail`);
-    if (s.failStreak >= 3) issues.push(`${s.failStreak} consecutive failures — the server may be offline`);
-    if (s.avgLatencyMs > 300) issues.push(`High latency: ${s.avgLatencyMs}ms average — check Wi-Fi signal`);
+    if (failRate > 0.5)
+      issues.push(`High failure rate: ${Math.round(failRate * 100)}% of connections fail`);
+    if (s.failStreak >= 3)
+      issues.push(`${s.failStreak} consecutive failures — the server may be offline`);
+    if (s.avgLatencyMs > 300)
+      issues.push(`High latency: ${s.avgLatencyMs}ms average — check Wi-Fi signal`);
     if (s.longestDowntimeMs > 60_000)
-      issues.push(`Longest outage: ${Math.round(s.longestDowntimeMs / 60000)}min — connection is unstable`);
+      issues.push(
+        `Longest outage: ${Math.round(s.longestDowntimeMs / 60000)}min — connection is unstable`,
+      );
 
     const failPorts = Object.entries(s.portHistory)
       .filter(([, v]) => v.fail > 0 && v.ok === 0)
       .map(([p]) => p);
     if (failPorts.length > 0)
-      issues.push(`Ports that never worked: ${failPorts.slice(0, 3).join(", ")} — likely wrong port range`);
+      issues.push(
+        `Ports that never worked: ${failPorts.slice(0, 3).join(", ")} — likely wrong port range`,
+      );
 
     if (issues.length === 0) {
       recs.push("Connection is stable — no action needed");

@@ -1,14 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronLeft, Bug, Copy, Send } from "lucide-react";
-import { Card, Chip, EmptyState, IconBadge, Row, SectionHeader, ActionButton } from "@/components/nexus/ui";
+import {
+  Card,
+  Chip,
+  EmptyState,
+  IconBadge,
+  Row,
+  SectionHeader,
+  ActionButton,
+} from "@/components/nexus/ui";
 
 export const Route = createFileRoute("/crash-report")({
   head: () => ({
     meta: [
       { title: "Crash Report — Butler AI NEXUS" },
-      { name: "description", content: "Local crash diagnostics you can review and copy before sharing manually." },
+      {
+        name: "description",
+        content: "Local crash diagnostics you can review and copy before sharing manually.",
+      },
       { property: "og:title", content: "Crash Report — Butler AI" },
-      { property: "og:description", content: "Diagnostics stay on device until you copy them yourself." },
+      {
+        property: "og:description",
+        content: "Diagnostics stay on device until you copy them yourself.",
+      },
     ],
   }),
   component: CrashReport,
@@ -18,7 +32,10 @@ function CrashReport() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background sm:max-w-xl lg:max-w-2xl">
       <header className="sticky top-0 z-20 border-b border-dim bg-surface/95 px-4 py-3 backdrop-blur">
-        <Link to="/settings" className="flex items-center gap-1 label-mono text-muted-foreground hover:text-cyan">
+        <Link
+          to="/settings"
+          className="flex items-center gap-1 label-mono text-muted-foreground hover:text-cyan"
+        >
           <ChevronLeft size={14} /> back
         </Link>
         <h1 className="mt-2 font-mono text-base font-bold tracking-widest">CRASH REPORT</h1>
@@ -33,7 +50,9 @@ function CrashReport() {
             </IconBadge>
             <div>
               <div className="text-sm font-medium">No fatal errors recorded</div>
-              <div className="text-[11px] text-muted-foreground">boot guard reports a clean session</div>
+              <div className="text-[11px] text-muted-foreground">
+                boot guard reports a clean session
+              </div>
             </div>
           </div>
         </Card>
@@ -41,7 +60,11 @@ function CrashReport() {
         <section>
           <SectionHeader title="environment" accent="system" />
           <div className="space-y-2">
-            <Row title="App build" sub="shell · v6-unified" right={<Chip accent="system">web</Chip>} />
+            <Row
+              title="App build"
+              sub="shell · v6-unified"
+              right={<Chip accent="system">web</Chip>}
+            />
             <Row title="Bridge" sub="butler_server.py" right={<Chip accent="warn">unknown</Chip>} />
             <Row title="Session" sub="started —" right={<Chip accent="ok">clean</Chip>} />
           </div>

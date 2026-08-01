@@ -13,7 +13,9 @@ import type { PermDef } from "@/lib/permissions";
  *
  * Mirrors docs/native/PROMINENT_DISCLOSURES.md.
  */
-export const DISCLOSURES: Partial<Record<PermDef["key"], { title: string; body: string; bullets: string[] }>> = {
+export const DISCLOSURES: Partial<
+  Record<PermDef["key"], { title: string; body: string; bullets: string[] }>
+> = {
   camera: {
     title: "Camera is used only for the pairing QR",
     body: "Butler AI opens the camera solely to read the one-time pairing code shown on your PC screen.",
@@ -26,17 +28,27 @@ export const DISCLOSURES: Partial<Record<PermDef["key"], { title: string; body: 
   notifications: {
     title: "Notifications are used only for your own runs",
     body: "Alerts tell you when a script you started finishes, or when your paired PC drops off the network.",
-    bullets: ["No marketing, no promotions, no third-party pushes", "Refusing keeps alerts inside the app as toasts"],
+    bullets: [
+      "No marketing, no promotions, no third-party pushes",
+      "Refusing keeps alerts inside the app as toasts",
+    ],
   },
   storage: {
     title: "Only the files you pick are read",
     body: "Fileshare reads a file after you choose it in the system picker. No folder is scanned or indexed.",
-    bullets: ["No media library access — those permissions are blocked in the build", "Refusing keeps Fileshare receive-only"],
+    bullets: [
+      "No media library access — those permissions are blocked in the build",
+      "Refusing keeps Fileshare receive-only",
+    ],
   },
   network: {
     title: "Local network scan needs your consent",
     body: "Discovery sends a short probe across your own Wi-Fi to find the PC running Butler server.",
-    bullets: ["The public internet is never scanned", "One-time scan, started only by this tap", "You can type the IP address manually instead"],
+    bullets: [
+      "The public internet is never scanned",
+      "One-time scan, started only by this tap",
+      "You can type the IP address manually instead",
+    ],
   },
 };
 
@@ -82,7 +94,9 @@ export function usePermissionDisclosure() {
               <ShieldAlert size={17} />
             </span>
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">before we ask</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                before we ask
+              </p>
               <h2 className="text-sm font-semibold leading-snug text-foreground">{copy.title}</h2>
             </div>
             <button

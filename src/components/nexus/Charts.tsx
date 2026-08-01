@@ -124,7 +124,12 @@ export function GrowthChart({
             <circle cx={geo.last[0]} cy={geo.last[1]} r="3.5" fill={stroke} />
             <circle cx={geo.last[0]} cy={geo.last[1]} r="7" fill={stroke} opacity="0.22">
               <animate attributeName="r" values="5;10;5" dur="2.6s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.3;0;0.3" dur="2.6s" repeatCount="indefinite" />
+              <animate
+                attributeName="opacity"
+                values="0.3;0;0.3"
+                dur="2.6s"
+                repeatCount="indefinite"
+              />
             </circle>
           </>
         ) : null}
@@ -140,7 +145,15 @@ export function GrowthChart({
 }
 
 /** Per-hour intake bars, derived from the same series as the growth curve. */
-export function IntakeBars({ points, accent = "cyan", bars = 24 }: { points: Point[]; accent?: Accent; bars?: number }) {
+export function IntakeBars({
+  points,
+  accent = "cyan",
+  bars = 24,
+}: {
+  points: Point[];
+  accent?: Accent;
+  bars?: number;
+}) {
   const data = useMemo(() => {
     const tail = points.slice(-bars);
     const max = Math.max(1, ...tail.map((p) => p.added));
@@ -169,7 +182,13 @@ export function IntakeBars({ points, accent = "cyan", bars = 24 }: { points: Poi
 }
 
 /** Category distribution — horizontal bars, biggest first. */
-export function CategoryBars({ categories, max = 6 }: { categories: { name: string; count: number }[]; max?: number }) {
+export function CategoryBars({
+  categories,
+  max = 6,
+}: {
+  categories: { name: string; count: number }[];
+  max?: number;
+}) {
   const rows = useMemo(() => {
     const top = [...categories].sort((a, b) => b.count - a.count).slice(0, max);
     const peak = Math.max(1, ...top.map((c) => c.count));
@@ -186,7 +205,9 @@ export function CategoryBars({ categories, max = 6 }: { categories: { name: stri
         <li key={r.name} className="space-y-1">
           <div className="flex items-baseline justify-between gap-3">
             <span className="truncate text-[13px] text-body">{r.name}</span>
-            <span className="font-mono text-[12px] tabular-nums text-muted">{r.count.toLocaleString()}</span>
+            <span className="font-mono text-[12px] tabular-nums text-muted">
+              {r.count.toLocaleString()}
+            </span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-3">
             <div
@@ -220,8 +241,22 @@ export function ProgressRing({
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={caption ?? "progress"}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="currentColor" strokeWidth="5" className="text-dim/50" />
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        role="img"
+        aria-label={caption ?? "progress"}
+      >
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="5"
+          className="text-dim/50"
+        />
         <circle
           cx={size / 2}
           cy={size / 2}
