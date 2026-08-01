@@ -33,7 +33,24 @@ let status: BridgeStatus = "idle";
 let lastError = "";
 let config: BridgeConfig = DEFAULTS;
 
+/**
+ * Stable snapshot object. `useSyncExternalStore` compares snapshots by
+ * reference, so this MUST be rebuilt only when something actually changed —
+ * returning a fresh object literal on every read causes an infinite render
+ * loop ("Maximum update depth exceeded").
+ */
+let snapshot: { status: BridgeStatus; lastError: string; config: BridgeConfig } = {
+  status,
+  lastError,
+  config,
+};
+
+function rebuild() {
+  snapshot = { status, lastError, config };
+}
+
 function emit() {
+  rebuild();
   for (const l of listeners) l();
 }
 
@@ -43,7 +60,7 @@ export function subscribeBridge(fn: Listener) {
 }
 
 export function bridgeSnapshot() {
-  return { status, lastError, config };
+  return snapshot;
 }
 
 function setStatus(next: BridgeStatus, error = "") {
