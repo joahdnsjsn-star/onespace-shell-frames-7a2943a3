@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { fx } from "@/lib/fx";
 import { primeAudio } from "@/lib/sound";
 import { SplashScreen } from "./Mascot";
+import { butlerSay } from "@/lib/voice";
 import { Chip } from "./ui";
 import { OfflineBanner } from "./OfflineBanner";
 import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
@@ -172,7 +173,22 @@ export function AppShell({
 
       <TabBar onOpenPages={() => setPagesOpen(true)} />
       {fill ? null : <ButlerDock />}
-      {booting ? <SplashScreen onDone={() => setBooting(false)} /> : null}
+      {booting ? (
+        <SplashScreen
+          onDone={() => {
+            setBooting(false);
+            window.setTimeout(
+              () =>
+                butlerSay("All systems nominal. Butler online and standing by.", {
+                  tone: "ok",
+                  label: "ONLINE",
+                  hold: 2400,
+                }),
+              700,
+            );
+          }}
+        />
+      ) : null}
       <CommandBar open={cmdOpen} onOpenChange={setCmdOpen} />
       <PageLauncher open={pagesOpen} onOpenChange={setPagesOpen} />
     </div>

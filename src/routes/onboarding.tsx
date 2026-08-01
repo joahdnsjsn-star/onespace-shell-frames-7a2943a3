@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import {
@@ -15,6 +15,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Card, Chip, IconBadge, ProgressBar, Row, ActionButton } from "@/components/nexus/ui";
+import { butlerSay } from "@/lib/voice";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -134,6 +135,21 @@ function Onboarding() {
 
   const go = (dir: 1 | -1) =>
     setStep((v) => Math.min(STEPS.length - 1, Math.max(0, v + dir)));
+
+  // Butler narrates every step — spoken when voice is on, always captioned.
+  const spoken = useRef(-1);
+  useEffect(() => {
+    if (spoken.current === step) return;
+    spoken.current = step;
+    const t = window.setTimeout(() => {
+      butlerSay(step === 0 ? `Welcome aboard. I'm Butler. ${s.tip}` : `${s.title}. ${s.tip}`, {
+        tone: step === 3 ? "warn" : "info",
+        label: s.label,
+        hold: 2600,
+      });
+    }, step === 0 ? 900 : 220);
+    return () => window.clearTimeout(t);
+  }, [step, s.tip, s.title, s.label]);
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col bg-background sm:max-w-xl lg:max-w-2xl">
