@@ -521,7 +521,7 @@ function Settings() {
             sub="Feedback on actions"
             icon={<SlidersHorizontal size={14} />}
           />
-          <SwitchRow id="notif.sound" title="Sound" sub="Audible cue on alerts" icon={<Volume2 size={14} />} />
+          <SwitchRow id="notif.sound" title="Sound" sub="Low-volume UI cues and alerts" icon={<Volume2 size={14} />} />
           <SwitchRow
             id="notif.quiet"
             title="Quiet hours"
