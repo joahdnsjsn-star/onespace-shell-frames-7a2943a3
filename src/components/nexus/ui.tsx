@@ -190,19 +190,22 @@ export function Row({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-xl border border-dim/50 bg-surface-3/50 px-3 py-3 press hover:border-cyan/25 hover:bg-surface-3/80",
+        "flex items-start gap-3 rounded-xl border border-dim/50 bg-surface-3/50 px-3 py-3 press hover:border-cyan/25 hover:bg-surface-3/80",
         className,
       )}
     >
-      {left}
+      {left ? <div className="shrink-0 pt-0.5">{left}</div> : null}
       <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-medium leading-tight">{title}</div>
-        {sub ? <div className="mt-0.5 truncate text-xs text-muted-foreground">{sub}</div> : null}
+        <div className="text-sm font-medium leading-snug text-balance">{title}</div>
+        {sub ? (
+          <div className="mt-0.5 text-xs leading-snug text-muted-foreground">{sub}</div>
+        ) : null}
       </div>
-      {right}
+      {right ? <div className="shrink-0 self-center">{right}</div> : null}
     </div>
   );
 }
+
 
 export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("shimmer rounded-md bg-surface-3/80", className)} />;
