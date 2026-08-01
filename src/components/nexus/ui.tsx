@@ -47,7 +47,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-xl border border-dim/70 bg-surface-2 p-4",
+        "relative rounded-2xl border border-dim/60 bg-surface-2 surface-elevated hairline-top p-4 transition-colors duration-200",
         accent && accentBorder[accent],
         className,
       )}
@@ -71,8 +71,11 @@ export function SectionHeader({
   return (
     <div className="mb-3 flex items-end justify-between gap-3">
       <div>
-        <div className={cn("label-mono", accentText[accent])}>{title}</div>
-        {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
+        <div className={cn("flex items-center gap-2 label-mono", accentText[accent])}>
+          <span className="h-3 w-0.5 rounded-full bg-current" aria-hidden />
+          {title}
+        </div>
+        {hint ? <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{hint}</p> : null}
       </div>
       {action}
     </div>
@@ -94,7 +97,7 @@ export function IconBadge({
     <span
       style={{ width: size, height: size }}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-[0.7rem] border",
+        "inline-flex shrink-0 items-center justify-center rounded-xl border shadow-[inset_0_1px_0_0_color-mix(in_oklab,white_10%,transparent)] transition-transform duration-200",
         accentBg[accent],
         accentBorder[accent],
         accentText[accent],
@@ -118,7 +121,7 @@ export function Chip({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 label-mono",
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 label-mono backdrop-blur-sm transition-colors",
         accentBg[accent],
         accentBorder[accent],
         accentText[accent],
@@ -146,22 +149,25 @@ export function StatTile({
   sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-dim/70 bg-surface-2 p-3">
+    <div className="group relative rounded-2xl border border-dim/60 bg-surface-2 surface-elevated p-3.5 press hover:border-dim">
       <div className="label-mono text-muted-foreground">{label}</div>
       <div className="mt-1.5 flex items-baseline gap-1">
-        <span className={cn("font-mono text-2xl leading-none", accentText[accent])}>{value}</span>
+        <span className={cn("font-mono text-2xl font-bold leading-none tabular-nums", accentText[accent])}>{value}</span>
         {unit ? <span className="font-mono text-[10px] text-muted-foreground">{unit}</span> : null}
       </div>
-      {sub ? <div className="mt-1 text-[11px] text-muted-foreground">{sub}</div> : null}
+      {sub ? <div className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{sub}</div> : null}
     </div>
   );
 }
 
 export function ProgressBar({ value, accent = "cyan" }: { value: number; accent?: Accent }) {
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-3">
+    <div className="h-2 w-full overflow-hidden rounded-full bg-surface-3/80 ring-1 ring-inset ring-dim/50">
       <div
-        className={cn("h-full rounded-full", accentText[accent], "bg-current")}
+        className={cn(
+          "h-full rounded-full bg-current shadow-[0_0_12px_-2px_currentColor] transition-[width] duration-700 ease-out",
+          accentText[accent],
+        )}
         style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
       />
     </div>
@@ -184,14 +190,14 @@ export function Row({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-lg border border-dim/50 bg-surface-3/60 px-3 py-2.5",
+        "flex items-center gap-3 rounded-xl border border-dim/50 bg-surface-3/50 px-3 py-3 press hover:border-cyan/25 hover:bg-surface-3/80",
         className,
       )}
     >
       {left}
       <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-medium">{title}</div>
-        {sub ? <div className="truncate text-[11px] text-muted-foreground">{sub}</div> : null}
+        <div className="truncate text-sm font-medium leading-tight">{title}</div>
+        {sub ? <div className="mt-0.5 truncate text-xs text-muted-foreground">{sub}</div> : null}
       </div>
       {right}
     </div>
@@ -199,7 +205,7 @@ export function Row({
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-md bg-surface-3", className)} />;
+  return <div className={cn("shimmer rounded-md bg-surface-3/80", className)} />;
 }
 
 /** Skeleton stand-in for a Row list while real data is pending. */
@@ -251,10 +257,10 @@ export function EmptyState({
   icon?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center rounded-xl border border-dashed border-dim bg-surface/60 px-5 py-8 text-center">
+    <div className="flex flex-col items-center rounded-2xl border border-dashed border-dim/80 bg-surface/50 px-5 py-10 text-center">
       {icon ? <div className="mb-3 text-faint">{icon}</div> : null}
       <div className="label-mono text-muted-foreground">{title}</div>
-      <p className="mt-2 max-w-[26ch] text-xs text-muted-foreground/80">{body}</p>
+      <p className="mt-2 max-w-[30ch] text-xs leading-relaxed text-muted-foreground/90">{body}</p>
     </div>
   );
 }
@@ -263,13 +269,13 @@ export function Toggle({ on }: { on?: boolean }) {
   return (
     <span
       className={cn(
-        "inline-flex h-6 w-11 shrink-0 items-center rounded-full border p-0.5 transition-colors",
-        on ? "border-cyan/50 bg-cyan/25" : "border-dim bg-surface-3",
+        "inline-flex h-6 w-11 shrink-0 items-center rounded-full border p-0.5 transition-colors duration-300",
+        on ? "border-cyan/50 bg-cyan/25 shadow-[0_0_16px_-6px_var(--cyan)]" : "border-dim bg-surface-3",
       )}
     >
       <span
         className={cn(
-          "size-4 rounded-full transition-transform",
+          "size-4 rounded-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
           on ? "translate-x-5 bg-cyan" : "translate-x-0 bg-faint",
         )}
       />
@@ -289,10 +295,11 @@ export function ActionButton({
   return (
     <span
       className={cn(
-        "inline-flex h-11 select-none items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-colors",
-        variant === "primary" && "bg-cyan text-primary-foreground hover:bg-cyan/90",
+        "press inline-flex h-11 cursor-pointer select-none items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold tracking-tight",
+        variant === "primary" &&
+          "bg-cyan text-primary-foreground shadow-[0_10px_30px_-14px_var(--cyan)] hover:bg-cyan/90",
         variant === "ghost" && "border border-dim bg-surface-3 text-foreground hover:bg-surface-3/70",
-        variant === "danger" && "border border-danger/40 bg-danger/15 text-danger",
+        variant === "danger" && "border border-danger/40 bg-danger/15 text-danger hover:bg-danger/25",
         className,
       )}
     >
