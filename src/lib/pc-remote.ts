@@ -49,7 +49,7 @@ export async function pullFromPc(): Promise<RemoteResult<string>> {
       timeoutMs: 8000,
     });
     const text = r?.text ?? r?.content ?? "";
-    log("info", "remote", `clipboard pull · ${text.length} chars`);
+    log("info", "bridge", `clipboard pull · ${text.length} chars`);
     return { ok: true, value: text };
   } catch (e) {
     return fail(e);
@@ -62,7 +62,7 @@ export async function pushToPc(text: string): Promise<RemoteResult<number>> {
   const payload = text.slice(0, 10000);
   try {
     await bridgeRequest("/api/clipboard", { method: "POST", body: { text: payload }, timeoutMs: 8000 });
-    log("info", "remote", `clipboard push · ${payload.length} chars`);
+    log("info", "bridge", `clipboard push · ${payload.length} chars`);
     return { ok: true, value: payload.length };
   } catch (e) {
     return fail(e);
@@ -88,7 +88,7 @@ export async function typeOnPc(text: string): Promise<RemoteResult<true>> {
   if (!features.has("keyboard")) return { ok: false, error: "Server has no keyboard support" };
   try {
     await bridgeRequest("/api/keyboard/type", { method: "POST", body: { text }, timeoutMs: 10000 });
-    log("info", "remote", `typed ${text.length} chars on host`);
+    log("info", "bridge", `typed ${text.length} chars on host`);
     return { ok: true, value: true };
   } catch (e) {
     return fail(e);
@@ -102,7 +102,7 @@ export async function powerAction(action: PowerAction): Promise<RemoteResult<tru
   if (!features.has("power")) return { ok: false, error: "Server has no power controls" };
   try {
     await bridgeRequest("/api/power", { method: "POST", body: { action, confirm: true }, timeoutMs: 8000 });
-    log("warn", "remote", `power action sent · ${action}`);
+    log("warn", "bridge", `power action sent · ${action}`);
     return { ok: true, value: true };
   } catch (e) {
     return fail(e);
