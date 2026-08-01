@@ -26,67 +26,96 @@ export const Route = createFileRoute("/scripts")({
   component: Scripts,
 });
 
-type Script = { name: string; lang: string; accent: "system" | "cyan" | "neural" | "net" };
+const FILTERS = ["all", "system", "files", "media", "network"] as const;
 
-const SEED: Script[] = [
-  { name: "backup_docs.ps1", lang: "powershell", accent: "system" },
-  { name: "clean_temp.sh", lang: "bash", accent: "cyan" },
-  { name: "render_queue.py", lang: "python", accent: "neural" },
-  { name: "wake_nas.ps1", lang: "powershell", accent: "net" },
-  { name: "sync_photos.py", lang: "python", accent: "neural" },
-  { name: "restart_spooler.ps1", lang: "powershell", accent: "system" },
-];
-
-const FILTERS = ["all", "powershell", "python", "bash"] as const;
+const ACCENTS = ["system", "cyan", "neural", "net"] as const;
+const accentFor = (id: string) =>
+  ACCENTS[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % ACCENTS.length]!;
 
 const COACH = [
   {
     target: "scripts-search",
     title: "find any script",
-    body: "Start typing and the library filters as you go — name or language, no exact spelling needed.",
+    body: "Start typing and your PC's library filters as you go — name, tag or category.",
   },
   {
     target: "scripts-filters",
-    title: "filter by language",
-    body: "Tap a chip to narrow the library to PowerShell, Python or Bash in one press.",
+    title: "filter by category",
+    body: "Tap a chip to narrow the library in one press.",
   },
   {
     target: "scripts-list",
-    title: "run or remove",
-    body: "Green play runs a script on your PC; red bin removes it from the library.",
+    title: "run or hide",
+    body: "Green play runs the script on your paired PC; red bin hides it from this list.",
   },
   {
     target: "scripts-console",
     title: "live output & undo",
-    body: "Output streams into this console, and undo restores anything you deleted by accident.",
+    body: "Output lands in this console. Undo rolls back the last run, or restores a hidden script.",
   },
 ];
 
 function Scripts() {
-  const [scripts, setScripts] = useState<Script[]>(SEED);
-  const [trash, setTrash] = useState<{ item: Script; index: number }[]>([]);
+  const { status, paired } = useBridge();
+  const [scripts, setScripts] = useState<LibraryScript[]>([]);
+  const [hidden, setHidden] = useState<{ item: LibraryScript; index: number }[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [out, setOut] = useState<string[]>(["> waiting for execution…"]);
   const [query, setQuery] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [lastUndoId, setLastUndoId] = useState<string | null>(null);
+
+  const log = useCallback((...lines: string[]) => {
+    setOut((o) => [...o, ...lines].slice(-80));
+  }, []);
+
+  // Pull the real library from the PC whenever the link comes up.
+  useEffect(() => {
+    if (status !== "online") return;
+    let alive = true;
+    void fetchLibrary()
+      .then((list) => {
+        if (alive) setScripts(list);
+      })
+      .catch((err: unknown) => {
+        if (alive) log(`! library unavailable: ${(err as Error).message}`);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [log, status]);
 
   const q = query.trim().toLowerCase();
   const visible = scripts.filter(
     (s) =>
-      (filter === "all" || s.lang === filter) &&
-      (!q || s.name.toLowerCase().includes(q) || s.lang.includes(q)),
+      (filter === "all" || s.category.toLowerCase().includes(filter)) &&
+      (!q ||
+        s.name.toLowerCase().includes(q) ||
+        s.desc.toLowerCase().includes(q) ||
+        s.tags.some((t) => t.toLowerCase().includes(q))),
   );
 
-  const remove = useCallback((name: string) => {
+  const remove = useCallback((id: string) => {
     setScripts((list) => {
-      const index = list.findIndex((s) => s.name === name);
+      const index = list.findIndex((s) => s.id === id);
       if (index < 0) return list;
-      setTrash((t) => [...t, { item: list[index]!, index }]);
+      setHidden((t) => [...t, { item: list[index]!, index }]);
       return list.filter((_, i) => i !== index);
     });
   }, []);
 
   const undo = useCallback(() => {
-    setTrash((t) => {
+    // Rolling back a real run always wins over un-hiding a row.
+    if (lastUndoId) {
+      const id = lastUndoId;
+      setLastUndoId(null);
+      log(`> undo ${id}`);
+      void undoRun(id)
+        .then((r) => log(r.output || (r.ok ? "  rolled back" : "  undo refused")))
+        .catch((err: unknown) => log(`! ${(err as Error).message}`));
+      return;
+    }
+    setHidden((t) => {
       const last = t[t.length - 1];
       if (!last) return t;
       setScripts((list) => {
@@ -96,11 +125,31 @@ function Scripts() {
       });
       return t.slice(0, -1);
     });
-  }, []);
+  }, [lastUndoId, log]);
 
-  const run = useCallback((name: string) => {
-    setOut((o) => [...o.slice(-40), `> run ${name}`, "  simulated — no host attached"]);
-  }, []);
+  const run = useCallback(
+    (s: LibraryScript) => {
+      if (busy) return;
+      fx.tap();
+      setBusy(s.id);
+      log(`> run ${s.name}`);
+      void runScript(s.id)
+        .then((r) => {
+          log(r.output || (r.ok ? "  done" : "  failed"));
+          setLastUndoId(r.undoId ?? null);
+        })
+        .catch((err: unknown) => {
+          const message =
+            err instanceof BridgeError && err.code === "no-config"
+              ? "  no PC paired — open the LINK page first"
+              : `! ${(err as Error).message}`;
+          log(message);
+        })
+        .finally(() => setBusy(null));
+    },
+    [busy, log],
+  );
+
 
   return (
     <AppShell title="SCRIPTS" subtitle="local automation library" accentLabel={`${visible.length}/${scripts.length}`} fill>
