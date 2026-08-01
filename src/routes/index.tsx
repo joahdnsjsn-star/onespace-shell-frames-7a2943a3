@@ -24,6 +24,12 @@ import {
   SectionHeader,
   StatTile,
 } from "@/components/nexus/ui";
+import {
+  LiveClock,
+  NeuralCore,
+  RadialGauge,
+  ScanFrame,
+} from "@/components/nexus/Instruments";
 import { useTelemetry } from "@/hooks/useTelemetry";
 
 export const Route = createFileRoute("/")({
