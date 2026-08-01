@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { fx } from "@/lib/fx";
 
@@ -40,13 +40,15 @@ export function Card({
   children,
   className,
   accent,
+  ...rest
 }: {
   children: ReactNode;
   className?: string;
   accent?: Accent;
-}) {
+} & Omit<ComponentPropsWithoutRef<"div">, "className" | "children">) {
   return (
     <div
+      {...rest}
       className={cn(
         "relative rounded-2xl border border-dim/60 bg-surface-2 surface-elevated hairline-top p-4 transition-colors duration-200",
         accent && accentBorder[accent],
