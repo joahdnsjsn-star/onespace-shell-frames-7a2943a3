@@ -15,6 +15,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
 import { Chip } from "./ui";
 import { OfflineBanner } from "./OfflineBanner";
 import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
@@ -54,6 +55,7 @@ export function TabBar({ onOpenPages }: { onOpenPages: () => void }) {
             key={t.to}
             to={t.to}
             className={item}
+            onClick={() => haptic("tap")}
             activeOptions={{ exact: t.to === "/" }}
             activeProps={{
               className:
@@ -109,7 +111,11 @@ export function AppShell({
       )}
     >
       <BackdropFX />
+      <a href="#nexus-main" className="skip-link">
+        Skip to content
+      </a>
       <header className="sticky top-0 z-20 border-b border-dim/70 glass hull-plate pt-[env(safe-area-inset-top)]">
+
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 px-4 py-3 sm:px-6">
           <NexusLogo size={30} className="press" status={offline ? "offline" : "online"} />
           <AnimatedTitle title={title} subtitle={subtitle} online={!offline} />
@@ -118,7 +124,10 @@ export function AppShell({
             {accentLabel ? <Chip accent="cyan">{accentLabel}</Chip> : null}
             <button
               type="button"
-              onClick={() => setCmdOpen(true)}
+              onClick={() => {
+                haptic("select");
+                setCmdOpen(true);
+              }}
               aria-label="Open command palette"
               className="press grid size-9 place-items-center rounded-xl border border-dim/70 bg-surface-2/60 text-faint hover:border-cyan/40 hover:text-cyan"
             >
@@ -131,7 +140,9 @@ export function AppShell({
       </header>
 
       <main
+        id="nexus-main"
         key={title}
+
         className={cn(
           "rise-in nexus-grid px-4 sm:px-6",
           fill

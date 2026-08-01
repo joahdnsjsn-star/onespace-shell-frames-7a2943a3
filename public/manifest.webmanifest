@@ -1,0 +1,23 @@
+{
+  "name": "Butler AI NEXUS",
+  "short_name": "NEXUS",
+  "description": "Local PC command centre — dark HUD control shell for scripts, telemetry and your AI butler.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070a10",
+  "theme_color": "#070a10",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Butler chat", "url": "/butler" },
+    { "name": "Script library", "url": "/scripts" },
+    { "name": "Settings", "url": "/settings" }
+  ]
+}

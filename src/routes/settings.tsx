@@ -28,6 +28,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
+import { notifyPrefsChanged } from "@/components/nexus/PreferenceBridge";
+
 import {
   Card,
   Chip,
@@ -94,7 +96,17 @@ function SwitchRow({
           {icon}
         </IconBadge>
       }
-      right={<Toggle on={value} onChange={set} label={title} />}
+      right={
+        <Toggle
+          on={value}
+          onChange={(v) => {
+            set(v);
+            notifyPrefsChanged();
+          }}
+          label={title}
+        />
+      }
+
     />
   );
 }
@@ -129,7 +141,16 @@ function ChoiceRow<T extends string>({
           {sub ? <div className="mt-0.5 text-xs text-muted-foreground">{sub}</div> : null}
         </div>
       </div>
-      <Segmented options={options} value={value} onChange={set} className="mt-3 flex w-full" />
+      <Segmented
+        options={options}
+        value={value}
+        onChange={(v) => {
+          set(v);
+          notifyPrefsChanged();
+        }}
+        className="mt-3 flex w-full"
+      />
+
     </div>
   );
 }

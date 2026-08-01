@@ -191,3 +191,7 @@ child regions own their own scroll areas.
 ## License
 
 MIT — see [LICENSE](./LICENSE).
+
+## Android / Play Store
+
+The app is an installable PWA. See [docs/PLAYSTORE.md](docs/PLAYSTORE.md) for the Bubblewrap/TWA packaging steps and the Play Console content checklist.
