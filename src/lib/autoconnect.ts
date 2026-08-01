@@ -19,7 +19,15 @@
  *    so there is no second heartbeat timer
  */
 
-import { checkHealth, loadBridge, peekBridge, saveBridge, subscribeBridge } from "./butler-bridge";
+import {
+  checkHealth,
+  loadBridge,
+  peekBridge,
+  saveBridge,
+  serverMetrics,
+  statusFull,
+  subscribeBridge,
+} from "./butler-bridge";
 import { rememberGoodHost, scanLan } from "./discovery";
 import { log } from "./logger";
 
@@ -151,6 +159,24 @@ async function rediscover(): Promise<boolean> {
   }
 }
 
+/** Slow lane: PC vitals every ~60s, never blocking or failing the heartbeat. */
+const VITALS_INTERVAL = 60_000;
+let lastVitals = 0;
+
+async function refreshVitals(): Promise<void> {
+  if (Date.now() - lastVitals < VITALS_INTERVAL) return;
+  lastVitals = Date.now();
+  const [metrics, status] = await Promise.all([
+    serverMetrics().catch(() => null),
+    statusFull().catch(() => null),
+  ]);
+  if (!metrics && !status) return;
+  set({
+    ...(metrics ? { cpu: Math.round(metrics.cpu), ram: Math.round(metrics.ram) } : {}),
+    ...(status ? { model: status.model, serverVersion: status.version, kbTotal: status.kbTotal } : {}),
+  });
+}
+
 async function tick(): Promise<void> {
   if (inFlight) return;
   if (!awake()) {
@@ -180,6 +206,7 @@ async function tick(): Promise<void> {
       message: health.ollama ? "Linked — local model ready." : "Linked — Ollama not detected.",
       ...recompute(),
     });
+    void refreshVitals();
     schedule(OK_INTERVAL);
   } catch (err) {
     record(-1);
