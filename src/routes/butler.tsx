@@ -1,9 +1,10 @@
 import { useCallback, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bot, Mic, Paperclip, SendHorizonal, Undo2, User, Keyboard, Square } from "lucide-react";
+import { Bot, Paperclip, SendHorizonal, Undo2, User, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
 import { Chip, IconBadge } from "@/components/nexus/ui";
-import { cn } from "@/lib/utils";
+import { Coach } from "@/components/nexus/Coach";
+import { fx } from "@/lib/fx";
 
 export const Route = createFileRoute("/butler")({
   head: () => ({
@@ -24,6 +25,31 @@ const SUGGESTIONS = [
   "Close all Chrome windows",
   "Summarise today's logs",
   "Copy clipboard from PC",
+  "List running processes",
+  "Lock the workstation",
+];
+
+const COACH = [
+  {
+    target: "chat-transcript",
+    title: "the transcript",
+    body: "Everything Butler reports lands here. It is the only part of this page that scrolls, so the controls never move on you.",
+  },
+  {
+    target: "chat-suggestions",
+    title: "quick prompts",
+    body: "Swipe this rail and tap a prompt to fire it instantly — the fastest way to get an answer with zero typing.",
+  },
+  {
+    target: "chat-composer",
+    title: "write anything",
+    body: "The box is always ready. Type in plain language and hit send; Enter works too.",
+  },
+  {
+    target: "chat-undo",
+    title: "undo & redo",
+    body: "Sent something by mistake? Undo pulls back the last exchange, and redo puts it right back.",
+  },
 ];
 
 type Msg = { id: number; role: "user" | "bot"; text: string };
@@ -46,14 +72,14 @@ function Butler() {
   const [msgs, setMsgs] = useState<Msg[]>(SEED);
   const [undone, setUndone] = useState<Msg[]>([]);
   const [typing, setTyping] = useState(false);
-  const [talking, setTalking] = useState(false);
-  const [keyboardMode, setKeyboardMode] = useState(false);
   const [draft, setDraft] = useState("");
   const idRef = useRef(100);
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const push = useCallback((text: string) => {
     if (!text.trim()) return;
+    fx.tap();
     const mine: Msg = { id: ++idRef.current, role: "user", text: text.trim() };
     setMsgs((m) => [...m, mine]);
     setUndone([]);
@@ -79,7 +105,6 @@ function Butler() {
       if (m.length <= 1) return m;
       const trailing: Msg[] = [];
       const next = [...m];
-      // pull back the last exchange (assistant reply + the user turn that caused it)
       while (next.length > 1 && next[next.length - 1]!.role === "bot") {
         trailing.unshift(next.pop()!);
       }
@@ -99,21 +124,23 @@ function Butler() {
 
   return (
     <AppShell title="BUTLER" subtitle="neural command interface" accentLabel="ai ready" fill>
+      <Coach id="butler-chat" steps={COACH} />
+
       {/* transcript — the only scroll region on this page */}
-      <div className="scroll-y min-h-0 flex-1 space-y-3 pr-0.5">
+      <div data-coach="chat-transcript" className="scroll-y min-h-0 flex-1 space-y-3 pr-0.5">
         {msgs.map((m) =>
           m.role === "bot" ? (
             <div key={m.id} className="flex gap-2">
               <IconBadge accent="neural" size={34}>
                 <Bot size={16} />
               </IconBadge>
-              <div className="nx-pop max-w-[84%] rounded-xl rounded-tl-sm border border-dim/60 bg-surface-2 p-3 text-sm leading-relaxed">
+              <div className="nx-pop max-w-[84%] rounded-2xl rounded-tl-sm border border-dim/60 bg-surface-2 p-3 text-[13.5px] leading-relaxed">
                 {m.text}
               </div>
             </div>
           ) : (
             <div key={m.id} className="flex justify-end gap-2">
-              <div className="nx-pop max-w-[84%] rounded-xl rounded-tr-sm bg-cyan px-3 py-2 text-sm leading-relaxed text-primary-foreground">
+              <div className="nx-pop max-w-[84%] rounded-2xl rounded-tr-sm bg-cyan px-3 py-2 text-[13.5px] leading-relaxed text-primary-foreground">
                 {m.text}
               </div>
               <IconBadge accent="cyan" size={34}>
@@ -128,7 +155,7 @@ function Butler() {
             <IconBadge accent="neural" size={34}>
               <Bot size={16} />
             </IconBadge>
-            <div className="flex items-center gap-1.5 rounded-xl rounded-tl-sm border border-dim/60 bg-surface-2 px-3 py-3">
+            <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-sm border border-dim/60 bg-surface-2 px-3 py-3">
               {[0, 1, 2].map((i) => (
                 <span
                   key={i}
@@ -143,111 +170,69 @@ function Butler() {
       </div>
 
       {/* suggestions rail — horizontal, never grows the page */}
-      <div className="scroll-x -mx-4 flex shrink-0 gap-2 px-4 pb-0.5 sm:-mx-6 sm:px-6">
-        {SUGGESTIONS.map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => push(s)}
-            className="press shrink-0 whitespace-nowrap rounded-full border border-dim bg-surface-2 px-3 py-1.5 text-xs text-muted-foreground hover:border-cyan/40 hover:text-cyan"
-          >
-            {s}
-          </button>
-        ))}
+      <div className="shrink-0 space-y-2">
+        <div className="flex items-center gap-1.5 px-0.5">
+          <Sparkles size={12} className="text-neural" />
+          <span className="label-mono text-[10px] text-faint">quick prompts</span>
+        </div>
+        <div
+          data-coach="chat-suggestions"
+          className="scroll-x -mx-4 flex gap-2 px-4 pb-0.5 sm:-mx-6 sm:px-6"
+        >
+          {SUGGESTIONS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => push(s)}
+              className="press shrink-0 whitespace-nowrap rounded-full border border-cyan/25 bg-cyan/8 px-3.5 py-2 text-xs text-cyan/90 transition-colors hover:border-cyan/60 hover:bg-cyan/15"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* TALK — the headline action, impossible to miss */}
+      {/* composer — always writable, big hit targets */}
       <div className="shrink-0 space-y-2">
-        <button
-          type="button"
-          onClick={() => setTalking((t) => !t)}
-          aria-pressed={talking}
-          className={cn(
-            "press relative grid w-full place-items-center gap-2 overflow-hidden rounded-2xl border-2 py-4 transition-colors",
-            talking
-              ? "border-danger/70 bg-danger/15 text-danger"
-              : "border-cyan/60 bg-cyan/12 text-cyan shadow-[0_14px_40px_-20px_var(--cyan)]",
-          )}
+        <div
+          data-coach="chat-composer"
+          className="flex items-end gap-2 rounded-2xl border border-cyan/30 bg-surface-2 p-2 shadow-[0_18px_44px_-30px_var(--cyan)] focus-within:border-cyan/60"
         >
-          <span
-            className={cn(
-              "grid size-14 place-items-center rounded-full border-2",
-              talking
-                ? "border-danger/70 bg-danger/20 animate-pulse"
-                : "border-cyan/60 bg-cyan/15",
-            )}
-          >
-            {talking ? <Square size={22} /> : <Mic size={26} />}
-          </span>
-          <span className="label-mono text-[11px] tracking-[0.22em]">
-            {talking ? "listening — tap to stop" : "hold the bridge · tap to talk"}
-          </span>
-          {talking ? (
-            <span className="flex h-4 items-end gap-1">
-              {[6, 12, 9, 15, 7, 11].map((h, i) => (
-                <span
-                  key={i}
-                  className="w-1 rounded-full bg-danger nx-typing"
-                  style={{ height: h, animationDelay: `${i * 0.09}s` }}
-                />
-              ))}
-            </span>
-          ) : null}
-        </button>
-
-        {/* composer — tapping it does NOT raise the mobile keyboard */}
-        <div className="flex items-center gap-2 rounded-2xl border border-dim bg-surface-2 p-2">
-          <IconBadge accent="cyan" size={36}>
-            <Paperclip size={16} />
-          </IconBadge>
-
-          {keyboardMode ? (
-            <input
-              autoFocus
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") push(draft);
-                if (e.key === "Escape") setKeyboardMode(false);
-              }}
-              placeholder="Message Butler…"
-              className="min-w-0 flex-1 bg-transparent px-1 text-sm outline-none placeholder:text-faint"
-            />
-          ) : (
-            <button
-              type="button"
-              onClick={() => setTalking(true)}
-              className="min-w-0 flex-1 truncate px-1 text-left text-sm text-muted-foreground"
-            >
-              {draft || "Tap the mic to talk…"}
-            </button>
-          )}
-
           <button
             type="button"
-            aria-label={keyboardMode ? "Hide keyboard" : "Type instead"}
-            onClick={() => setKeyboardMode((k) => !k)}
-            className={cn(
-              "press grid size-9 place-items-center rounded-[0.7rem] border",
-              keyboardMode
-                ? "border-cyan/50 bg-cyan/15 text-cyan"
-                : "border-dim bg-surface-3 text-faint",
-            )}
+            aria-label="Attach a file"
+            className="press grid size-10 shrink-0 place-items-center rounded-xl border border-dim bg-surface-3 text-faint hover:text-cyan"
           >
-            <Keyboard size={16} />
+            <Paperclip size={16} />
           </button>
 
+          <textarea
+            ref={inputRef}
+            rows={1}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                push(draft);
+              }
+            }}
+            placeholder="Message Butler…"
+            className="scroll-y max-h-24 min-h-10 min-w-0 flex-1 resize-none bg-transparent px-1 py-2.5 text-sm leading-snug outline-none placeholder:text-faint"
+          />
+
           <button
             type="button"
-            aria-label="Send"
-            onClick={() => push(draft || "Status report")}
-            className="press grid size-9 place-items-center rounded-[0.7rem] bg-cyan text-primary-foreground"
+            aria-label="Send message"
+            onClick={() => push(draft)}
+            disabled={!draft.trim()}
+            className="press grid size-10 shrink-0 place-items-center rounded-xl bg-cyan text-primary-foreground transition-opacity disabled:opacity-35"
           >
-            <SendHorizonal size={16} />
+            <SendHorizonal size={17} />
           </button>
         </div>
 
-        <div className="flex items-center justify-between gap-2">
+        <div data-coach="chat-undo" className="flex items-center justify-between gap-2">
           <Chip accent={typing ? "warn" : "ok"} dot>
             {typing ? "thinking" : "bridge idle"}
           </Chip>
