@@ -52,7 +52,7 @@ const STEPS = [
   {
     label: "AGREEMENTS",
     title: "ALL REQUIRED",
-    sub: "Six binding checkboxes",
+    sub: "Seven binding checkboxes",
     tip: "Every checkbox is a real agreement — read before ticking.",
     icon: ShieldCheck,
     accent: "ok" as const,
