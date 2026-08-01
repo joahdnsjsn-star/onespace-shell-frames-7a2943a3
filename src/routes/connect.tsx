@@ -1,5 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Server, QrCode, Wifi, RefreshCw, ShieldCheck, Radar, Github, Download, Copy, Check, X, Zap, Activity, Keyboard, Power } from "lucide-react";
+import {
+  Server,
+  QrCode,
+  Wifi,
+  RefreshCw,
+  ShieldCheck,
+  Radar,
+  Github,
+  Download,
+  Copy,
+  Check,
+  X,
+  Zap,
+  Activity,
+  Keyboard,
+  Power,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   checkHealth,
@@ -10,7 +26,14 @@ import {
   saveBridge,
   type HealthReport,
 } from "@/lib/butler-bridge";
-import { parseConnection, rememberGoodHost, scanLan, toBaseUrl, type FoundHost, type ScanProgress } from "@/lib/discovery";
+import {
+  parseConnection,
+  rememberGoodHost,
+  scanLan,
+  toBaseUrl,
+  type FoundHost,
+  type ScanProgress,
+} from "@/lib/discovery";
 import { useBridge } from "@/lib/useBridge";
 import { useLink } from "@/lib/useLink";
 import serverAsset from "@/assets/butler_server.py.asset.json";
@@ -20,7 +43,15 @@ import { neuralTripwire, type TripwireState } from "@/lib/tripwire";
 import { fx } from "@/lib/fx";
 import { remoteCapabilities, syncClipboard, pullFromPc, powerAction } from "@/lib/pc-remote";
 import { AppShell } from "@/components/nexus/AppShell";
-import { Card, Chip, IconBadge, Row, SectionHeader, StatTile, ActionButton } from "@/components/nexus/ui";
+import {
+  Card,
+  Chip,
+  IconBadge,
+  Row,
+  SectionHeader,
+  StatTile,
+  ActionButton,
+} from "@/components/nexus/ui";
 
 export const Route = createFileRoute("/connect")({
   head: () => ({
@@ -28,10 +59,14 @@ export const Route = createFileRoute("/connect")({
       { title: "Pair & Connect — Butler AI NEXUS" },
       {
         name: "description",
-        content: "Scan the server QR, discover machines on your LAN and manage the encrypted bridge.",
+        content:
+          "Scan the server QR, discover machines on your LAN and manage the encrypted bridge.",
       },
       { property: "og:title", content: "Pair & Connect — NEXUS" },
-      { property: "og:description", content: "Pair your phone with butler_server.py in under 60 seconds." },
+      {
+        property: "og:description",
+        content: "Pair your phone with butler_server.py in under 60 seconds.",
+      },
     ],
   }),
   component: Connect,
@@ -53,7 +88,6 @@ function CopyCommand() {
     </ActionButton>
   );
 }
-
 
 /**
  * Auto-discovery. Sweeps the LAN for a listening butler server so pairing needs
@@ -78,7 +112,11 @@ function DiscoveryPanel({ onLinked }: { onLinked: () => void }) {
     fx.select();
     void scanLan(setProgress, ctrl.signal)
       .then((hosts) => {
-        setNote(hosts.length ? `${hosts.length} host(s) answered.` : "No server answered. Is butler_server.py running?");
+        setNote(
+          hosts.length
+            ? `${hosts.length} host(s) answered.`
+            : "No server answered. Is butler_server.py running?",
+        );
         if (hosts.length) fx.success();
       })
       .catch((err: unknown) => setNote((err as Error).message))
@@ -98,7 +136,10 @@ function DiscoveryPanel({ onLinked }: { onLinked: () => void }) {
       .then(onLinked);
   };
 
-  const pct = progress && progress.total ? Math.min(100, Math.round((progress.scanned / progress.total) * 100)) : 0;
+  const pct =
+    progress && progress.total
+      ? Math.min(100, Math.round((progress.scanned / progress.total) * 100))
+      : 0;
   const hosts = progress?.found ?? [];
 
   return (
@@ -106,7 +147,11 @@ function DiscoveryPanel({ onLinked }: { onLinked: () => void }) {
       <div className="flex items-center justify-between gap-2">
         <div className="label-mono text-net">auto-discovery</div>
         <Chip accent={busy ? "warn" : hosts.length ? "ok" : "system"} dot={busy}>
-          {busy ? (progress?.phase === "known" ? "probing known" : "sweeping lan") : `${hosts.length} found`}
+          {busy
+            ? progress?.phase === "known"
+              ? "probing known"
+              : "sweeping lan"
+            : `${hosts.length} found`}
         </Chip>
       </div>
 
@@ -156,7 +201,8 @@ function DiscoveryPanel({ onLinked }: { onLinked: () => void }) {
           <X size={16} /> Stop
         </ActionButton>
         <ActionButton onClick={start} disabled={busy}>
-          <Radar size={16} className={busy ? "animate-spin" : ""} /> {busy ? "Scanning…" : "Scan LAN"}
+          <Radar size={16} className={busy ? "animate-spin" : ""} />{" "}
+          {busy ? "Scanning…" : "Scan LAN"}
         </ActionButton>
       </div>
     </Card>
@@ -201,12 +247,12 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
     // very first paired request already carries X-Butler-App-Sig.
     if (parsed.appSig) void saveBridge({ appSig: parsed.appSig });
     setPaste("");
-    setNote(`Imported ${parsed.ip}${parsed.port ? `:${parsed.port}` : ""}${parsed.token ? " with code" : ""}.`);
+    setNote(
+      `Imported ${parsed.ip}${parsed.port ? `:${parsed.port}` : ""}${parsed.token ? " with code" : ""}.`,
+    );
     fx.success();
   };
   const importString = () => importText(paste);
-
-
 
   const valid = url.trim().length > 0 && isLocalBridgeUrl(url.trim());
 
@@ -337,7 +383,8 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
           <ShieldCheck size={16} /> Unpair
         </ActionButton>
         <ActionButton onClick={connect} disabled={!valid || busy}>
-          <RefreshCw size={16} className={busy ? "animate-spin" : ""} /> {busy ? "Linking…" : "Link"}
+          <RefreshCw size={16} className={busy ? "animate-spin" : ""} />{" "}
+          {busy ? "Linking…" : "Link"}
         </ActionButton>
       </div>
 
@@ -355,7 +402,12 @@ function PairingPanel({ reloadKey }: { reloadKey: number }) {
           sub="ollama · local"
         />
         <StatTile label="transport" value="lan" accent="net" sub="no cloud relay" />
-        <StatTile label="device id" value={deviceId ? deviceId.slice(0, 8) : "—"} accent="system" sub="local only" />
+        <StatTile
+          label="device id"
+          value={deviceId ? deviceId.slice(0, 8) : "—"}
+          accent="system"
+          sub="local only"
+        />
         <StatTile
           label="pc cpu"
           value={link.state === "online" ? `${link.cpu}%` : "—"}
@@ -393,7 +445,8 @@ function DiagnosticsPanel() {
   const report = networkMonitor.getDiagnosticReport();
   const stats = networkMonitor.getStats();
   const timeline = networkMonitor.getConnectionTimeline(6);
-  const healthAccent = report.healthScore >= 80 ? "ok" : report.healthScore >= 50 ? "warn" : "danger";
+  const healthAccent =
+    report.healthScore >= 80 ? "ok" : report.healthScore >= 50 ? "warn" : "danger";
   const alert = wire?.alertLevel && wire.alertLevel !== "NONE";
 
   return (
@@ -420,12 +473,13 @@ function DiagnosticsPanel() {
           <p className="text-[11px] leading-snug text-danger">{wire?.alertMessage}</p>
         ) : wire?.baseline ? (
           <p className="text-[11px] leading-snug text-muted-foreground">
-            Baseline {Math.round(wire.baseline.meanMs)}ms ±{Math.round(wire.baseline.stddevMs)}ms · live{" "}
-            {wire.liveMeanMs}ms ({wire.deviationSigma.toFixed(1)}σ). No routing anomalies.
+            Baseline {Math.round(wire.baseline.meanMs)}ms ±{Math.round(wire.baseline.stddevMs)}ms ·
+            live {wire.liveMeanMs}ms ({wire.deviationSigma.toFixed(1)}σ). No routing anomalies.
           </p>
         ) : (
           <p className="text-[11px] leading-snug text-muted-foreground">
-            Learning your link — {wire?.samplesCollected ?? 0}/{wire?.samplesNeeded ?? 20} pings sampled.
+            Learning your link — {wire?.samplesCollected ?? 0}/{wire?.samplesNeeded ?? 20} pings
+            sampled.
           </p>
         )}
       </div>
@@ -433,21 +487,25 @@ function DiagnosticsPanel() {
       {report.issues.length ? (
         <ul className="mt-3 space-y-1">
           {report.issues.slice(0, 3).map((i) => (
-            <li key={i} className="text-[11px] leading-snug text-warn">• {i}</li>
+            <li key={i} className="text-[11px] leading-snug text-warn">
+              • {i}
+            </li>
           ))}
         </ul>
       ) : null}
       {report.recommendations.length ? (
         <ul className="mt-2 space-y-1">
           {report.recommendations.slice(0, 3).map((r) => (
-            <li key={r} className="text-[11px] leading-snug text-muted-foreground">› {r}</li>
+            <li key={r} className="text-[11px] leading-snug text-muted-foreground">
+              › {r}
+            </li>
           ))}
         </ul>
       ) : null}
 
       {timeline.length ? (
         <pre className="mt-3 max-h-32 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-dim/60 bg-background p-3 font-mono text-[10px] leading-relaxed text-muted-foreground">
-{timeline.map((e) => networkMonitor.formatEntry(e)).join("\n")}
+          {timeline.map((e) => networkMonitor.formatEntry(e)).join("\n")}
         </pre>
       ) : null}
 
@@ -480,7 +538,11 @@ function RemotePanel() {
   const [note, setNote] = useState<string | null>(null);
   const any = caps.clipboard || caps.keyboard || caps.power;
 
-  async function run(id: string, fn: () => Promise<{ ok: boolean; error?: string }>, okMsg: string) {
+  async function run(
+    id: string,
+    fn: () => Promise<{ ok: boolean; error?: string }>,
+    okMsg: string,
+  ) {
     setBusy(id);
     setNote(null);
     const r = await fn();
@@ -498,7 +560,9 @@ function RemotePanel() {
     <Card accent="cyan" className="space-y-3">
       <Row
         title="PC remote"
-        sub={any ? "Capabilities reported by the paired host" : "Pair a host to unlock remote actions"}
+        sub={
+          any ? "Capabilities reported by the paired host" : "Pair a host to unlock remote actions"
+        }
         left={
           <IconBadge accent="cyan" size={34}>
             <Keyboard size={16} />
@@ -544,14 +608,14 @@ function RemotePanel() {
 
       {note ? <p className="label-mono text-muted-foreground">{note}</p> : null}
       <p className="text-[11px] leading-relaxed text-muted-foreground">
-        Nothing here fires on its own — every action is one explicit tap, over the LAN, to the host you paired.
+        Nothing here fires on its own — every action is one explicit tap, over the LAN, to the host
+        you paired.
       </p>
     </Card>
   );
 }
 
 function Connect() {
-
   const [reloadKey, setReloadKey] = useState(0);
   return (
     <AppShell title="LINK" subtitle="pairing & transport" accentLabel="lan only">
@@ -560,21 +624,31 @@ function Connect() {
       </section>
 
       <section>
-        <SectionHeader title="discovered hosts" accent="net" action={<Radar size={14} className="text-faint" />} />
+        <SectionHeader
+          title="discovered hosts"
+          accent="net"
+          action={<Radar size={14} className="text-faint" />}
+        />
         <DiscoveryPanel onLinked={() => setReloadKey((k) => k + 1)} />
       </section>
 
       <section>
-        <SectionHeader title="link diagnostics" accent="warn" action={<Activity size={14} className="text-faint" />} />
+        <SectionHeader
+          title="link diagnostics"
+          accent="warn"
+          action={<Activity size={14} className="text-faint" />}
+        />
         <DiagnosticsPanel />
       </section>
 
       <section>
-        <SectionHeader title="pc remote" accent="cyan" action={<Keyboard size={14} className="text-faint" />} />
+        <SectionHeader
+          title="pc remote"
+          accent="cyan"
+          action={<Keyboard size={14} className="text-faint" />}
+        />
         <RemotePanel />
       </section>
-
-
 
       <section>
         <SectionHeader title="transport" accent="cyan" />
@@ -587,7 +661,11 @@ function Connect() {
                 <Wifi size={16} />
               </IconBadge>
             }
-            right={<Chip accent="ok" dot>ready</Chip>}
+            right={
+              <Chip accent="ok" dot>
+                ready
+              </Chip>
+            }
           />
           <Row
             title="Encryption"
@@ -626,12 +704,12 @@ function Connect() {
             <CopyCommand />
           </div>
           <pre className="mt-3 whitespace-pre-wrap break-words rounded-lg border border-dim/60 bg-background p-3 font-mono text-[11px] text-muted-foreground">
-{`python butler_server.py
+            {`python butler_server.py
 # QR + pairing code print in the terminal`}
           </pre>
           <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
-            <Github size={14} className="text-cyan" /> No web console — the bridge is terminal-only and
-            LAN-scoped. This app is the only UI.
+            <Github size={14} className="text-cyan" /> No web console — the bridge is terminal-only
+            and LAN-scoped. This app is the only UI.
           </div>
         </Card>
       </section>
@@ -640,7 +718,6 @@ function Connect() {
         <QrCode size={13} className="mr-1 inline text-cyan" />
         Scan the QR above, paste the payload, or let the LAN sweep find the machine for you.
       </p>
-
     </AppShell>
   );
 }

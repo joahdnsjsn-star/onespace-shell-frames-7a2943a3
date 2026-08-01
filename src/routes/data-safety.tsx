@@ -13,7 +13,8 @@ export const Route = createFileRoute("/data-safety")({
       { property: "og:title", content: "Data Safety — Butler AI" },
       {
         property: "og:description",
-        content: "Pairing ID and app activity stay on your device and your own PC. Nothing shared, nothing sold.",
+        content:
+          "Pairing ID and app activity stay on your device and your own PC. Nothing shared, nothing sold.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

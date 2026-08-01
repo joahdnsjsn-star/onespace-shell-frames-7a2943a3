@@ -24,10 +24,14 @@ export const Route = createFileRoute("/onboarding")({
       { title: "Onboarding — Butler AI NEXUS" },
       {
         name: "description",
-        content: "Ten-step init sequence: tour, agreements, permissions, server setup and QR pairing.",
+        content:
+          "Ten-step init sequence: tour, agreements, permissions, server setup and QR pairing.",
       },
       { property: "og:title", content: "Butler AI NEXUS onboarding" },
-      { property: "og:description", content: "Ten-step init sequence for pairing your phone with your PC." },
+      {
+        property: "og:description",
+        content: "Ten-step init sequence for pairing your phone with your PC.",
+      },
     ],
   }),
   component: Onboarding,
@@ -135,21 +139,23 @@ function Onboarding() {
   const blocked = step === 2 && !allAgreed;
   const last = step === STEPS.length - 1;
 
-  const go = (dir: 1 | -1) =>
-    setStep((v) => Math.min(STEPS.length - 1, Math.max(0, v + dir)));
+  const go = (dir: 1 | -1) => setStep((v) => Math.min(STEPS.length - 1, Math.max(0, v + dir)));
 
   // Butler narrates every step — spoken when voice is on, always captioned.
   const spoken = useRef(-1);
   useEffect(() => {
     if (spoken.current === step) return;
     spoken.current = step;
-    const t = window.setTimeout(() => {
-      butlerSay(step === 0 ? `Welcome aboard. I'm Butler. ${s.tip}` : `${s.title}. ${s.tip}`, {
-        tone: step === 3 ? "warn" : "info",
-        label: s.label,
-        hold: 2600,
-      });
-    }, step === 0 ? 900 : 220);
+    const t = window.setTimeout(
+      () => {
+        butlerSay(step === 0 ? `Welcome aboard. I'm Butler. ${s.tip}` : `${s.title}. ${s.tip}`, {
+          tone: step === 3 ? "warn" : "info",
+          label: s.label,
+          hold: 2600,
+        });
+      },
+      step === 0 ? 900 : 220,
+    );
     return () => window.clearTimeout(t);
   }, [step, s.tip, s.title, s.label]);
 
@@ -219,9 +225,7 @@ function Onboarding() {
                 <button
                   key={a}
                   type="button"
-                  onClick={() =>
-                    setChecked((c) => c.map((v, idx) => (idx === i ? !v : v)))
-                  }
+                  onClick={() => setChecked((c) => c.map((v, idx) => (idx === i ? !v : v)))}
                   className="press flex w-full items-start gap-3 rounded-lg border border-dim/50 bg-surface-3/60 p-3 text-left"
                 >
                   <span
@@ -287,7 +291,12 @@ function Onboarding() {
 
       <footer className="sticky bottom-0 border-t border-dim bg-surface/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
         <div className="flex gap-3">
-          <ActionButton variant="ghost" className="flex-1" onClick={() => go(-1)} disabled={step === 0}>
+          <ActionButton
+            variant="ghost"
+            className="flex-1"
+            onClick={() => go(-1)}
+            disabled={step === 0}
+          >
             Back
           </ActionButton>
           {last ? (
@@ -304,4 +313,3 @@ function Onboarding() {
     </div>
   );
 }
-

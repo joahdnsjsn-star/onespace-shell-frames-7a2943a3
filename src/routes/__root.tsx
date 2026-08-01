@@ -20,7 +20,6 @@ import { installLogger } from "../lib/logger";
 import { startAutoConnect } from "../lib/autoconnect";
 import { startKnowledge } from "../lib/knowledge";
 
-
 function NotFoundComponent() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
@@ -96,7 +95,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
 
       { title: "Butler AI NEXUS — Local PC Command Centre" },
-      { name: "description", content: "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing." },
+      {
+        name: "description",
+        content:
+          "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#070a10" },
@@ -108,10 +111,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "format-detection", content: "telephone=no" },
       { property: "og:title", content: "Butler AI NEXUS — Local PC Command Centre" },
       { name: "twitter:title", content: "Butler AI NEXUS — Local PC Command Centre" },
-      { property: "og:description", content: "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing." },
-      { name: "twitter:description", content: "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f8666411-f3a8-45f1-8287-a8c46c688db1/id-preview-038ec225--24f4c969-fe96-4094-8c33-91b616358379.lovable.app-1785567046997.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f8666411-f3a8-45f1-8287-a8c46c688db1/id-preview-038ec225--24f4c969-fe96-4094-8c33-91b616358379.lovable.app-1785567046997.png" },
+      {
+        property: "og:description",
+        content:
+          "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f8666411-f3a8-45f1-8287-a8c46c688db1/id-preview-038ec225--24f4c969-fe96-4094-8c33-91b616358379.lovable.app-1785567046997.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f8666411-f3a8-45f1-8287-a8c46c688db1/id-preview-038ec225--24f4c969-fe96-4094-8c33-91b616358379.lovable.app-1785567046997.png",
+      },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -162,7 +181,6 @@ function RootComponent() {
       stopLink();
     };
   }, []);
-
 
   return (
     <QueryClientProvider client={queryClient}>

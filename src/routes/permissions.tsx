@@ -27,7 +27,8 @@ export const Route = createFileRoute("/permissions")({
       { property: "og:title", content: "Permission Centre — Butler AI" },
       {
         property: "og:description",
-        content: "Minimum permissions, plain-language reasons, graceful fallbacks for every refusal.",
+        content:
+          "Minimum permissions, plain-language reasons, graceful fallbacks for every refusal.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -63,7 +64,11 @@ function PermissionRow({
   const actionable = def.runtime && state !== "granted" && state !== "unsupported";
   return (
     <Row
-      left={<IconBadge accent={def.accent}><ShieldCheck size={14} /></IconBadge>}
+      left={
+        <IconBadge accent={def.accent}>
+          <ShieldCheck size={14} />
+        </IconBadge>
+      }
       title={
         <span className="flex flex-wrap items-center gap-2">
           {def.label}
@@ -147,8 +152,8 @@ function PermissionsPage() {
         />
         <Card className="space-y-3">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Butler AI asks for the smallest possible set, only at the moment it is needed, and
-            every refusal has a working fallback. Nothing is requested on launch.
+            Butler AI asks for the smallest possible set, only at the moment it is needed, and every
+            refusal has a working fallback. Nothing is requested on launch.
           </p>
           <div className="flex flex-wrap gap-2">
             <Chip accent="ok">no background access</Chip>
@@ -189,8 +194,8 @@ function PermissionsPage() {
         />
         <Card className="space-y-3">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            These are stripped from the native manifest during the build, so no dependency can
-            widen the app's footprint later. Mirrored in{" "}
+            These are stripped from the native manifest during the build, so no dependency can widen
+            the app's footprint later. Mirrored in{" "}
             <span className="font-mono text-xs">app.permissions.json</span>.
           </p>
           <div className="flex flex-wrap gap-2">

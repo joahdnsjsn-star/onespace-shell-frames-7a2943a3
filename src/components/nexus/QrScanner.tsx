@@ -87,7 +87,11 @@ export function QrScanner({ open, onClose, onResult }: Props) {
       let stream: MediaStream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
           audio: false,
         });
       } catch (err) {
@@ -119,7 +123,9 @@ export function QrScanner({ open, onClose, onResult }: Props) {
       setPhase("scanning");
       logger.info("ui", "qr: scanning");
 
-      const detector = window.BarcodeDetector ? new window.BarcodeDetector({ formats: ["qr_code"] }) : null;
+      const detector = window.BarcodeDetector
+        ? new window.BarcodeDetector({ formats: ["qr_code"] })
+        : null;
       if (!detector) logger.warn("ui", "qr: no BarcodeDetector, using frame fallback");
       let busy = false;
       let lastTick = 0;
@@ -196,7 +202,9 @@ export function QrScanner({ open, onClose, onResult }: Props) {
     const track = streamRef.current?.getVideoTracks()[0];
     if (!track) return;
     try {
-      await track.applyConstraints({ advanced: [{ torch: !torch }] } as unknown as MediaTrackConstraints);
+      await track.applyConstraints({
+        advanced: [{ torch: !torch }],
+      } as unknown as MediaTrackConstraints);
       setTorch((t) => !t);
     } catch {
       setDetail("This camera has no torch.");
@@ -261,8 +269,8 @@ export function QrScanner({ open, onClose, onResult }: Props) {
       </div>
 
       <p className="border-t border-dim px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-center text-xs text-faint">
-        Point at the QR printed by <span className="font-mono text-soft">butler_server.py</span>. Nothing is recorded or
-        uploaded.
+        Point at the QR printed by <span className="font-mono text-soft">butler_server.py</span>.
+        Nothing is recorded or uploaded.
       </p>
     </div>
   );

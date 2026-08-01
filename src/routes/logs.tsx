@@ -2,7 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Bug, Download, Filter, Info, Radio, Trash2 } from "lucide-react";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { AppShell } from "@/components/nexus/AppShell";
-import { Card, Chip, IconBadge, Row, SectionHeader, StatTile, ActionButton } from "@/components/nexus/ui";
+import {
+  Card,
+  Chip,
+  IconBadge,
+  Row,
+  SectionHeader,
+  StatTile,
+  ActionButton,
+} from "@/components/nexus/ui";
 import { cn } from "@/lib/utils";
 import { fx } from "@/lib/fx";
 import {
@@ -32,9 +40,21 @@ export const Route = createFileRoute("/logs")({
   component: Logs,
 });
 
-const CHANNELS: (LogChannel | "all")[] = ["all", "bridge", "ai", "script", "crash", "perf", "console", "app"];
+const CHANNELS: (LogChannel | "all")[] = [
+  "all",
+  "bridge",
+  "ai",
+  "script",
+  "crash",
+  "perf",
+  "console",
+  "app",
+];
 
-const LEVEL_META: Record<LogLevel, { accent: "system" | "warn" | "danger" | "net"; icon: typeof Info }> = {
+const LEVEL_META: Record<
+  LogLevel,
+  { accent: "system" | "warn" | "danger" | "net"; icon: typeof Info }
+> = {
   debug: { accent: "net", icon: Radio },
   info: { accent: "system", icon: Info },
   warn: { accent: "warn", icon: AlertTriangle },
@@ -42,7 +62,12 @@ const LEVEL_META: Record<LogLevel, { accent: "system" | "warn" | "danger" | "net
 };
 
 const clock = (t: number) =>
-  new Date(t).toLocaleTimeString(undefined, { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  new Date(t).toLocaleTimeString(undefined, {
+    hour12: false,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 
 /** Stable empty snapshot: the recorder only exists in the browser, so the
  *  server (and the hydration pass) must render an empty list or React tears
@@ -65,7 +90,10 @@ function Logs() {
   const visible = useMemo(
     () =>
       entries
-        .filter((e) => (channel === "all" || e.channel === channel) && (level === "all" || e.level === level))
+        .filter(
+          (e) =>
+            (channel === "all" || e.channel === channel) && (level === "all" || e.level === level),
+        )
         .slice()
         .reverse()
         .slice(0, 200),
@@ -87,7 +115,11 @@ function Logs() {
   }, [entries]);
 
   return (
-    <AppShell title="LOGS" subtitle="event stream · telemetry" accentLabel={`${entries.length} events`}>
+    <AppShell
+      title="LOGS"
+      subtitle="event stream · telemetry"
+      accentLabel={`${entries.length} events`}
+    >
       <section className="grid grid-cols-2 gap-3 min-[400px]:grid-cols-4">
         <StatTile label="info" value={String(counts.info)} accent="system" />
         <StatTile label="warn" value={String(counts.warn)} accent="warn" />
@@ -101,7 +133,13 @@ function Logs() {
           {CHANNELS.map((c) => (
             <button key={c} type="button" onClick={() => setChannel(c)} className="press shrink-0">
               <span className={cn(channel === c ? "" : "opacity-55")}>
-                <Chip accent={c === "all" ? "cyan" : c === "ai" ? "neural" : c === "crash" ? "danger" : "net"}>{c}</Chip>
+                <Chip
+                  accent={
+                    c === "all" ? "cyan" : c === "ai" ? "neural" : c === "crash" ? "danger" : "net"
+                  }
+                >
+                  {c}
+                </Chip>
               </span>
             </button>
           ))}
@@ -124,7 +162,10 @@ function Logs() {
             {bars.map((h, i) => (
               <div
                 key={i}
-                className={cn("flex-1 rounded-t transition-all", h > 0 ? "bg-cyan/70" : "bg-surface-3")}
+                className={cn(
+                  "flex-1 rounded-t transition-all",
+                  h > 0 ? "bg-cyan/70" : "bg-surface-3",
+                )}
                 style={{ height: `${Math.max(6, h * 100)}%` }}
               />
             ))}

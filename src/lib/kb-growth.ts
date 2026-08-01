@@ -13,14 +13,7 @@ const MAX_EVENTS = 4000;
 const CHUNK_MINS = 15;
 
 export type GrowthMethod =
-  | "seed"
-  | "crawler"
-  | "source"
-  | "topic"
-  | "note"
-  | "recall"
-  | "manual"
-  | "legacy_seed";
+  "seed" | "crawler" | "source" | "topic" | "note" | "recall" | "manual" | "legacy_seed";
 
 export interface GrowthEvent {
   ts: number;

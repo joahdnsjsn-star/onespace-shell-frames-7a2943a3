@@ -40,39 +40,165 @@ export const PAGE_GROUPS: { group: string; pages: PageEntry[] }[] = [
   {
     group: "core",
     pages: [
-      { to: "/", label: "Home", desc: "Live telemetry & core", icon: LayoutDashboard, accent: "cyan", keywords: "dashboard start overview status" },
-      { to: "/butler", label: "Butler AI", desc: "Chat with your machine", icon: Bot, accent: "neural", keywords: "chat assistant ask voice talk prompt" },
-      { to: "/scripts", label: "Scripts", desc: "Automation library", icon: Code2, accent: "ok", keywords: "forge automation macro run command library" },
-      { to: "/knowledge", label: "Brain", desc: "Crawler graph & recall", icon: Brain, accent: "neural", keywords: "kb memory notes learn docs crawler graph knowledge index search" },
+      {
+        to: "/",
+        label: "Home",
+        desc: "Live telemetry & core",
+        icon: LayoutDashboard,
+        accent: "cyan",
+        keywords: "dashboard start overview status",
+      },
+      {
+        to: "/butler",
+        label: "Butler AI",
+        desc: "Chat with your machine",
+        icon: Bot,
+        accent: "neural",
+        keywords: "chat assistant ask voice talk prompt",
+      },
+      {
+        to: "/scripts",
+        label: "Scripts",
+        desc: "Automation library",
+        icon: Code2,
+        accent: "ok",
+        keywords: "forge automation macro run command library",
+      },
+      {
+        to: "/knowledge",
+        label: "Brain",
+        desc: "Crawler graph & recall",
+        icon: Brain,
+        accent: "neural",
+        keywords: "kb memory notes learn docs crawler graph knowledge index search",
+      },
     ],
   },
   {
     group: "modules",
     pages: [
-      { to: "/logs", label: "Logs", desc: "System event stream", icon: BarChart3, accent: "warn", keywords: "events history errors console trace" },
-      { to: "/builder", label: "Builder", desc: "Visual flow composer", icon: Hammer, accent: "warn", keywords: "flow nodes compose create workflow" },
-      { to: "/fileshare", label: "Fileshare", desc: "LAN transfer bridge", icon: FolderOpen, accent: "net", keywords: "vault files send transfer upload lan" },
-      { to: "/connect", label: "Connect", desc: "Pair a new device", icon: Server, accent: "system", keywords: "pair qr scan link device server ip" },
+      {
+        to: "/logs",
+        label: "Logs",
+        desc: "System event stream",
+        icon: BarChart3,
+        accent: "warn",
+        keywords: "events history errors console trace",
+      },
+      {
+        to: "/builder",
+        label: "Builder",
+        desc: "Visual flow composer",
+        icon: Hammer,
+        accent: "warn",
+        keywords: "flow nodes compose create workflow",
+      },
+      {
+        to: "/fileshare",
+        label: "Fileshare",
+        desc: "LAN transfer bridge",
+        icon: FolderOpen,
+        accent: "net",
+        keywords: "vault files send transfer upload lan",
+      },
+      {
+        to: "/connect",
+        label: "Connect",
+        desc: "Pair a new device",
+        icon: Server,
+        accent: "system",
+        keywords: "pair qr scan link device server ip",
+      },
     ],
   },
   {
     group: "system",
     pages: [
-      { to: "/cosmetic", label: "Cosmetic", desc: "Theme & HUD density", icon: Palette, accent: "neural", keywords: "skins theme colour color appearance" },
-      { to: "/settings", label: "Settings", desc: "Every configuration", icon: SlidersHorizontal, accent: "cyan", keywords: "config options preferences sound haptics voice" },
-      { to: "/onboarding", label: "Onboarding", desc: "Replay setup sequence", icon: Rocket, accent: "ok", keywords: "setup tutorial walkthrough intro tips" },
-      { to: "/components", label: "Component kit", desc: "UI primitive gallery", icon: Boxes, accent: "system", keywords: "design kit gallery primitives" },
+      {
+        to: "/cosmetic",
+        label: "Cosmetic",
+        desc: "Theme & HUD density",
+        icon: Palette,
+        accent: "neural",
+        keywords: "skins theme colour color appearance",
+      },
+      {
+        to: "/settings",
+        label: "Settings",
+        desc: "Every configuration",
+        icon: SlidersHorizontal,
+        accent: "cyan",
+        keywords: "config options preferences sound haptics voice",
+      },
+      {
+        to: "/onboarding",
+        label: "Onboarding",
+        desc: "Replay setup sequence",
+        icon: Rocket,
+        accent: "ok",
+        keywords: "setup tutorial walkthrough intro tips",
+      },
+      {
+        to: "/components",
+        label: "Component kit",
+        desc: "UI primitive gallery",
+        icon: Boxes,
+        accent: "system",
+        keywords: "design kit gallery primitives",
+      },
     ],
   },
   {
     group: "legal & trust",
     pages: [
-      { to: "/permissions", label: "Permissions", desc: "What the app may touch", icon: ShieldCheck, accent: "ok", keywords: "camera mic access grant android" },
-      { to: "/security-trust", label: "Security & trust", desc: "How data is protected", icon: ShieldCheck, accent: "ok", keywords: "encryption safety trust" },
-      { to: "/privacy-policy", label: "Privacy policy", desc: "What we never collect", icon: Lock, accent: "system", keywords: "gdpr data privacy policy" },
-      { to: "/terms", label: "Terms", desc: "Terms of service", icon: FileText, accent: "system", keywords: "legal tos agreement" },
-      { to: "/data-safety", label: "Data safety", desc: "Store disclosure", icon: Database, accent: "net", keywords: "playstore disclosure collection" },
-      { to: "/crash-report", label: "Crash report", desc: "Diagnostics bundle", icon: Bug, accent: "danger", keywords: "debug diagnostics error report" },
+      {
+        to: "/permissions",
+        label: "Permissions",
+        desc: "What the app may touch",
+        icon: ShieldCheck,
+        accent: "ok",
+        keywords: "camera mic access grant android",
+      },
+      {
+        to: "/security-trust",
+        label: "Security & trust",
+        desc: "How data is protected",
+        icon: ShieldCheck,
+        accent: "ok",
+        keywords: "encryption safety trust",
+      },
+      {
+        to: "/privacy-policy",
+        label: "Privacy policy",
+        desc: "What we never collect",
+        icon: Lock,
+        accent: "system",
+        keywords: "gdpr data privacy policy",
+      },
+      {
+        to: "/terms",
+        label: "Terms",
+        desc: "Terms of service",
+        icon: FileText,
+        accent: "system",
+        keywords: "legal tos agreement",
+      },
+      {
+        to: "/data-safety",
+        label: "Data safety",
+        desc: "Store disclosure",
+        icon: Database,
+        accent: "net",
+        keywords: "playstore disclosure collection",
+      },
+      {
+        to: "/crash-report",
+        label: "Crash report",
+        desc: "Diagnostics bundle",
+        icon: Bug,
+        accent: "danger",
+        keywords: "debug diagnostics error report",
+      },
     ],
   },
 ];
@@ -172,12 +298,19 @@ export function PageLauncher({
       className="press lift flex items-start gap-2.5 rounded-2xl border border-dim/60 bg-surface-2/60 p-3 hover:border-cyan/30 hover:bg-surface-3/70"
       activeProps={{ className: "border-cyan/45 bg-cyan/8" }}
     >
-      <span className={cn("grid size-9 shrink-0 place-items-center rounded-xl border", ACCENT[p.accent])}>
+      <span
+        className={cn(
+          "grid size-9 shrink-0 place-items-center rounded-xl border",
+          ACCENT[p.accent],
+        )}
+      >
         <p.icon size={17} strokeWidth={1.8} />
       </span>
       <span className="min-w-0">
         <span className="block text-sm font-medium leading-snug text-balance">{p.label}</span>
-        <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">{p.desc}</span>
+        <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">
+          {p.desc}
+        </span>
       </span>
     </Link>
   );

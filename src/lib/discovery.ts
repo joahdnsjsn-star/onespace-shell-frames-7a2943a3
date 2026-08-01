@@ -37,15 +37,15 @@ export function parseConnection(raw: string): ParsedConn | null {
   if (jsonStart !== -1) {
     try {
       const o = JSON.parse(s.slice(jsonStart)) as Record<string, unknown>;
-      const ip = String(o['ip'] ?? o['address'] ?? o['host'] ?? "").trim();
+      const ip = String(o["ip"] ?? o["address"] ?? o["host"] ?? "").trim();
       if (ip) {
         // `appSig` is the per-PC client secret; without it the server answers
         // 403 INVALID_APP_SIG once it is locked to a device.
-        const sig = String(o['appSig'] ?? o['app_sig'] ?? o['sig'] ?? "").trim();
+        const sig = String(o["appSig"] ?? o["app_sig"] ?? o["sig"] ?? "").trim();
         return {
           ip,
-          port: String(o['port'] ?? "").trim(),
-          token: String(o['pairingCode'] ?? o['code'] ?? o['token'] ?? o['pin'] ?? "").trim(),
+          port: String(o["port"] ?? "").trim(),
+          token: String(o["pairingCode"] ?? o["code"] ?? o["token"] ?? o["pin"] ?? "").trim(),
           ...(sig ? { appSig: sig } : {}),
         };
       }
@@ -108,8 +108,19 @@ export type ScanProgress = {
 
 /** Ordered by real-world probability — the port is discovered, never assumed. */
 const PORTS = [8770, 8765, 8766, 8767, 8000, 8080, 5000, 3000, 8888, 9000];
-const SUBNETS = ["192.168.1", "192.168.0", "192.168.2", "192.168.100", "192.168.178", "10.0.0", "10.0.1", "172.20.10"];
-const HOSTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100, 101, 102, 103, 104, 105, 110, 120, 150, 200, 254];
+const SUBNETS = [
+  "192.168.1",
+  "192.168.0",
+  "192.168.2",
+  "192.168.100",
+  "192.168.178",
+  "10.0.0",
+  "10.0.1",
+  "172.20.10",
+];
+const HOSTS = [
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100, 101, 102, 103, 104, 105, 110, 120, 150, 200, 254,
+];
 const PROBE_PATHS = ["/api/health", "/api/status", "/health", "/status"];
 const HOST_TIMEOUT_MS = 700;
 const BATCH = 16;
@@ -138,8 +149,8 @@ async function probe(ip: string, port: number): Promise<FoundHost | null> {
           ip,
           port,
           latencyMs: Math.round(performance.now() - t0),
-          version: (body['serverVersion'] ?? body['version']) as string | undefined,
-          ollama: Boolean(body['ollama'] ?? body['ollamaOk']),
+          version: (body["serverVersion"] ?? body["version"]) as string | undefined,
+          ollama: Boolean(body["ollama"] ?? body["ollamaOk"]),
         };
       }
     } catch (err) {
@@ -233,10 +244,16 @@ export async function scanLan(
   const best = found[0];
   if (best) await vaultSet(LAST_KEY, { ip: best.ip, port: best.port });
 
-  log(found.length ? "info" : "warn", "bridge", `lan sweep ${found.length} host(s)`, {
-    scanned,
-    aborted: signal?.aborted ?? false,
-  }, performance.now() - started);
+  log(
+    found.length ? "info" : "warn",
+    "bridge",
+    `lan sweep ${found.length} host(s)`,
+    {
+      scanned,
+      aborted: signal?.aborted ?? false,
+    },
+    performance.now() - started,
+  );
 
   onProgress({ phase: "done", scanned, total, found: [...found] });
   return found;

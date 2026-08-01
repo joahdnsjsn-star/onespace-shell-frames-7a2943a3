@@ -7,7 +7,13 @@ import { cn } from "@/lib/utils";
 import { Coach } from "@/components/nexus/Coach";
 import { fx } from "@/lib/fx";
 import { useBridge } from "@/lib/useBridge";
-import { BridgeError, fetchLibrary, runScript, undoRun, type LibraryScript } from "@/lib/butler-bridge";
+import {
+  BridgeError,
+  fetchLibrary,
+  runScript,
+  undoRun,
+  type LibraryScript,
+} from "@/lib/butler-bridge";
 import { historySnapshot, loadHistory, recordRun, subscribeHistory } from "@/lib/history";
 
 export const Route = createFileRoute("/scripts")({
@@ -68,7 +74,10 @@ function Scripts() {
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [lastUndoId, setLastUndoId] = useState<string | null>(null);
-  const recent = useSyncExternalStore(subscribeHistory, historySnapshot, historySnapshot).slice(0, 6);
+  const recent = useSyncExternalStore(subscribeHistory, historySnapshot, historySnapshot).slice(
+    0,
+    6,
+  );
 
   useEffect(() => {
     void loadHistory();
@@ -175,9 +184,13 @@ function Scripts() {
     [busy, log],
   );
 
-
   return (
-    <AppShell title="SCRIPTS" subtitle="local automation library" accentLabel={`${visible.length}/${scripts.length}`} fill>
+    <AppShell
+      title="SCRIPTS"
+      subtitle="local automation library"
+      accentLabel={`${visible.length}/${scripts.length}`}
+      fill
+    >
       <Coach id="scripts-lib" steps={COACH} />
 
       <div className="shrink-0 space-y-3">
@@ -209,11 +222,24 @@ function Scripts() {
             </IconBadge>
           </button>
         </div>
-        <div data-coach="scripts-filters" className="scroll-x -mx-4 flex gap-2 px-4 sm:-mx-6 sm:px-6">
+        <div
+          data-coach="scripts-filters"
+          className="scroll-x -mx-4 flex gap-2 px-4 sm:-mx-6 sm:px-6"
+        >
           {FILTERS.map((f) => (
             <button key={f} type="button" onClick={() => setFilter(f)} className="press shrink-0">
               <span className={cn(filter === f ? "" : "opacity-55")}>
-                <Chip accent={f === "all" ? "cyan" : f === "media" ? "neural" : f === "network" ? "net" : "system"}>
+                <Chip
+                  accent={
+                    f === "all"
+                      ? "cyan"
+                      : f === "media"
+                        ? "neural"
+                        : f === "network"
+                          ? "net"
+                          : "system"
+                  }
+                >
                   {f}
                 </Chip>
               </span>
@@ -233,7 +259,9 @@ function Scripts() {
                   onClick={() => target && run(target)}
                   className={cn(
                     "press label-mono shrink-0 rounded-full border px-3 py-1 text-[10px]",
-                    r.ok ? "border-dim bg-surface-3 text-soft" : "border-red-500/40 bg-surface-3 text-red-300",
+                    r.ok
+                      ? "border-dim bg-surface-3 text-soft"
+                      : "border-red-500/40 bg-surface-3 text-red-300",
                     !target && "opacity-40",
                   )}
                 >
@@ -301,13 +329,17 @@ function Scripts() {
             <span className="label-mono text-muted-foreground">stdout</span>
           </div>
           <pre className="scroll-y mt-2 max-h-20 whitespace-pre-wrap break-words rounded-lg border border-dim/60 bg-background p-2.5 font-mono text-[11px] text-faint">
-{out.join("\n")}
+            {out.join("\n")}
           </pre>
         </div>
 
         <div className="flex items-center justify-between gap-2">
           <Chip accent={busy ? "warn" : status === "online" ? "ok" : "danger"} dot>
-            {busy ? "running…" : status === "online" ? `${scripts.length} scripts synced` : "bridge offline"}
+            {busy
+              ? "running…"
+              : status === "online"
+                ? `${scripts.length} scripts synced`
+                : "bridge offline"}
           </Chip>
           <button
             type="button"
