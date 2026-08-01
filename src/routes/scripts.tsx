@@ -136,10 +136,18 @@ function Scripts() {
       fx.tap();
       setBusy(s.id);
       log(`> run ${s.name}`);
+      const t0 = performance.now();
       void runScript(s.id)
         .then((r) => {
           log(r.output || (r.ok ? "  done" : "  failed"));
           setLastUndoId(r.undoId ?? null);
+          void recordRun({
+            scriptId: s.id,
+            name: s.name,
+            category: s.category ?? "general",
+            ok: Boolean(r.ok),
+            ms: Math.round(performance.now() - t0),
+          });
         })
         .catch((err: unknown) => {
           const message =
@@ -147,6 +155,14 @@ function Scripts() {
               ? "  no PC paired — open the LINK page first"
               : `! ${(err as Error).message}`;
           log(message);
+          void recordRun({
+            scriptId: s.id,
+            name: s.name,
+            category: s.category ?? "general",
+            ok: false,
+            ms: Math.round(performance.now() - t0),
+            error: (err as Error).message,
+          });
         })
         .finally(() => setBusy(null));
     },
