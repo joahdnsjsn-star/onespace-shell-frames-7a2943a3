@@ -215,6 +215,29 @@ function Scripts() {
             </button>
           ))}
         </div>
+        {recent.length ? (
+          <div className="scroll-x -mx-4 flex items-center gap-2 px-4 sm:-mx-6 sm:px-6">
+            <span className="label-mono shrink-0 text-[10px] text-faint">recent</span>
+            {recent.map((r) => {
+              const target = scripts.find((s) => s.id === r.scriptId);
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  disabled={!target || Boolean(busy)}
+                  onClick={() => target && run(target)}
+                  className={cn(
+                    "press label-mono shrink-0 rounded-full border px-3 py-1 text-[10px]",
+                    r.ok ? "border-dim bg-surface-3 text-soft" : "border-red-500/40 bg-surface-3 text-red-300",
+                    !target && "opacity-40",
+                  )}
+                >
+                  {r.name} · {r.ms}ms
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
 
       {/* library — the only scrolling region */}
