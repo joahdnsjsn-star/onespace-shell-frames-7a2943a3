@@ -1,8 +1,11 @@
 # Butler AI — NEXUS (Web Shell)
 
-A dark, HUD-style command-centre UI for **Butler AI NEXUS**, a local-PC assistant.
-This repository is the **visual shell**: every screen, component and interaction state is
-built and interactive, but nothing talks to a real backend yet.
+A dark, HUD-style command-centre UI for **Butler AI: PC Automation**, a local-PC assistant.
+This repository is the **Android-focused web shell** for OnSpace.ai: every screen,
+component and interaction state is built and optimized for a phone form factor.
+The PC automation engine itself is a separate self-hosted Python server; the shell
+talks to it privately over the local LAN.
+
 
 Built with **TanStack Start (React 19) · Vite 7 · Tailwind CSS v4 · TypeScript**.
 
@@ -12,14 +15,15 @@ Built with **TanStack Start (React 19) · Vite 7 · Tailwind CSS v4 · TypeScrip
 
 | Tool | Version | Notes |
 | --- | --- | --- |
-| Node.js | **20 or 22** | `.nvmrc` pins 20. Node 18 will fail (Vite 7 requires 20.19+). |
-| Package manager | npm 10+ / pnpm 9+ / bun 1.1+ | Any works; examples use npm. |
-| Git | any | Only needed for cloning/deploying. |
+| Node.js | **22** | `.nvmrc` and `.node-version` pin 22. |
+| Package manager | **bun** 1.2+ | Preferred; npm/pnpm also work. |
+| Git | any | Only needed for deploying. |
 
 Check your version first:
 
 ```bash
-node -v     # must print v20.x or v22.x
+node -v     # must print v22.x
+bun -v      # must print 1.2.x
 ```
 
 Using nvm:
@@ -29,36 +33,42 @@ nvm install   # reads .nvmrc
 nvm use
 ```
 
+
 ## 2. Run it from scratch
 
 ```bash
 git clone https://github.com/<you>/<repo>.git
 cd <repo>
 
-npm install            # install dependencies
+bun install            # install dependencies
 cp .env.example .env   # optional — no vars are required for the shell
 
-npm run dev            # http://localhost:8080
+bun run dev            # http://localhost:8080
 ```
 
 Other scripts:
 
 ```bash
-npm run build     # production build
-npm run preview   # serve the production build locally
-npm run lint      # eslint
-npx tsgo --noEmit # typecheck (or: npx tsc --noEmit)
+bun run build         # production build (Cloudflare Worker output)
+bun run build:node    # Node SSR build — what OnSpace uses
+bun run start         # serve the Node SSR build on $PORT (default 3000)
+bun run preview       # preview the Vite client build
+bun run lint          # eslint
+bunx tsc --noEmit     # typecheck
+bun run parity        # verify OnSpace/Expo permission parity
 ```
+
 
 ### Troubleshooting
 
 | Symptom | Fix |
 | --- | --- |
-| `Unsupported engine` / crypto errors on install | You are on Node 18 or older. Switch to Node 20+. |
-| Port 8080 already in use | `npm run dev -- --port 5173` |
-| Blank page after adding a route | Route files under `src/routes/` regenerate `src/routeTree.gen.ts`. Never edit that file by hand; restart `npm run dev`. |
-| Stale build / weird module errors | `rm -rf node_modules .output dist && npm install` |
+| `Unsupported engine` / crypto errors on install | You are on Node 20 or older. Switch to Node 22. |
+| Port 8080 already in use | `bun run dev -- --port 5173` |
+| Blank page after adding a route | Route files under `src/routes/` regenerate `src/routeTree.gen.ts`. Never edit that file by hand; restart `bun run dev`. |
+| Stale build / weird module errors | `rm -rf node_modules .output dist && bun install` |
 | Tailwind class not applying | Tokens live in `src/styles.css` (`@theme`). There is no `tailwind.config.js`. |
+
 
 ## 3. Environment variables
 
@@ -90,29 +100,55 @@ git push -u origin main
 CI runs automatically: `.github/workflows/ci.yml` installs, typechecks and builds on
 every push and pull request to `main`.
 
-### 4.2 OnSpace.ai (Android app build)
+### 4.2 OnSpace.ai (Android wrapper / TWA build)
 
-Import the repository and use:
+This repo is the **Android-focused web shell** of Butler AI. It is not a native
+Expo/React Native project; instead, OnSpace.ai should wrap it as a **Trusted Web
+Activity (TWA)** or PWA-style Android app using the phone form factor settings below.
 
 | Setting | Value |
 | --- | --- |
-| Install command | `npm install` |
-| Build command | `npm run build` |
+| Install command | `bun install` |
+| Build command | `bun run build:node` |
+| Start command | `bun run start` |
 | Output directory | `dist` |
-| Dev command | `npm run dev` |
-| Node version | `20` |
+| Server entry | `dist/server/index.mjs` |
+| Static assets | `dist/client` |
+| Dev command | `bun run dev` |
+| Node version | `22` |
+| Health check | `/api/health` |
 | Env vars | none required |
+| Form factor | phone (portrait) |
+| Android package | `com.butlerai.package.automation` |
+| URL scheme | `butlerai` |
+
+If you need a true native Android APK/AAB built with Expo, use the separate Expo
+native repo (`butler-ai-final`) instead of this web shell.
+
+
+### 4.3 Docker / container run
+
+```bash
+bun install
+bun run build:node
+docker build -t butler-ai-nexus .
+docker run -p 3000:3000 butler-ai-nexus
+```
+
+A `healthcheck` is built into the image and hits `/api/health` every 30 seconds.
+
 
 ### 4.4 Self-hosting the production build
 
 ```bash
-npm ci
-npm run build:node
-npm start            # serves the app bundle on $PORT (default 3000)
+bun install
+bun run build:node
+bun start            # serves the app bundle on $PORT (default 3000)
 ```
 
 This is the same command OnSpace runs; the output is the Android app bundle the
 wrapper loads. There is no separate website build.
+
 
 ## 5. Routes
 

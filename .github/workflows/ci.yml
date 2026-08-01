@@ -32,6 +32,18 @@ jobs:
           test -f dist/server/index.mjs
           test -f dist/client/manifest.webmanifest
           echo "android app bundle ok"
+      - name: Start server and health check
+        run: |
+          bun run start &
+          SERVER_PID=$!
+          for i in $(seq 1 30); do
+            bun run healthcheck && break
+            sleep 1
+          done
+          kill $SERVER_PID
+        env:
+          PORT: 3000
+
       - name: Upload app bundle
         uses: actions/upload-artifact@v4
         with:
