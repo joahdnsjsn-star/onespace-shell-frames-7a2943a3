@@ -1,35 +1,30 @@
 {
-  "$comment": "Build contract for OnSpace.ai / any CI importing this repo from GitHub. Keep in sync with package.json scripts and docs/ONSPACE_SYNC.md.",
+  "$comment": "Build contract for OnSpace.ai. This project is an Android phone app only — there is no website/desktop target. Keep in sync with package.json scripts and docs/ONSPACE_SYNC.md.",
   "name": "Butler AI NEXUS",
+  "target": "android",
+  "formFactor": "phone",
   "framework": "vite-tanstack-start",
   "node": "22",
   "packageManager": "bun",
   "install": "bun install",
-  "modes": {
-    "ssr": {
-      "description": "Recommended. Real server-side rendering on Node.",
-      "build": "bun run build:node",
-      "start": "bun run start",
-      "serverEntry": "dist/server/index.mjs",
-      "staticDir": "dist/client",
-      "port": "$PORT (default 3000)"
-    },
-    "static": {
-      "description": "Zero-server hosting. Every route pre-rendered to real HTML.",
-      "build": "bun run build:static",
-      "output": "dist/static",
-      "spaFallback": "404.html + _redirects (/* -> /index.html 200)"
-    },
-    "edge": {
-      "description": "Cloudflare Workers / Pages Functions.",
-      "build": "bun run build",
-      "output": "dist/server (wrangler.json emitted) + dist/client"
-    }
+  "build": "bun run build:node",
+  "start": "bun run start",
+  "serverEntry": "dist/server/index.mjs",
+  "staticDir": "dist/client",
+  "port": "$PORT (default 3000)",
+  "android": {
+    "package": "com.butlerai.pc.automation",
+    "scheme": "butlerai",
+    "orientation": "portrait",
+    "minSdk": 24,
+    "targetSdk": 35,
+    "displayMode": "standalone",
+    "themeColor": "#070a10"
   },
   "env": {
     "required": [],
     "optional": ["VITE_APP_NAME", "VITE_API_BASE_URL", "VITE_WS_URL", "VITE_ENABLE_ANALYTICS"]
   },
   "permissions": "app.permissions.json",
-  "pwa": "public/manifest.webmanifest"
+  "manifest": "public/manifest.webmanifest"
 }
