@@ -52,7 +52,7 @@ const STEPS = [
   {
     label: "AGREEMENTS",
     title: "ALL REQUIRED",
-    sub: "Six binding checkboxes",
+    sub: "Seven binding checkboxes",
     tip: "Every checkbox is a real agreement — read before ticking.",
     icon: ShieldCheck,
     accent: "ok" as const,
@@ -116,11 +116,12 @@ const STEPS = [
 ];
 
 const AGREEMENTS = [
-  "I understand Butler AI executes commands on my own PC",
+  "I confirm I am 18 years or older and understand this is a remote administration tool",
+  "I understand Butler AI executes real commands on my own PC, and that every command needs a manual tap — nothing runs automatically",
   "I accept the End User Licence Agreement",
   "I accept the Privacy Policy and Data Safety statement",
-  "I will only pair devices I personally own",
-  "I understand no data is sent to third-party servers",
+  "I will only pair devices I personally own or am authorised to administer",
+  "I understand no data is sent to third-party servers — only to the PC I pair with",
   "I accept that misuse voids my licence",
 ];
 

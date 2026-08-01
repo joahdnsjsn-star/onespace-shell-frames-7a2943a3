@@ -13,6 +13,7 @@ import {
   type PermDef,
   type PermState,
 } from "@/lib/permissions";
+import { usePermissionDisclosure } from "@/components/nexus/Disclosure";
 
 export const Route = createFileRoute("/permissions")({
   head: () => ({
@@ -109,6 +110,7 @@ function PermissionsPage() {
   const [states, setStates] = useState<Record<string, PermState>>(() =>
     Object.fromEntries(PERMISSIONS.map((p) => [p.key, "checking" as PermState])),
   );
+  const disclosure = usePermissionDisclosure();
 
   const refresh = useCallback(async () => {
     const entries = await Promise.all(
@@ -121,16 +123,22 @@ function PermissionsPage() {
     void refresh();
   }, [refresh]);
 
-  const onRequest = useCallback(async (def: PermDef) => {
-    const next = await requestPermission(def);
-    setStates((s) => ({ ...s, [def.key]: next }));
-    if (next === "granted") fx.success();
-  }, []);
+  const onRequest = useCallback(
+    async (def: PermDef) => {
+      // Play policy: prominent in-app disclosure before the OS prompt.
+      if (!(await disclosure.confirm(def))) return;
+      const next = await requestPermission(def);
+      setStates((s) => ({ ...s, [def.key]: next }));
+      if (next === "granted") fx.success();
+    },
+    [disclosure],
+  );
 
   const granted = PERMISSIONS.filter((p) => states[p.key] === "granted").length;
 
   return (
     <AppShell title="PERMISSIONS" subtitle="what the app may touch">
+      {disclosure.node}
       <section>
         <SectionHeader
           title="permission centre"

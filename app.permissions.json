@@ -9,7 +9,12 @@
     "iosBundleIdentifier": "com.butlerai.pc.automation",
     "userInterfaceStyle": "dark",
     "orientation": "portrait",
-    "backgroundColor": "#0C0E14"
+    "backgroundColor": "#0C0E14",
+    "version": "5.0.9",
+    "androidVersionCode": 1784400005,
+    "description": "Butler AI \u2014 PC Automation & Control. \u00a9 2024-2026 Andrej Sladkovic. All Rights Reserved. Unauthorised copying, reverse-engineering or redistribution is strictly prohibited.",
+    "copyright": "\u00a9 2024-2026 Andrej Sladkovic. All Rights Reserved.",
+    "minAge": 18
   },
   "android": {
     "permissions": [
@@ -18,31 +23,54 @@
       "android.permission.VIBRATE"
     ],
     "blockedPermissions": [
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+      "android.permission.MEDIA_PROJECTION",
+      "android.permission.PHONE_CALL",
+      "android.permission.READ_PHONE_STATE",
       "android.permission.RECORD_AUDIO",
+      "android.permission.READ_MEDIA_AUDIO",
+      "android.permission.READ_MEDIA_IMAGES",
+      "android.permission.READ_MEDIA_VIDEO",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.READ_EXTERNAL_STORAGE",
       "android.permission.ACCESS_FINE_LOCATION",
       "android.permission.ACCESS_COARSE_LOCATION",
       "android.permission.ACCESS_BACKGROUND_LOCATION",
-      "android.permission.READ_CONTACTS",
-      "android.permission.READ_PHONE_STATE",
-      "android.permission.PHONE_CALL",
-      "android.permission.READ_EXTERNAL_STORAGE",
-      "android.permission.WRITE_EXTERNAL_STORAGE",
-      "android.permission.READ_MEDIA_IMAGES",
-      "android.permission.READ_MEDIA_VIDEO",
-      "android.permission.READ_MEDIA_AUDIO",
-      "android.permission.MEDIA_PROJECTION",
-      "android.permission.FOREGROUND_SERVICE",
-      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
-      "android.permission.BODY_SENSORS",
       "android.permission.ACTIVITY_RECOGNITION",
-      "com.google.android.gms.permission.ACTIVITY_RECOGNITION"
+      "com.google.android.gms.permission.ACTIVITY_RECOGNITION",
+      "android.permission.BODY_SENSORS"
     ]
   },
   "ios": {
     "NSCameraUsageDescription": "Butler AI uses the camera once to scan the pairing QR code shown by your PC. Nothing is recorded or uploaded."
   },
   "web": {
-    "runtimeRequested": ["camera", "notifications", "clipboard-write", "screen-wake-lock"],
-    "neverRequested": ["microphone", "geolocation", "midi", "bluetooth", "usb", "idle-detection"]
+    "runtimeRequested": [
+      "camera",
+      "notifications",
+      "clipboard-write",
+      "screen-wake-lock"
+    ],
+    "neverRequested": [
+      "microphone",
+      "geolocation",
+      "midi",
+      "bluetooth",
+      "usb",
+      "idle-detection"
+    ]
+  },
+  "playStore": {
+    "$comment": "Mirrors docs/native/DATA_SAFETY_FORM.md. Any change here must be re-entered in Play Console -> App content -> Data safety.",
+    "dataCollected": [
+      "Device or other IDs",
+      "App interactions"
+    ],
+    "dataShared": [],
+    "encryptedInTransit": true,
+    "deletionPath": "Settings -> Personal Files & Account -> Delete All My Data",
+    "targetAudience": "18+",
+    "adsOrTracking": false
   }
 }
