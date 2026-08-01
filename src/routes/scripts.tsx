@@ -8,6 +8,7 @@ import { Coach } from "@/components/nexus/Coach";
 import { fx } from "@/lib/fx";
 import { useBridge } from "@/lib/useBridge";
 import { BridgeError, fetchLibrary, runScript, undoRun, type LibraryScript } from "@/lib/butler-bridge";
+import { historySnapshot, loadHistory, recordRun, subscribeHistory } from "@/lib/history";
 
 export const Route = createFileRoute("/scripts")({
   head: () => ({
