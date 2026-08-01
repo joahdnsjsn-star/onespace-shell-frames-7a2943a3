@@ -108,6 +108,25 @@
 
   html {
     scroll-behavior: smooth;
+    /* fluid base size: auto-scales the whole rem-based UI to the device width */
+    font-size: clamp(14.5px, 0.82rem + 0.85vw, 17.5px);
+    -webkit-text-size-adjust: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
   }
 
   body {
@@ -305,6 +324,59 @@
     );
     animation: nexus-shimmer 1.6s ease-in-out infinite;
   }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* bulletproof horizontal rails: momentum, snap, no scroll-chaining */
+@utility scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  & > * {
+    scroll-snap-align: start;
+  }
+}
+
+@utility scroll-y {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--cyan) 30%, transparent) transparent;
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--cyan) 26%, transparent);
+    border-radius: 999px;
+  }
+}
+
+/* fluid type helpers — readable from 320px to desktop */
+@utility text-fluid-xs {
+  font-size: clamp(0.68rem, 0.64rem + 0.2vw, 0.78rem);
+}
+
+@utility text-fluid-sm {
+  font-size: clamp(0.8rem, 0.76rem + 0.24vw, 0.92rem);
+}
+
+@utility text-fluid-lg {
+  font-size: clamp(1rem, 0.92rem + 0.5vw, 1.25rem);
 }
 
 @utility press {
