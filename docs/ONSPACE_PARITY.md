@@ -88,7 +88,9 @@ and changing it would be a visual rewrite, not a compatibility fix.
 
 ## Deploying this repo
 
-This repo is the web/PWA face. See `docs/ONSPACE_SYNC.md` for the three build
-modes (static / Node SSR / edge) and `docs/PLAYSTORE.md` for the Trusted Web
-Activity route if you ever want a store build from the web code instead of the
-Expo one.
+This repo is the Android-focused web shell. See `docs/ONSPACE_SYNC.md` for the
+build commands and `docs/PLAYSTORE.md` for the Trusted Web Activity / PWA route
+if you want a store build from the web code instead of the Expo one. The
+`Dockerfile` in the repo root also gives you a reproducible container for any
+host that supports Docker.
+
