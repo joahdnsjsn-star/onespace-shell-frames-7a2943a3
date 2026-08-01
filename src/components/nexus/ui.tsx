@@ -202,6 +202,45 @@ export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("animate-pulse rounded-md bg-surface-3", className)} />;
 }
 
+/** Skeleton stand-in for a Row list while real data is pending. */
+export function SkeletonRow() {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-dim bg-surface/70 px-3 py-3">
+      <Skeleton className="size-9 rounded-lg" />
+      <div className="flex-1 space-y-2">
+        <Skeleton className="h-3 w-2/5" />
+        <Skeleton className="h-2.5 w-3/5" />
+      </div>
+      <Skeleton className="h-5 w-12 rounded-full" />
+    </div>
+  );
+}
+
+/** Skeleton stand-in for a metrics Card / StatTile grid. */
+export function SkeletonCard({ rows = 3 }: { rows?: number }) {
+  return (
+    <div className="space-y-3 rounded-xl border border-dim bg-surface/70 p-4">
+      <Skeleton className="h-3 w-24" />
+      <div className="grid grid-cols-2 gap-3">
+        {Array.from({ length: rows * 2 }).map((_, i) => (
+          <Skeleton key={i} className="h-14 rounded-lg" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Inline loading strip for streams, consoles and charts. */
+export function LoadingStrip({ label = "awaiting host response" }: { label?: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-lg border border-dim bg-surface/60 px-3 py-2 label-mono text-faint">
+      <span className="size-1.5 rounded-full bg-cyan pulse-dot" aria-hidden />
+      {label}
+    </div>
+  );
+}
+
+
 export function EmptyState({
   title,
   body,

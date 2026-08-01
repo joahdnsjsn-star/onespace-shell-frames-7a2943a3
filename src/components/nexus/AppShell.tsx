@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Chip } from "./ui";
+import { OfflineBanner } from "./OfflineBanner";
 
 export const TABS = [
   { to: "/", label: "HOME", icon: LayoutDashboard },
@@ -77,12 +78,8 @@ export function AppShell({
           </div>
           {accentLabel ? <Chip accent="cyan">{accentLabel}</Chip> : null}
         </div>
-        {offline ? (
-          <div className="flex items-center gap-2 border-t border-warn/30 bg-warn/12 px-4 py-1.5 label-mono text-warn">
-            <span className="size-1.5 rounded-full bg-warn pulse-dot" aria-hidden />
-            offline — reconnecting to PC bridge
-          </div>
-        ) : null}
+        <OfflineBanner online={!offline} />
+
       </header>
 
       <main className={cn("flex-1 space-y-5 nexus-grid px-4 pb-8 pt-5")}>{children}</main>
