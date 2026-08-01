@@ -165,9 +165,19 @@ export async function bridgeRequest<T = Json>(
       method: opts.method ?? (opts.body ? "POST" : "GET"),
       headers: {
         "Content-Type": "application/json",
-        ...(cfg.token ? { Authorization: `Bearer ${cfg.token}` } : {}),
+        // The server accepts the token as Bearer, X-Session-Token or
+        // X-Fallback-Token; sending all three makes pairing survive a partial
+        // token rotation without a re-scan.
+        ...(cfg.token
+          ? {
+              Authorization: `Bearer ${cfg.token}`,
+              "X-Session-Token": cfg.token,
+              "X-Fallback-Token": cfg.token,
+            }
+          : {}),
+        ...(cfg.appSig ? { "X-Butler-App-Sig": cfg.appSig } : {}),
         "X-Device-Id": cfg.deviceId,
-        "X-App-Version": "5.0.9",
+        "X-App-Version": APP_VERSION,
       },
       ...(opts.body ? { body: JSON.stringify(opts.body) } : {}),
       signal: controller.signal,
