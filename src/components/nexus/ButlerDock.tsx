@@ -63,8 +63,11 @@ export function ButlerDock() {
         type="button"
         onClick={() =>
           setOpen((o) => {
-            if (o) fx.close();
-            else fx.open();
+            if (o) {
+              fx.close();
+            } else {
+              fx.open();
+            }
             return !o;
           })
         }

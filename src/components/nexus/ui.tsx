@@ -455,8 +455,11 @@ export function ActionButton({
       onClick={
         onClick
           ? () => {
-              if (variant === "danger") fx.warn();
-              else fx.tap();
+              if (variant === "danger") {
+                fx.warn();
+              } else {
+                fx.tap();
+              }
               onClick();
             }
           : undefined

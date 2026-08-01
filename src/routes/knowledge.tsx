@@ -576,8 +576,11 @@ function SourcesTab({ queue }: { queue: number }) {
 
   const feedback = useCallback((ok: boolean, text: string) => {
     setMsg({ ok, text });
-    if (ok) fx.success();
-    else fx.warn();
+    if (ok) {
+      fx.success();
+    } else {
+      fx.warn();
+    }
     setTimeout(() => setMsg(null), 6000);
   }, []);
 

@@ -66,8 +66,11 @@ function Home() {
   const [fired, setFired] = useState<string | null>(null);
 
   const fire = (label: string) => {
-    if (label === "Shutdown" || label === "Restart") fx.warn();
-    else fx.success();
+    if (label === "Shutdown" || label === "Restart") {
+      fx.warn();
+    } else {
+      fx.success();
+    }
     setFired(label);
     window.setTimeout(() => setFired((v) => (v === label ? null : v)), 1200);
   };
