@@ -57,29 +57,29 @@
 
 :root {
   --radius: 0.875rem;
-  --background: oklch(0.148 0.023 255.1);
-  --foreground: oklch(0.917 0.03 229.2);
-  --surface: oklch(0.175 0.027 253.8);
-  --surface-2: oklch(0.205 0.034 251.4);
-  --surface-3: oklch(0.234 0.04 249.9);
-  --dim: oklch(0.278 0.046 248.7);
-  --faint: oklch(0.52 0.05 248.7);
-  --card: oklch(0.205 0.034 251.4);
+  --background: oklch(0.098 0.018 255.1);
+  --foreground: oklch(0.935 0.024 229.2);
+  --surface: oklch(0.132 0.021 253.8);
+  --surface-2: oklch(0.158 0.026 251.4);
+  --surface-3: oklch(0.186 0.031 249.9);
+  --dim: oklch(0.226 0.036 248.7);
+  --faint: oklch(0.49 0.042 248.7);
+  --card: oklch(0.152 0.025 251.4);
   --card-foreground: oklch(0.917 0.03 229.2);
-  --popover: oklch(0.205 0.034 251.4);
+  --popover: oklch(0.152 0.025 251.4);
   --popover-foreground: oklch(0.917 0.03 229.2);
   --primary: oklch(0.844 0.146 209.3);
-  --primary-foreground: oklch(0.148 0.023 255.1);
-  --secondary: oklch(0.234 0.04 249.9);
+  --primary-foreground: oklch(0.098 0.018 255.1);
+  --secondary: oklch(0.186 0.031 249.9);
   --secondary-foreground: oklch(0.917 0.03 229.2);
-  --muted: oklch(0.234 0.04 249.9);
-  --muted-foreground: oklch(0.66 0.042 246.5);
-  --accent: oklch(0.278 0.046 248.7);
+  --muted: oklch(0.186 0.031 249.9);
+  --muted-foreground: oklch(0.672 0.04 246.5);
+  --accent: oklch(0.226 0.036 248.7);
   --accent-foreground: oklch(0.917 0.03 229.2);
   --destructive: oklch(0.661 0.227 18.4);
-  --destructive-foreground: oklch(0.148 0.023 255.1);
-  --border: oklch(0.278 0.046 248.7);
-  --input: oklch(0.234 0.04 249.9);
+  --destructive-foreground: oklch(0.098 0.018 255.1);
+  --border: oklch(0.222 0.035 248.7);
+  --input: oklch(0.186 0.031 249.9);
   --ring: oklch(0.844 0.146 209.3);
 
   --cyan: oklch(0.844 0.146 209.3);
@@ -90,13 +90,14 @@
   --system: oklch(0.657 0.183 260.3);
   --net: oklch(0.76 0.134 184.3);
 
-  --grid-line: color-mix(in oklab, var(--cyan) 5%, transparent);
-  --shadow-elev: 0 1px 0 0 color-mix(in oklab, white 6%, transparent) inset,
-    0 18px 40px -24px color-mix(in oklab, black 90%, transparent);
+  --grid-line: color-mix(in oklab, var(--cyan) 4%, transparent);
+  --shadow-elev: 0 1px 0 0 color-mix(in oklab, white 5%, transparent) inset,
+    0 1px 2px 0 color-mix(in oklab, black 60%, transparent),
+    0 22px 48px -28px color-mix(in oklab, black 96%, transparent);
   --gradient-surface: linear-gradient(
     160deg,
-    color-mix(in oklab, var(--surface-2) 96%, var(--cyan) 4%),
-    var(--surface)
+    color-mix(in oklab, var(--surface-2) 97%, var(--cyan) 3%),
+    color-mix(in oklab, var(--surface) 92%, black 8%)
   );
 }
 
@@ -113,12 +114,12 @@
     background-color: var(--color-background);
     background-image: radial-gradient(
         90% 60% at 50% -10%,
-        color-mix(in oklab, var(--cyan) 9%, transparent),
+        color-mix(in oklab, var(--cyan) 6%, transparent),
         transparent 70%
       ),
       radial-gradient(
         70% 50% at 100% 100%,
-        color-mix(in oklab, var(--neural) 7%, transparent),
+        color-mix(in oklab, var(--neural) 5%, transparent),
         transparent 70%
       );
     background-attachment: fixed;
@@ -231,8 +232,23 @@
 }
 
 @utility glass {
-  background-color: color-mix(in oklab, var(--surface) 72%, transparent);
-  backdrop-filter: blur(14px) saturate(150%);
+  background-color: color-mix(in oklab, var(--surface) 78%, transparent);
+  backdrop-filter: blur(16px) saturate(160%);
+}
+
+@utility vignette {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      120% 90% at 50% 0%,
+      transparent 55%,
+      color-mix(in oklab, black 45%, transparent)
+    );
+  }
 }
 
 @utility hairline-top {
@@ -263,6 +279,7 @@
 }
 
 @utility rise-in {
+  will-change: transform, opacity;
   animation: nexus-rise 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
