@@ -179,7 +179,7 @@ export function speakLine(text: string, opts: { force?: boolean } = {}) {
  */
 export function butlerSay(text: string, opts: Omit<SayPayload, "text"> = { tone: "info" }) {
   if (typeof window === "undefined") return;
-  const detail: SayPayload = { text, tone: opts.tone ?? "info", ...opts };
+  const detail: SayPayload = { ...opts, text, tone: opts.tone ?? "info" };
   window.dispatchEvent(new CustomEvent<SayPayload>("nexus:butler-say", { detail }));
 }
 
