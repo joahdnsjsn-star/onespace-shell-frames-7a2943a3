@@ -12,6 +12,7 @@ import {
   Palette,
   SlidersHorizontal,
   Search,
+  LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Chip } from "./ui";
@@ -19,6 +20,7 @@ import { OfflineBanner } from "./OfflineBanner";
 import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
 import { ButlerDock } from "./ButlerDock";
 import { CommandBar } from "./CommandBar";
+import { PageLauncher } from "./PageLauncher";
 
 export const TABS = [
   { to: "/", label: "HOME", icon: LayoutDashboard },
@@ -94,6 +96,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [pagesOpen, setPagesOpen] = useState(false);
 
   return (
     <div className="relative mx-auto flex min-h-dvh w-full max-w-lg flex-col sm:max-w-xl lg:max-w-2xl">
@@ -128,9 +131,10 @@ export function AppShell({
         {children}
       </main>
 
-      <TabBar />
+      <TabBar onOpenPages={() => setPagesOpen(true)} />
       <ButlerDock />
       <CommandBar open={cmdOpen} onOpenChange={setCmdOpen} />
+      <PageLauncher open={pagesOpen} onOpenChange={setPagesOpen} />
     </div>
   );
 }
