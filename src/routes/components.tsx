@@ -12,6 +12,9 @@ import {
   Skeleton,
   StatTile,
   Toggle,
+  SkeletonRow,
+  SkeletonCard,
+  LoadingStrip,
 } from "@/components/nexus/ui";
 
 export const Route = createFileRoute("/components")({
@@ -107,6 +110,22 @@ function Kit() {
             <ActionButton className="w-full">Primary</ActionButton>
             <ActionButton variant="ghost" className="w-full">Ghost</ActionButton>
             <ActionButton variant="danger" className="w-full">Destructive</ActionButton>
+          </div>
+        </section>
+
+        <section>
+          <SectionHeader title="loading states" accent="cyan" />
+          <div className="space-y-3">
+            <SkeletonRow />
+            <SkeletonCard rows={1} />
+            <LoadingStrip />
+          </div>
+        </section>
+
+        <section>
+          <SectionHeader title="connection" accent="warn" />
+          <div className="overflow-hidden rounded-xl border border-dim">
+            <OfflineBanner online={false} />
           </div>
         </section>
 
