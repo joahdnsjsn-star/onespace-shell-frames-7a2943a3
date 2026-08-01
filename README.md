@@ -70,6 +70,12 @@ The shell needs **none**. `.env.example` documents the shape for later:
 
 ## 4. Deployment
 
+> **Syncing with OnSpace.ai?** Follow the step-by-step checklist in
+> [`docs/ONSPACE_SYNC.md`](docs/ONSPACE_SYNC.md) — it covers GitHub push, CI,
+> OnSpace import, build settings, environment variables, auto-deploy and
+> post-deploy verification.
+
+
 ### 4.1 Push to GitHub
 
 ```bash

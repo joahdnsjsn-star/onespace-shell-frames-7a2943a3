@@ -5,6 +5,11 @@ import { cn } from "@/lib/utils";
 export function BackdropFX() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      {/* deep space: two parallax star layers behind everything */}
+      <div className="starfield-far absolute inset-[-20%] opacity-60" />
+      <div className="starfield absolute inset-[-20%] opacity-70" />
+      {/* cockpit canopy glow */}
+      <div className="canopy absolute inset-0" />
       <div className="nx-orb left-[-15%] top-[-10%] size-[55vmax] bg-cyan/40" />
       <div className="nx-orb right-[-20%] top-[25%] size-[45vmax] bg-neural/35 [animation-delay:-6s]" />
       <div className="nx-orb bottom-[-18%] left-[10%] size-[50vmax] bg-net/30 [animation-delay:-11s]" />
