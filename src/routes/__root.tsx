@@ -150,6 +150,7 @@ function RootComponent() {
       <PreferenceBridge />
       <PerfGuard />
       <ButlerVoice />
+      <TouchInk />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
