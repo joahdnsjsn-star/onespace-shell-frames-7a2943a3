@@ -921,3 +921,24 @@ html[data-perf="low"] .mascot-watermark { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .nx-ink, .nx-pill, .axis-in, .snackbar { animation: none !important; transition: none !important; }
 }
+
+/* ---- Handset form factor ----------------------------------------------- */
+/* The app ships as an Android phone app. The shell is always a single
+   handset-width column; wider surfaces (tablet, emulator, desktop browser
+   used for QA) frame that column instead of reflowing it, so what you test
+   is byte-for-byte the phone layout. */
+.device-column {
+  width: 100%;
+  max-width: var(--device-width, 480px);
+}
+
+@media (min-width: 560px) {
+  html {
+    background: #04060a;
+  }
+  .device-column {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-dim) 80%, transparent),
+      0 40px 120px -40px rgb(0 0 0 / 0.9);
+  }
+}

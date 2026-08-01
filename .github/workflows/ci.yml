@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Android app bundle
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,24 +23,18 @@ jobs:
         run: bunx tsc --noEmit
       - name: Lint
         run: bun run lint
-      - name: Native permission parity (OnSpace / Expo contract)
+      - name: Android permission parity (OnSpace / Expo contract)
         run: bun run parity
-      - name: Build (edge / default target)
-        run: bun run build
-      - name: Build static export (OnSpace / Pages compatible)
-        run: bun run build:static
-      - name: Verify every route rendered
+      - name: Build app bundle
+        run: bun run build:node
+      - name: Verify bundle output
         run: |
-          test -f dist/static/index.html
-          for r in onboarding butler scripts knowledge builder components connect \
-                   cosmetic fileshare logs settings permissions crash-report \
-                   data-safety privacy-policy security-trust terms; do
-            test -f "dist/static/$r/index.html" || { echo "missing $r"; exit 1; }
-          done
-          echo "all routes prerendered"
-      - name: Upload static build
+          test -f dist/server/index.mjs
+          test -f dist/client/manifest.webmanifest
+          echo "android app bundle ok"
+      - name: Upload app bundle
         uses: actions/upload-artifact@v4
         with:
-          name: static-site
-          path: dist/static
+          name: butler-nexus-android-bundle
+          path: dist
           retention-days: 7

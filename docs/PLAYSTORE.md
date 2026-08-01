@@ -17,8 +17,8 @@ app and published to Google Play without rewriting anything.
 
 ## Steps
 
-1. Deploy the site to a public HTTPS domain (GitHub Pages, OnSpace, or any
-   static host). Note the origin, e.g. `https://nexus.example.com`.
+1. Deploy the app bundle to a public HTTPS origin via OnSpace (`bun run build:node`
+   + `bun run start`). Note the origin, e.g. `https://nexus.example.com`.
 2. Install Bubblewrap: `npm i -g @bubblewrap/cli`
 3. Initialise the wrapper:
    `bubblewrap init --manifest https://nexus.example.com/manifest.webmanifest`
