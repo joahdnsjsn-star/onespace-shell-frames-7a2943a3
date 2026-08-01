@@ -46,3 +46,49 @@ app and published to Google Play without rewriting anything.
 - Chrome on Android shows the "Install app" prompt.
 - After install, the app opens full-screen with no browser chrome.
 - Rotate/resize: no clipped text, no horizontal scroll.
+
+---
+
+## Compliance source of truth (synced from the native Expo repo, 2026-08-01)
+
+These files are verbatim copies of the submission documents used by the
+`com.butlerai.pc.automation` Expo build. Do not edit one side only.
+
+| File | Use in Play Console |
+|---|---|
+| `docs/native/DATA_SAFETY_FORM.md` | Exact answers for App content → Data safety, plus the Notes for reviewer text |
+| `docs/native/PROMINENT_DISCLOSURES.md` | Evidence that every disclosure (remote control, camera, LAN scan, 18+, deletion) is shown in-app |
+| `docs/native/PRIVACY_POLICY.md` | Source text for the hosted policy URL |
+| `docs/native/SECURITY_AND_PLAYSTORE_COMPLIANCE.md` | Device & Network Abuse policy justification |
+| `docs/native/THIRD_PARTY_LICENSES.md` | Open-source attributions |
+| `docs/native/PLAYSTORE_SUBMISSION_GUIDE.md` / `PLAYSTORE_DEPLOYMENT_AUTOMATION.md` | Step-by-step upload + EAS submit automation |
+| `docs/native/COPYRIGHT.md` | Ownership notice matching `native.copyright` |
+
+### Machine-checked invariants
+
+`bun run parity` (also run by `bun run verify` and CI) fails the build if:
+
+- requested/blocked Android permissions drift from the Expo `app.json`
+- `native.version` / `androidVersionCode` / `copyright` / `minAge: 18` are missing or drift
+- the Data safety declaration in `app.permissions.json` loses "encrypted in transit",
+  gains a shared data type, or drops the deletion path
+- the in-app `/data-safety` page stops disclosing a declared data type, or
+  contradicts the form by claiming "no data is collected"
+- any compliance doc above is deleted
+- `onspace.json` stops targeting Android or drifts from the package/scheme
+
+Run it against the real native manifest before every submission:
+
+```bash
+node scripts/check-native-parity.mjs ../butler-ai-final/app.json
+```
+
+### In-app gates that reviewers will look for
+
+- Onboarding step 3 blocks progress until all **seven** binding checkboxes are
+  ticked, including the explicit 18+ confirmation and the "every command needs a
+  manual tap" acknowledgement.
+- `src/components/nexus/Disclosure.tsx` shows a prominent disclosure sheet
+  **before** any OS prompt for camera, notifications, file picking and LAN scan.
+- `/privacy-policy`, `/data-safety`, `/terms` and `/security-trust` are reachable
+  offline from inside the app, not just as external links.
