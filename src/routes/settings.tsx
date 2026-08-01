@@ -25,10 +25,15 @@ import {
   Camera,
   KeyRound,
   Clock,
+  Gauge,
   CheckCircle2,
 } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
 import { notifyPrefsChanged } from "@/components/nexus/PreferenceBridge";
+import { PerfReadout } from "@/components/nexus/PerfGuard";
+import { usePerf } from "@/hooks/usePerf";
+import { setPerfMode, type PerfMode } from "@/lib/perf";
+import serverAsset from "@/assets/butler_server.py.asset.json";
 
 import {
   Card,
@@ -186,6 +191,102 @@ function RangeRow({
       {...(unit ? { unit } : {})}
       {...(accent ? { accent } : {})}
     />
+  );
+}
+
+/** Adaptive quality controls plus a live frame-rate readout. */
+function PerformanceSection() {
+  const perf = usePerf();
+  const modes = ["auto", "high", "balanced", "low"] as const;
+  return (
+    <section>
+      <SectionHeader
+        title="performance"
+        hint="Self-adjusts when frames drop"
+        accent="warn"
+        action={<PerfReadout />}
+      />
+      <div className="space-y-2">
+        <Card>
+          <div className="flex items-start gap-3">
+            <IconBadge accent="warn" size={34}>
+              <Gauge size={16} />
+            </IconBadge>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold">Quality mode</div>
+              <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+                Auto watches frame rate, main-thread stalls and memory, then trims effects
+                automatically. Current tier: <span className="text-cyan">{perf.tier}</span>
+                {perf.degraded ? " (reduced)" : ""}.
+              </p>
+            </div>
+          </div>
+          <Segmented
+            options={modes}
+            value={perf.mode as (typeof modes)[number]}
+            onChange={(next) => {
+              setPerfMode(next as PerfMode);
+              notifyPrefsChanged();
+            }}
+            className="mt-3 flex w-full"
+          />
+        </Card>
+        <SwitchRow
+          id="perf.warnHost"
+          title="Host load warnings"
+          sub="Notify when PC CPU or RAM runs hot"
+          icon={<Cpu size={14} />}
+          accent="warn"
+          initial
+        />
+        <SwitchRow
+          id="perf.background"
+          title="Pause work in background"
+          sub="Stop streams while the app is hidden"
+          icon={<Clock size={14} />}
+          initial
+        />
+        <SwitchRow
+          id="perf.preload"
+          title="Preload next pages"
+          sub="Faster navigation, slightly more data"
+          icon={<Zap size={14} />}
+          initial
+        />
+      </div>
+    </section>
+  );
+}
+
+/** The PC bridge, shipped in-app as a plain download — no web console. */
+function ServerSection() {
+  return (
+    <section>
+      <SectionHeader title="pc server" hint="Runs locally, terminal only" accent="system" />
+      <Card accent="system">
+        <Row
+          title="butler_server.py"
+          sub={`${(serverAsset.size / 1_048_576).toFixed(2)} MB · python 3.10+`}
+          left={
+            <IconBadge accent="system" size={34}>
+              <Server size={16} />
+            </IconBadge>
+          }
+          right={<Chip accent="ok">bundled</Chip>}
+        />
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <ActionButton href={serverAsset.url} download="butler_server.py">
+            <Download size={16} /> Download
+          </ActionButton>
+          <Link
+            to="/connect"
+            className="press inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-dim bg-surface-3 text-sm font-semibold hover:bg-surface-3/70"
+          >
+            <Terminal size={16} /> Setup guide
+          </Link>
+        </div>
+      </Card>
+    </section>
   );
 }
 
@@ -442,6 +543,9 @@ function Settings() {
           </div>
         </div>
       </section>
+
+      <PerformanceSection />
+      <ServerSection />
 
       {/* permissions */}
       <section>
