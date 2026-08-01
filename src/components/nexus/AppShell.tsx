@@ -47,7 +47,7 @@ export function TabBar({ onOpenPages }: { onOpenPages: () => void }) {
   const item =
     "group press flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-1 py-2 text-faint hover:bg-surface-3/60 hover:text-cyan";
   return (
-    <nav className="sticky bottom-0 z-30 border-t border-dim/70 glass pb-[env(safe-area-inset-bottom)]">
+    <nav className="sticky bottom-0 z-30 border-t border-dim/70 glass hull-plate pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-stretch gap-1 px-2 py-2">
         {PRIMARY.map((t) => (
           <Link
@@ -109,7 +109,7 @@ export function AppShell({
       )}
     >
       <BackdropFX />
-      <header className="sticky top-0 z-20 border-b border-dim/70 glass pt-[env(safe-area-inset-top)]">
+      <header className="sticky top-0 z-20 border-b border-dim/70 glass hull-plate pt-[env(safe-area-inset-top)]">
         <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 px-4 py-3 sm:px-6">
           <NexusLogo size={30} className="press" status={offline ? "offline" : "online"} />
           <AnimatedTitle title={title} subtitle={subtitle} online={!offline} />

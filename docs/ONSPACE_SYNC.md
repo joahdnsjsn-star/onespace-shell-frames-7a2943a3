@@ -1,0 +1,156 @@
+# GitHub → OnSpace.ai Sync Checklist
+
+Butler AI NEXUS — web shell. Follow top to bottom; each step lists the
+expected outcome so you can confirm before moving on.
+
+---
+
+## 0. Prerequisites
+
+| Item | Value |
+| --- | --- |
+| Node | `22.x` (pinned in `.nvmrc`) |
+| Package manager | `bun` (preferred) or `npm` |
+| Repo visibility | public or private — both work with OnSpace |
+
+---
+
+## 1. Push the repo to GitHub
+
+```bash
+git init
+git add -A
+git commit -m "feat: Butler AI NEXUS shell"
+git branch -M main
+git remote add origin https://github.com/<you>/butler-ai-nexus.git
+git push -u origin main
+```
+
+**Expected:** GitHub shows all files, and the **Actions** tab starts a run
+named `CI` automatically (`.github/workflows/ci.yml`).
+
+---
+
+## 2. Confirm CI is green (automated)
+
+`.github/workflows/ci.yml` runs on every push and PR:
+
+1. `bun install --frozen-lockfile`
+2. `bunx tsgo --noEmit` (type check)
+3. `bun run build` (production build)
+
+**Expected:** green check next to the commit. If it fails, fix locally with
+the same three commands before continuing — OnSpace imports the same code.
+
+---
+
+## 3. Optional: GitHub Pages preview (automated)
+
+`.github/workflows/deploy-pages.yml` publishes the built `dist/` to Pages.
+
+- Repo → **Settings → Pages → Build and deployment → Source: GitHub Actions**
+
+**Expected:** after the next push to `main`, the site is live at
+`https://<you>.github.io/<repo>/`. This is just a preview; OnSpace hosting is
+independent.
+
+---
+
+## 4. Connect the repo in OnSpace.ai
+
+1. Sign in at **onspace.ai** → **New Project → Import from GitHub**.
+2. Authorize the OnSpace GitHub App; grant access to this repository only.
+3. Pick the repo, branch `main`, root directory `/`.
+
+**Expected:** OnSpace detects a Vite + TanStack Start project and pre-fills the
+build settings below.
+
+---
+
+## 5. Build settings
+
+| Field | Value |
+| --- | --- |
+| Framework preset | Vite / TanStack Start |
+| Install command | `bun install` (or `npm ci`) |
+| Build command | `bun run build` |
+| Output directory | `dist` |
+| Node version | `22` |
+| SPA fallback | on (all routes → `index.html`) |
+
+**Expected:** first deploy finishes in ~1–2 min and OnSpace returns a live URL.
+
+---
+
+## 6. Environment variables
+
+This shell is **fully offline** — it ships with **zero required variables**.
+Everything below is optional and only needed when you wire real services.
+Copy names from `.env.example`.
+
+| Variable | Required | Where it is read | Purpose |
+| --- | --- | --- | --- |
+| `VITE_APP_NAME` | no | client | Overrides the header wordmark |
+| `VITE_API_BASE_URL` | no | client | Base URL of your Butler PC agent |
+| `VITE_WS_URL` | no | client | WebSocket for live telemetry |
+| `VITE_ENABLE_ANALYTICS` | no | client | `true` / `false` |
+
+Rules:
+
+- Anything the browser reads **must** start with `VITE_`.
+- Never put a private key in a `VITE_` variable — it ships to the browser.
+- Server-only secrets go in OnSpace → **Project → Settings → Environment
+  Variables** (unprefixed) and are read only in server code.
+- Add variables in **both** the Preview and Production environments.
+
+**Expected:** after saving variables, trigger **Redeploy** — Vite inlines env
+values at build time, so a rebuild is required for changes to take effect.
+
+---
+
+## 7. Turn on auto-sync (automated)
+
+In OnSpace → **Project → Settings → Git**:
+
+- Production branch: `main`
+- Auto-deploy on push: **enabled**
+- Preview deploys for pull requests: **enabled**
+
+**Expected:** every `git push` to `main` redeploys production within a minute;
+every PR gets its own preview URL commented on the PR.
+
+---
+
+## 8. Post-deploy verification
+
+Open the live URL and confirm:
+
+- [ ] Home dashboard renders with live-animating telemetry tiles
+- [ ] Bottom bar shows 5 slots; **PAGES** opens the full launcher grid
+- [ ] All 17 routes load with no console errors
+- [ ] Deep-linking works — reload directly on `/settings` (SPA fallback)
+- [ ] Settings toggles persist after a page refresh (localStorage)
+- [ ] No horizontal scrolling at 320 px width
+- [ ] Butler dock opens; `Ctrl/⌘ + K` opens the command bar
+
+**Expected:** all boxes checked. Any 404 on refresh means SPA fallback in
+step 5 is off.
+
+---
+
+## 9. Rollback
+
+OnSpace keeps every deployment. **Deployments → … → Promote to Production**
+restores an earlier build instantly; no Git revert needed.
+
+---
+
+## Quick local commands
+
+```bash
+bun install        # install
+bun run dev        # dev server on :8080
+bunx tsgo --noEmit # type check
+bun run build      # production build → dist/
+bun run preview    # serve the production build locally
+```
