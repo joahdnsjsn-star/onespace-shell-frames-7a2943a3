@@ -209,12 +209,17 @@ export function AppShell({
         Skip to content
       </a>
       <header className="sticky top-0 z-20 border-b border-dim/70 glass hull-plate pt-[env(safe-area-inset-top)]">
-
-        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 px-4 py-3 sm:px-6">
-          <NexusLogo size={30} className="press" status={offline ? "offline" : "online"} />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan/60 to-transparent"
+        />
+        <div className="relative grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3.5 py-2.5 sm:px-6">
+          <span className="relative grid size-11 shrink-0 place-items-center rounded-2xl border border-cyan/25 bg-surface-2/50 shadow-[inset_0_1px_0_color-mix(in_oklab,var(--cyan)_18%,transparent)]">
+            <NexusLogo size={28} className="press" status={offline ? "offline" : "online"} />
+          </span>
           <AnimatedTitle title={title} subtitle={subtitle} online={!offline} />
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5">
             {accentLabel ? <Chip accent="cyan">{accentLabel}</Chip> : null}
             <LinkPill />
             <button
@@ -230,6 +235,7 @@ export function AppShell({
             </button>
           </div>
         </div>
+
         <OfflineBanner online={!offline} />
         {fill ? null : <ScrollProgress />}
       </header>

@@ -78,7 +78,7 @@ function Home() {
   };
 
   return (
-    <AppShell title="NEXUS CORE" subtitle="workstation · DESKTOP-A9F2" accentLabel="linked">
+    <AppShell title="PC AUTOMATION" subtitle="workstation · DESKTOP-A9F2" accentLabel="linked">
       <Coach
         id="home"
         steps={[
