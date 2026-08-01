@@ -538,3 +538,62 @@
   .nx-title { color: var(--foreground); }
   .lift:hover { transform: none; }
 }
+
+/* ==== v13: "orbital command deck" theme layer ==========================
+   The app's identity: the flight deck of a small starship. Everything below
+   is decorative depth — starfield parallax, hull plating, viewport horizon. */
+@keyframes nx-star-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, -120px, 0); }
+}
+@keyframes nx-horizon {
+  0%, 100% { opacity: .45; }
+  50%      { opacity: .8; }
+}
+
+/* Parallax star layers (pure CSS, no DOM nodes, hydration-safe). */
+@utility starfield {
+  background-image:
+    radial-gradient(1.4px 1.4px at 18% 22%, color-mix(in oklab, white 62%, transparent), transparent 60%),
+    radial-gradient(1.2px 1.2px at 74% 12%, color-mix(in oklab, var(--cyan) 70%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 42% 68%, color-mix(in oklab, white 48%, transparent), transparent 60%),
+    radial-gradient(1.6px 1.6px at 88% 54%, color-mix(in oklab, var(--neural) 60%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 8% 78%, color-mix(in oklab, white 40%, transparent), transparent 60%),
+    radial-gradient(1.2px 1.2px at 60% 92%, color-mix(in oklab, var(--net) 60%, transparent), transparent 60%);
+  background-size: 380px 380px;
+  background-repeat: repeat;
+  animation: nx-star-drift 42s linear infinite;
+  will-change: transform;
+}
+@utility starfield-far {
+  background-image:
+    radial-gradient(1px 1px at 30% 40%, color-mix(in oklab, white 34%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 82% 78%, color-mix(in oklab, white 28%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 55% 16%, color-mix(in oklab, white 24%, transparent), transparent 60%);
+  background-size: 220px 220px;
+  background-repeat: repeat;
+  animation: nx-star-drift 96s linear infinite;
+  will-change: transform;
+}
+
+/* Curved viewport glow along the top edge — the cockpit canopy. */
+@utility canopy {
+  background:
+    radial-gradient(120% 42% at 50% 0%, color-mix(in oklab, var(--cyan) 10%, transparent), transparent 72%),
+    radial-gradient(90% 34% at 50% 100%, color-mix(in oklab, var(--neural) 7%, transparent), transparent 74%);
+  animation: nx-horizon 12s ease-in-out infinite;
+}
+
+/* Brushed hull plating: hairline seams for panel surfaces. */
+@utility hull-plate {
+  background-image:
+    repeating-linear-gradient(
+      115deg,
+      transparent 0 9px,
+      color-mix(in oklab, white 1.6%, transparent) 9px 10px
+    );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starfield, .starfield-far, .canopy { animation: none !important; }
+}
