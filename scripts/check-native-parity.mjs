@@ -80,7 +80,80 @@ if (nativePath) {
     if (expo.scheme && expo.scheme !== contract.native.scheme) {
       problems.push(`expo.scheme "${expo.scheme}" != contract "${contract.native.scheme}"`);
     }
+    if (expo.version && expo.version !== contract.native.version) {
+      problems.push(`expo.version "${expo.version}" != contract "${contract.native.version}"`);
+    }
+    if (a.versionCode && a.versionCode !== contract.native.androidVersionCode) {
+      problems.push(`expo.android.versionCode ${a.versionCode} != contract ${contract.native.androidVersionCode}`);
+    }
   }
+}
+
+// 5. Play Store readiness: identity, data-safety declaration and the compliance
+//    docs the Play Console submission depends on must all be present and in sync.
+const n = contract.native ?? {};
+for (const key of ["version", "androidVersionCode", "description", "copyright", "minAge"]) {
+  if (n[key] === undefined || n[key] === "") problems.push(`app.permissions.json native.${key} is missing`);
+}
+if (n.minAge !== 18) problems.push("native.minAge must stay 18 (Play target audience is 18+)");
+if (!/^\d+\.\d+\.\d+$/.test(String(n.version ?? ""))) {
+  problems.push(`native.version "${n.version}" is not semver`);
+}
+const ps = contract.playStore ?? {};
+if (ps.encryptedInTransit !== true) problems.push("playStore.encryptedInTransit must be true");
+if (ps.adsOrTracking !== false) problems.push("playStore.adsOrTracking must be false");
+if ((ps.dataShared ?? []).length) problems.push("playStore.dataShared must stay empty (nothing is shared)");
+if (!(ps.dataCollected ?? []).length) {
+  problems.push("playStore.dataCollected must list what the Data safety form declares");
+}
+if (!String(ps.deletionPath ?? "").trim()) problems.push("playStore.deletionPath is required by Play policy");
+
+const requiredDocs = [
+  "docs/native/DATA_SAFETY_FORM.md",
+  "docs/native/PROMINENT_DISCLOSURES.md",
+  "docs/native/PRIVACY_POLICY.md",
+  "docs/native/THIRD_PARTY_LICENSES.md",
+  "docs/native/SECURITY_AND_PLAYSTORE_COMPLIANCE.md",
+  "docs/PLAYSTORE.md",
+  "docs/ONSPACE_SYNC.md",
+  "docs/ONSPACE_PARITY.md",
+];
+for (const d of requiredDocs) {
+  if (!existsSync(resolve(ROOT, d))) problems.push(`required compliance doc missing: ${d}`);
+}
+
+// 6. In-app legal surfaces must exist and must not contradict the Data safety
+//    form (a "we collect nothing" page next to a "Yes" declaration is a
+//    rejection trigger).
+for (const route of ["privacy-policy", "data-safety", "terms"]) {
+  const f = resolve(ROOT, `src/routes/${route}.tsx`);
+  if (!existsSync(f)) problems.push(`src/routes/${route}.tsx is missing`);
+}
+const safety = existsSync(resolve(ROOT, "src/routes/data-safety.tsx"))
+  ? readFileSync(resolve(ROOT, "src/routes/data-safety.tsx"), "utf8")
+  : "";
+for (const t of ps.dataCollected ?? []) {
+  if (!safety.toLowerCase().includes(t.toLowerCase().split(" ")[0])) {
+    problems.push(`src/routes/data-safety.tsx does not disclose declared data type "${t}"`);
+  }
+}
+if (/no data is collected/i.test(safety)) {
+  problems.push('src/routes/data-safety.tsx claims "no data is collected" but the form declares data types');
+}
+
+// 7. The OnSpace build contract must target the same package/scheme.
+const onspacePath = resolve(ROOT, "onspace.json");
+if (existsSync(onspacePath)) {
+  const onspace = JSON.parse(readFileSync(onspacePath, "utf8"));
+  if (onspace.android?.package !== contract.native.androidPackage) {
+    problems.push("onspace.json android.package != contract native.androidPackage");
+  }
+  if (onspace.android?.scheme !== contract.native.scheme) {
+    problems.push("onspace.json android.scheme != contract native.scheme");
+  }
+  if (onspace.target !== "android") problems.push('onspace.json target must be "android"');
+} else {
+  problems.push("onspace.json is missing");
 }
 
 if (problems.length) {
