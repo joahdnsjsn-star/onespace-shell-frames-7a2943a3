@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Server, QrCode, Wifi, RefreshCw, ShieldCheck, Radar, Github, Download, Copy, Check, X, Zap, Activity } from "lucide-react";
+import { Server, QrCode, Wifi, RefreshCw, ShieldCheck, Radar, Github, Download, Copy, Check, X, Zap, Activity, Keyboard, Power } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   checkHealth,
@@ -18,6 +18,7 @@ import { QrScanner } from "@/components/nexus/QrScanner";
 import { networkMonitor } from "@/lib/netmon";
 import { neuralTripwire, type TripwireState } from "@/lib/tripwire";
 import { fx } from "@/lib/fx";
+import { remoteCapabilities, syncClipboard, pullFromPc, powerAction } from "@/lib/pc-remote";
 import { AppShell } from "@/components/nexus/AppShell";
 import { Card, Chip, IconBadge, Row, SectionHeader, StatTile, ActionButton } from "@/components/nexus/ui";
 
@@ -488,7 +489,7 @@ function RemotePanel() {
       fx.success();
       setNote(okMsg);
     } else {
-      fx.error();
+      fx.warn();
       setNote(r.error ?? "Failed");
     }
   }
