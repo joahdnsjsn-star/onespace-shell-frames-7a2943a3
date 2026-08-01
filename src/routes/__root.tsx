@@ -80,8 +80,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Butler AI NEXUS" },
-      { name: "description", content: "Local PC command centre — dark HUD interface shell." },
+      { title: "Butler AI NEXUS — Local PC Command Centre" },
+      { name: "description", content: "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#070a10" },
@@ -91,6 +91,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "NEXUS" },
       { name: "format-detection", content: "telephone=no" },
+      { property: "og:title", content: "Butler AI NEXUS — Local PC Command Centre" },
+      { name: "twitter:title", content: "Butler AI NEXUS — Local PC Command Centre" },
+      { property: "og:description", content: "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing." },
+      { name: "twitter:description", content: "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f8666411-f3a8-45f1-8287-a8c46c688db1/id-preview-038ec225--24f4c969-fe96-4094-8c33-91b616358379.lovable.app-1785567046997.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f8666411-f3a8-45f1-8287-a8c46c688db1/id-preview-038ec225--24f4c969-fe96-4094-8c33-91b616358379.lovable.app-1785567046997.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

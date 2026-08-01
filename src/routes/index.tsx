@@ -46,10 +46,10 @@ export const Route = createFileRoute("/")({
         content:
           "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing.",
       },
-      { property: "og:title", content: "Butler AI NEXUS — Command Centre" },
+      { property: "og:title", content: "Butler AI NEXUS — Local PC Command Centre" },
       {
         property: "og:description",
-        content: "Dark HUD interface for controlling your own PC from your phone over LAN.",
+        content: "NEXUS command centre shell: live PC telemetry, scripts, neural knowledge base and secure LAN pairing.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
