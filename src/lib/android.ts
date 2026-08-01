@@ -69,18 +69,28 @@ function unpark() {
   if (!parked) return;
   parked = false;
   if ((window.history.state as Record<string, unknown> | null)?.[BACK_FLAG]) {
+    // We are removing our own entry — the resulting popstate is bookkeeping,
+    // not a user pressing back, so it must not fire any handler.
+    selfPop = true;
     window.history.back();
   }
 }
 
 function onPop() {
   parked = false; // the parked entry is already gone
+  if (selfPop) {
+    selfPop = false;
+    // Something may still be open (an overlay that mounted in the same tick).
+    if (backStack.length > 0) park();
+    return;
+  }
   const top = backStack[backStack.length - 1];
   if (!top) return;
   top.handler();
   // A handler that leaves entries behind still needs a guard for the next press.
   if (backStack.length > 1) park();
 }
+
 
 function bindPop() {
   if (popBound || typeof window === "undefined") return;
