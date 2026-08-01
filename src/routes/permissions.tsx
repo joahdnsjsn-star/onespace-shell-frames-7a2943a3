@@ -62,7 +62,7 @@ function PermissionRow({
   const actionable = def.runtime && state !== "granted" && state !== "unsupported";
   return (
     <Row
-      left={<IconBadge accent={def.accent} icon={<ShieldCheck size={14} />} />}
+      left={<IconBadge accent={def.accent}><ShieldCheck size={14} /></IconBadge>}
       title={
         <span className="flex flex-wrap items-center gap-2">
           {def.label}
