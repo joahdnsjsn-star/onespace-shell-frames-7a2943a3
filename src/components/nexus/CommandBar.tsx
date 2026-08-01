@@ -1,18 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, CornerDownLeft, Command } from "lucide-react";
-import { TABS } from "./AppShell";
+import { ALL_PAGES } from "./PageLauncher";
 import { cn } from "@/lib/utils";
-
-const EXTRA = [
-  { to: "/onboarding", label: "ONBOARDING" },
-  { to: "/components", label: "COMPONENT KIT" },
-  { to: "/privacy-policy", label: "PRIVACY POLICY" },
-  { to: "/terms", label: "TERMS" },
-  { to: "/data-safety", label: "DATA SAFETY" },
-  { to: "/security-trust", label: "SECURITY & TRUST" },
-  { to: "/crash-report", label: "CRASH REPORT" },
-] as const;
 
 type Item = { to: string; label: string };
 
@@ -23,7 +13,7 @@ export function CommandBar({ open, onOpenChange }: { open: boolean; onOpenChange
   const inputRef = useRef<HTMLInputElement>(null);
 
   const items = useMemo<Item[]>(() => {
-    const all: Item[] = [...TABS.map((t) => ({ to: t.to as string, label: t.label as string })), ...EXTRA];
+    const all: Item[] = ALL_PAGES.map((p) => ({ to: p.to, label: p.label.toUpperCase() }));
     const needle = q.trim().toLowerCase();
     return needle ? all.filter((x) => x.label.toLowerCase().includes(needle) || x.to.includes(needle)) : all;
   }, [q]);
