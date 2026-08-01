@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -15,7 +15,9 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { haptic } from "@/lib/haptics";
+import { fx } from "@/lib/fx";
+import { primeAudio } from "@/lib/sound";
+import { SplashScreen } from "./Mascot";
 import { Chip } from "./ui";
 import { OfflineBanner } from "./OfflineBanner";
 import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
@@ -55,7 +57,7 @@ export function TabBar({ onOpenPages }: { onOpenPages: () => void }) {
             key={t.to}
             to={t.to}
             className={item}
-            onClick={() => haptic("tap")}
+            onClick={() => fx.tap()}
             activeOptions={{ exact: t.to === "/" }}
             activeProps={{
               className:
@@ -101,6 +103,21 @@ export function AppShell({
   children: ReactNode;
 }) {
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [booting, setBooting] = useState(false);
+
+  // Boot splash: client-only, once per browser session, never for reduced-motion users.
+  useEffect(() => {
+    const cleanup = primeAudio();
+    try {
+      const seen = window.sessionStorage.getItem("nexus:booted") === "1";
+      const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!seen && !calm) setBooting(true);
+      window.sessionStorage.setItem("nexus:booted", "1");
+    } catch {
+      /* storage blocked — skip the splash */
+    }
+    return cleanup;
+  }, []);
   const [pagesOpen, setPagesOpen] = useState(false);
 
   return (
@@ -125,7 +142,7 @@ export function AppShell({
             <button
               type="button"
               onClick={() => {
-                haptic("select");
+                fx.open();
                 setCmdOpen(true);
               }}
               aria-label="Open command palette"
@@ -155,6 +172,7 @@ export function AppShell({
 
       <TabBar onOpenPages={() => setPagesOpen(true)} />
       {fill ? null : <ButlerDock />}
+      {booting ? <SplashScreen onDone={() => setBooting(false)} /> : null}
       <CommandBar open={cmdOpen} onOpenChange={setCmdOpen} />
       <PageLauncher open={pagesOpen} onOpenChange={setPagesOpen} />
     </div>
