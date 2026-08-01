@@ -14,6 +14,7 @@
  */
 
 import { vaultGet, vaultPeek, vaultReady, vaultSet } from "./vault";
+import { log } from "./logger";
 
 export type BridgeConfig = {
   baseUrl: string;
@@ -126,6 +127,7 @@ export async function bridgeRequest<T = Json>(
   if (!cfg.baseUrl) throw new BridgeError("No bridge paired yet.", "no-config");
   if (!isLocalBridgeUrl(cfg.baseUrl)) throw new BridgeError("Bridge address is not on your local network.", "unsafe-url");
 
+  const started = performance.now();
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), opts.timeoutMs ?? 20000);
   opts.signal?.addEventListener("abort", () => controller.abort(), { once: true });
@@ -147,10 +149,14 @@ export async function bridgeRequest<T = Json>(
     });
 
     const rotated = res.headers.get("X-New-Token");
-    if (rotated && rotated !== cfg.token) void saveBridge({ token: rotated });
+    if (rotated && rotated !== cfg.token) {
+      log("info", "bridge", "session token rotated by server");
+      void saveBridge({ token: rotated });
+    }
 
     if (res.status === 401 || res.status === 403) {
       setStatus("unauthorized", "Pairing expired — scan the QR again.");
+      log("warn", "bridge", `${path} rejected credentials`);
       throw new BridgeError("Pairing expired — scan the QR again.", "unauthorized");
     }
     const text = await res.text();
@@ -158,14 +164,17 @@ export async function bridgeRequest<T = Json>(
     if (!res.ok) {
       const msg = data?.error ?? `Bridge returned ${res.status}`;
       setStatus("online");
+      log("error", "bridge", `${path} -> ${res.status}`, msg, performance.now() - started);
       throw new BridgeError(msg, "server");
     }
     setStatus("online");
+    log("info", "bridge", `${opts.method ?? (opts.body ? "POST" : "GET")} ${path}`, undefined, performance.now() - started);
     return data;
   } catch (err) {
     if (err instanceof BridgeError) throw err;
     const aborted = (err as Error)?.name === "AbortError";
     setStatus("offline", aborted ? "Bridge timed out." : "Bridge unreachable on this network.");
+    log("error", "bridge", `${path} unreachable`, { aborted }, performance.now() - started);
     throw new BridgeError(
       aborted ? "Bridge timed out." : "Bridge unreachable on this network.",
       aborted ? "timeout" : "offline",
@@ -224,6 +233,7 @@ export async function askButler(
     (raw['reply'] as string) ??
     (raw['message'] as string) ??
     "Butler returned an empty reply.";
+  log("info", "ai", "butler replied", { chars: text.length, model: raw['model'] });
   return {
     text,
     degraded: Boolean(raw['degraded']),
@@ -297,6 +307,10 @@ export async function runScript(id: string, signal?: AbortSignal): Promise<RunRe
     body: { id },
     timeoutMs: 180000,
     ...(signal ? { signal } : {}),
+  });
+  log(raw['status'] === "ok" ? "info" : "error", "script", `run ${id}`, {
+    exitCode: raw['exitCode'],
+    undoId: raw['undoId'],
   });
   return {
     ok: raw['status'] === "ok",
