@@ -16,6 +16,7 @@ import { ButlerVoice } from "../components/nexus/ButlerVoice";
 import { TouchInk } from "../components/nexus/TouchInk";
 
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { installLogger } from "../lib/logger";
 
 function NotFoundComponent() {
   return (
@@ -42,6 +43,10 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  useEffect(() => {
+    installLogger();
+  }, []);
+
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
