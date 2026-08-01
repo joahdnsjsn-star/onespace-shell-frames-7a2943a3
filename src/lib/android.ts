@@ -42,9 +42,67 @@ export function useStandalone() {
 const BACK_FLAG = "__nexus_back__";
 
 /**
+ * One shared back stack for the whole app.
+ *
+ * Every overlay registers a handler here instead of parking its own history
+ * entry. That matters: with per-overlay entries, closing one overlay while
+ * another opens in the same tick fires a `history.back()` whose `popstate`
+ * lands on the newly-registered listener and instantly closes it again. One
+ * stack, one parked entry, one listener — no cross-talk, ever.
+ */
+type BackEntry = { handler: () => void };
+const backStack: BackEntry[] = [];
+let parked = false;
+let popBound = false;
+let selfPop = false;
+
+
+function park() {
+  if (parked || typeof window === "undefined") return;
+  try {
+    window.history.pushState({ [BACK_FLAG]: true }, "");
+    parked = true;
+  } catch {
+    /* history blocked — back simply behaves like the browser default */
+  }
+}
+
+function unpark() {
+  if (!parked) return;
+  parked = false;
+  if ((window.history.state as Record<string, unknown> | null)?.[BACK_FLAG]) {
+    // We are removing our own entry — the resulting popstate is bookkeeping,
+    // not a user pressing back, so it must not fire any handler.
+    selfPop = true;
+    window.history.back();
+  }
+}
+
+function onPop() {
+  parked = false; // the parked entry is already gone
+  if (selfPop) {
+    selfPop = false;
+    // Something may still be open (an overlay that mounted in the same tick).
+    if (backStack.length > 0) park();
+    return;
+  }
+  const top = backStack[backStack.length - 1];
+  if (!top) return;
+  top.handler();
+  // A handler that leaves entries behind still needs a guard for the next press.
+  if (backStack.length > 1) park();
+}
+
+
+function bindPop() {
+  if (popBound || typeof window === "undefined") return;
+  window.addEventListener("popstate", onPop);
+  popBound = true;
+}
+
+/**
  * Android hardware/gesture back closes the top-most overlay instead of leaving
- * the app. While `active` is true a throwaway history entry is parked on the
- * stack; popping it calls `onBack` instead of navigating.
+ * the app. While `active` is true this hook owns the top of the back stack.
  */
 export function useAndroidBack(active: boolean, onBack: () => void) {
   const cb = useRef(onBack);
@@ -52,31 +110,21 @@ export function useAndroidBack(active: boolean, onBack: () => void) {
 
   useEffect(() => {
     if (!active || typeof window === "undefined") return;
+    bindPop();
 
-    const token = `${BACK_FLAG}${Date.now()}`;
-    let ours = true;
-    try {
-      window.history.pushState({ [BACK_FLAG]: token }, "");
-    } catch {
-      return;
-    }
-
-    const onPop = () => {
-      ours = false; // our entry is already gone
-      cb.current();
-    };
-    window.addEventListener("popstate", onPop);
+    const entry: BackEntry = { handler: () => cb.current() };
+    backStack.push(entry);
+    park();
 
     return () => {
-      window.removeEventListener("popstate", onPop);
-      // Closed from the UI rather than the back key — remove our parked entry
-      // so the stack stays exactly as deep as the user's real navigation.
-      if (ours && (window.history.state as Record<string, unknown> | null)?.[BACK_FLAG] === token) {
-        window.history.back();
-      }
+      const i = backStack.lastIndexOf(entry);
+      if (i >= 0) backStack.splice(i, 1);
+      // Only drop the parked entry once nothing is guarding it any more.
+      if (backStack.length === 0) unpark();
     };
   }, [active]);
 }
+
 
 /**
  * Back on the home screen should feel like Android: the first press warns,
