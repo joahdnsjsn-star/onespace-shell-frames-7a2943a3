@@ -97,7 +97,7 @@ export function PerfGuard() {
 export function PerfReadout() {
   const perf = usePerf();
   return (
-    <div className="flex items-center gap-2 font-mono text-[11px] text-muted-foreground">
+    <div className="flex shrink-0 items-center gap-1.5 whitespace-nowrap font-mono text-[10px] text-muted-foreground">
       <Activity size={13} className="text-cyan" />
       <span className="tabular-nums">{perf.fps || "--"} fps</span>
       <span className="text-faint">·</span>
