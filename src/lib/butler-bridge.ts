@@ -359,14 +359,46 @@ export async function runScript(id: string, signal?: AbortSignal): Promise<RunRe
   };
 }
 
-/** Roll back the last run using the server's undo journal. */
+/**
+ * Roll back a run through the server's undo journal.
+ * The endpoint is `/api/undo/rollback` and it answers `{ ok, message }` —
+ * an older `/api/undo` path does not exist on butler_server.py.
+ */
 export async function undoRun(undoId: string): Promise<RunResult> {
-  const raw = await bridgeRequest<Json>("/api/undo", {
+  const raw = await bridgeRequest<Json>("/api/undo/rollback", {
     method: "POST",
-    body: { id: undoId, undoId },
+    body: { id: undoId, entryId: undoId },
     timeoutMs: 60000,
   });
-  return { ok: raw['status'] === "ok", output: String(raw['output'] ?? raw['error'] ?? "") };
+  const ok = raw['ok'] === true || raw['status'] === "ok";
+  log(ok ? "info" : "warn", "script", `undo ${undoId}`, { ok });
+  return { ok, output: String(raw['message'] ?? raw['output'] ?? raw['error'] ?? "") };
+}
+
+export type UndoEntry = {
+  id: string;
+  at: number;
+  request: string;
+  language: string;
+  status: string;
+  undone: boolean;
+};
+
+/** The rollback journal — what can still be reverted, newest first. */
+export async function undoList(): Promise<{ entries: UndoEntry[]; windowSec: number }> {
+  const raw = await bridgeRequest<Json>("/api/undo/list", { timeoutMs: 12000 });
+  const rows = Array.isArray(raw['entries']) ? (raw['entries'] as Json[]) : [];
+  return {
+    entries: rows.map((r) => ({
+      id: String(r['id'] ?? ""),
+      at: toMs(r['ts'] ?? r['at']),
+      request: String(r['user_req'] ?? r['userRequest'] ?? r['request'] ?? ""),
+      language: String(r['language'] ?? "python"),
+      status: String(r['status'] ?? ""),
+      undone: Boolean(r['undone']),
+    })),
+    windowSec: Number(raw['undoWindow'] ?? 0) || 0,
+  };
 }
 
 export type OllamaState = {
