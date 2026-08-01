@@ -25,6 +25,9 @@ import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX"
 import { ButlerDock } from "./ButlerDock";
 import { CommandBar } from "./CommandBar";
 import { PageLauncher } from "./PageLauncher";
+import { Defer } from "./Lazy";
+import { useDeferredMount } from "@/lib/defer";
+import { perfQuiet } from "@/lib/perf";
 
 export const TABS = [
   { to: "/", label: "HOME", icon: LayoutDashboard },
@@ -112,7 +115,10 @@ export function AppShell({
     try {
       const seen = window.sessionStorage.getItem("nexus:booted") === "1";
       const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!seen && !calm) setBooting(true);
+      if (!seen && !calm) {
+        perfQuiet(4000);
+        setBooting(true);
+      }
       window.sessionStorage.setItem("nexus:booted", "1");
     } catch {
       /* storage blocked — skip the splash */
@@ -121,6 +127,16 @@ export function AppShell({
   }, []);
   const [pagesOpen, setPagesOpen] = useState(false);
 
+  // Route swap = an expected burst of work. Silence the governor briefly so a
+  // normal page transition can never fire a false "performance mode" toast.
+  useEffect(() => {
+    perfQuiet(900);
+  }, [title]);
+
+  // Overlays live in the bundle already; we just keep them out of the tree
+  // until the app is idle — or instantly, the moment the user opens one.
+  const overlaysReady = useDeferredMount({ force: cmdOpen || pagesOpen, timeout: 3000 });
+
   return (
     <div
       className={cn(
@@ -128,7 +144,9 @@ export function AppShell({
         fill ? "h-dvh overflow-hidden" : "min-h-dvh",
       )}
     >
-      <BackdropFX />
+      <Defer timeout={1800} skipOnLowTier>
+        <BackdropFX />
+      </Defer>
       <a href="#nexus-main" className="skip-link">
         Skip to content
       </a>
@@ -172,7 +190,11 @@ export function AppShell({
       </main>
 
       <TabBar onOpenPages={() => setPagesOpen(true)} />
-      {fill ? null : <ButlerDock />}
+      {fill ? null : (
+        <Defer timeout={4000}>
+          <ButlerDock />
+        </Defer>
+      )}
       {booting ? (
         <SplashScreen
           onDone={() => {
@@ -189,8 +211,12 @@ export function AppShell({
           }}
         />
       ) : null}
-      <CommandBar open={cmdOpen} onOpenChange={setCmdOpen} />
-      <PageLauncher open={pagesOpen} onOpenChange={setPagesOpen} />
+      {overlaysReady ? (
+        <>
+          <CommandBar open={cmdOpen} onOpenChange={setCmdOpen} />
+          <PageLauncher open={pagesOpen} onOpenChange={setPagesOpen} />
+        </>
+      ) : null}
     </div>
   );
 }
