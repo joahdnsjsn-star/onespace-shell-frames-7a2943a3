@@ -10,33 +10,245 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BuilderRouteImport } from './routes/builder'
+import { Route as ButlerRouteImport } from './routes/butler'
+import { Route as ComponentsRouteImport } from './routes/components'
+import { Route as ConnectRouteImport } from './routes/connect'
+import { Route as CosmeticRouteImport } from './routes/cosmetic'
+import { Route as CrashReportRouteImport } from './routes/crash-report'
+import { Route as DataSafetyRouteImport } from './routes/data-safety'
+import { Route as FileshareRouteImport } from './routes/fileshare'
+import { Route as KnowledgeRouteImport } from './routes/knowledge'
+import { Route as LogsRouteImport } from './routes/logs'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as ScriptsRouteImport } from './routes/scripts'
+import { Route as SecurityTrustRouteImport } from './routes/security-trust'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as TermsRouteImport } from './routes/terms'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BuilderRoute = BuilderRouteImport.update({
+  id: '/builder',
+  path: '/builder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ButlerRoute = ButlerRouteImport.update({
+  id: '/butler',
+  path: '/butler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsRoute = ComponentsRouteImport.update({
+  id: '/components',
+  path: '/components',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectRoute = ConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CosmeticRoute = CosmeticRouteImport.update({
+  id: '/cosmetic',
+  path: '/cosmetic',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CrashReportRoute = CrashReportRouteImport.update({
+  id: '/crash-report',
+  path: '/crash-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DataSafetyRoute = DataSafetyRouteImport.update({
+  id: '/data-safety',
+  path: '/data-safety',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FileshareRoute = FileshareRouteImport.update({
+  id: '/fileshare',
+  path: '/fileshare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeRoute = KnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogsRoute = LogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScriptsRoute = ScriptsRouteImport.update({
+  id: '/scripts',
+  path: '/scripts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityTrustRoute = SecurityTrustRouteImport.update({
+  id: '/security-trust',
+  path: '/security-trust',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/builder': typeof BuilderRoute
+  '/butler': typeof ButlerRoute
+  '/components': typeof ComponentsRoute
+  '/connect': typeof ConnectRoute
+  '/cosmetic': typeof CosmeticRoute
+  '/crash-report': typeof CrashReportRoute
+  '/data-safety': typeof DataSafetyRoute
+  '/fileshare': typeof FileshareRoute
+  '/knowledge': typeof KnowledgeRoute
+  '/logs': typeof LogsRoute
+  '/onboarding': typeof OnboardingRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/scripts': typeof ScriptsRoute
+  '/security-trust': typeof SecurityTrustRoute
+  '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/builder': typeof BuilderRoute
+  '/butler': typeof ButlerRoute
+  '/components': typeof ComponentsRoute
+  '/connect': typeof ConnectRoute
+  '/cosmetic': typeof CosmeticRoute
+  '/crash-report': typeof CrashReportRoute
+  '/data-safety': typeof DataSafetyRoute
+  '/fileshare': typeof FileshareRoute
+  '/knowledge': typeof KnowledgeRoute
+  '/logs': typeof LogsRoute
+  '/onboarding': typeof OnboardingRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/scripts': typeof ScriptsRoute
+  '/security-trust': typeof SecurityTrustRoute
+  '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/builder': typeof BuilderRoute
+  '/butler': typeof ButlerRoute
+  '/components': typeof ComponentsRoute
+  '/connect': typeof ConnectRoute
+  '/cosmetic': typeof CosmeticRoute
+  '/crash-report': typeof CrashReportRoute
+  '/data-safety': typeof DataSafetyRoute
+  '/fileshare': typeof FileshareRoute
+  '/knowledge': typeof KnowledgeRoute
+  '/logs': typeof LogsRoute
+  '/onboarding': typeof OnboardingRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/scripts': typeof ScriptsRoute
+  '/security-trust': typeof SecurityTrustRoute
+  '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/builder'
+    | '/butler'
+    | '/components'
+    | '/connect'
+    | '/cosmetic'
+    | '/crash-report'
+    | '/data-safety'
+    | '/fileshare'
+    | '/knowledge'
+    | '/logs'
+    | '/onboarding'
+    | '/privacy-policy'
+    | '/scripts'
+    | '/security-trust'
+    | '/settings'
+    | '/terms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/builder'
+    | '/butler'
+    | '/components'
+    | '/connect'
+    | '/cosmetic'
+    | '/crash-report'
+    | '/data-safety'
+    | '/fileshare'
+    | '/knowledge'
+    | '/logs'
+    | '/onboarding'
+    | '/privacy-policy'
+    | '/scripts'
+    | '/security-trust'
+    | '/settings'
+    | '/terms'
+  id:
+    | '__root__'
+    | '/'
+    | '/builder'
+    | '/butler'
+    | '/components'
+    | '/connect'
+    | '/cosmetic'
+    | '/crash-report'
+    | '/data-safety'
+    | '/fileshare'
+    | '/knowledge'
+    | '/logs'
+    | '/onboarding'
+    | '/privacy-policy'
+    | '/scripts'
+    | '/security-trust'
+    | '/settings'
+    | '/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BuilderRoute: typeof BuilderRoute
+  ButlerRoute: typeof ButlerRoute
+  ComponentsRoute: typeof ComponentsRoute
+  ConnectRoute: typeof ConnectRoute
+  CosmeticRoute: typeof CosmeticRoute
+  CrashReportRoute: typeof CrashReportRoute
+  DataSafetyRoute: typeof DataSafetyRoute
+  FileshareRoute: typeof FileshareRoute
+  KnowledgeRoute: typeof KnowledgeRoute
+  LogsRoute: typeof LogsRoute
+  OnboardingRoute: typeof OnboardingRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  ScriptsRoute: typeof ScriptsRoute
+  SecurityTrustRoute: typeof SecurityTrustRoute
+  SettingsRoute: typeof SettingsRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +260,140 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/builder': {
+      id: '/builder'
+      path: '/builder'
+      fullPath: '/builder'
+      preLoaderRoute: typeof BuilderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/butler': {
+      id: '/butler'
+      path: '/butler'
+      fullPath: '/butler'
+      preLoaderRoute: typeof ButlerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components': {
+      id: '/components'
+      path: '/components'
+      fullPath: '/components'
+      preLoaderRoute: typeof ComponentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connect': {
+      id: '/connect'
+      path: '/connect'
+      fullPath: '/connect'
+      preLoaderRoute: typeof ConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cosmetic': {
+      id: '/cosmetic'
+      path: '/cosmetic'
+      fullPath: '/cosmetic'
+      preLoaderRoute: typeof CosmeticRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crash-report': {
+      id: '/crash-report'
+      path: '/crash-report'
+      fullPath: '/crash-report'
+      preLoaderRoute: typeof CrashReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data-safety': {
+      id: '/data-safety'
+      path: '/data-safety'
+      fullPath: '/data-safety'
+      preLoaderRoute: typeof DataSafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fileshare': {
+      id: '/fileshare'
+      path: '/fileshare'
+      fullPath: '/fileshare'
+      preLoaderRoute: typeof FileshareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge': {
+      id: '/knowledge'
+      path: '/knowledge'
+      fullPath: '/knowledge'
+      preLoaderRoute: typeof KnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logs': {
+      id: '/logs'
+      path: '/logs'
+      fullPath: '/logs'
+      preLoaderRoute: typeof LogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scripts': {
+      id: '/scripts'
+      path: '/scripts'
+      fullPath: '/scripts'
+      preLoaderRoute: typeof ScriptsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security-trust': {
+      id: '/security-trust'
+      path: '/security-trust'
+      fullPath: '/security-trust'
+      preLoaderRoute: typeof SecurityTrustRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BuilderRoute: BuilderRoute,
+  ButlerRoute: ButlerRoute,
+  ComponentsRoute: ComponentsRoute,
+  ConnectRoute: ConnectRoute,
+  CosmeticRoute: CosmeticRoute,
+  CrashReportRoute: CrashReportRoute,
+  DataSafetyRoute: DataSafetyRoute,
+  FileshareRoute: FileshareRoute,
+  KnowledgeRoute: KnowledgeRoute,
+  LogsRoute: LogsRoute,
+  OnboardingRoute: OnboardingRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  ScriptsRoute: ScriptsRoute,
+  SecurityTrustRoute: SecurityTrustRoute,
+  SettingsRoute: SettingsRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
