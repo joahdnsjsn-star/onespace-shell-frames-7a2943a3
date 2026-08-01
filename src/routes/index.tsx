@@ -24,6 +24,12 @@ import {
   SectionHeader,
   StatTile,
 } from "@/components/nexus/ui";
+import {
+  LiveClock,
+  NeuralCore,
+  RadialGauge,
+  ScanFrame,
+} from "@/components/nexus/Instruments";
 import { useTelemetry } from "@/hooks/useTelemetry";
 
 export const Route = createFileRoute("/")({
@@ -73,8 +79,11 @@ function Home() {
             <IconBadge accent="cyan" size={48} glow>
               <Zap size={22} />
             </IconBadge>
-            <div className="min-w-0">
-              <div className="label-mono text-cyan">bridge online</div>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="label-mono text-cyan">bridge online</div>
+                <LiveClock />
+              </div>
               <p className="mt-1 text-sm text-muted-foreground">
                 butler_server.py responding on 192.168.1.24:8770 — encrypted LAN channel, no cloud
                 relay.
@@ -92,8 +101,24 @@ function Home() {
       </section>
 
       <section>
+        <SectionHeader title="neural core" hint="Butler bridge status at a glance" accent="neural" />
+        <ScanFrame title="core online" status="local · secure">
+          <div className="flex flex-col items-center gap-4 py-2 min-[430px]:flex-row min-[430px]:justify-center">
+            <NeuralCore size={168} value={`${t.cpu.toFixed(0)}%`} label="load" />
+            <div className="grid grid-cols-2 gap-3">
+              <RadialGauge value={t.cpu} label="cpu" size={84} />
+              <RadialGauge value={(t.mem / 32) * 100} label="ram" size={84} color="var(--neural)" />
+              <RadialGauge value={t.disk} label="disk" size={84} color="var(--warn)" />
+              <RadialGauge value={Math.min(100, t.net * 4)} label="net" size={84} color="var(--net)" />
+            </div>
+          </div>
+        </ScanFrame>
+      </section>
+
+      <section>
         <SectionHeader title="live telemetry" hint="Streaming from your own machine" />
         <div className="grid grid-cols-2 gap-3 min-[430px]:grid-cols-4">
+
           <StatTile
             label="cpu load"
             value={t.cpu.toFixed(0)}
@@ -147,7 +172,7 @@ function Home() {
               <IconBadge accent={a.accent} size={34}>
                 <a.icon size={16} />
               </IconBadge>
-              <span className="min-w-0 flex-1 truncate text-sm font-medium">
+              <span className="min-w-0 flex-1 text-sm font-medium">
                 {fired === a.label ? <span className="text-cyan">sent…</span> : a.label}
               </span>
             </button>
