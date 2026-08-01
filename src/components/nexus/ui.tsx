@@ -405,6 +405,8 @@ export function ActionButton({
   onClick,
   disabled,
   type = "button",
+  href,
+  download,
 }: {
   children: ReactNode;
   variant?: "primary" | "ghost" | "danger";
@@ -412,7 +414,28 @@ export function ActionButton({
   onClick?: () => void;
   disabled?: boolean;
   type?: "button" | "submit";
+  /** Renders an anchor instead of a button — used for file downloads. */
+  href?: string;
+  download?: string;
 }) {
+  const classes = cn(
+    "press inline-flex h-11 cursor-pointer select-none items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold tracking-tight",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/60 disabled:opacity-50",
+    variant === "primary" &&
+      "bg-cyan text-primary-foreground shadow-[0_10px_30px_-14px_var(--cyan)] hover:bg-cyan/90",
+    variant === "ghost" && "border border-dim bg-surface-3 text-foreground hover:bg-surface-3/70",
+    variant === "danger" && "border border-danger/40 bg-danger/15 text-danger hover:bg-danger/25",
+    className,
+  );
+
+  if (href) {
+    return (
+      <a href={href} download={download} onClick={onClick} className={classes}>
+        {children}
+      </a>
+    );
+  }
+
   return (
     <button
       type={type}

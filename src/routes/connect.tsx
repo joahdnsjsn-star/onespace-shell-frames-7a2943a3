@@ -122,7 +122,6 @@ function Connect() {
           />
           <div className="mt-3 grid grid-cols-2 gap-2">
             <ActionButton
-              as="a"
               href={serverAsset.url}
               download="butler_server.py"
               onClick={() => fx.success()}
