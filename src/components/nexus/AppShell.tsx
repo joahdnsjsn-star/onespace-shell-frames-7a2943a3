@@ -115,7 +115,10 @@ export function AppShell({
     try {
       const seen = window.sessionStorage.getItem("nexus:booted") === "1";
       const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!seen && !calm) setBooting(true);
+      if (!seen && !calm) {
+        perfQuiet(4000);
+        setBooting(true);
+      }
       window.sessionStorage.setItem("nexus:booted", "1");
     } catch {
       /* storage blocked — skip the splash */
