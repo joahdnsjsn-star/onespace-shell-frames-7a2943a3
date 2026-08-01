@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Server, QrCode, Wifi, RefreshCw, ShieldCheck, Radar, Github, Download, Copy, Check, X, Zap } from "lucide-react";
+import { Server, QrCode, Wifi, RefreshCw, ShieldCheck, Radar, Github, Download, Copy, Check, X, Zap, Activity } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   checkHealth,
@@ -15,6 +15,8 @@ import { useBridge } from "@/lib/useBridge";
 import { useLink } from "@/lib/useLink";
 import serverAsset from "@/assets/butler_server.py.asset.json";
 import { QrScanner } from "@/components/nexus/QrScanner";
+import { networkMonitor } from "@/lib/netmon";
+import { neuralTripwire, type TripwireState } from "@/lib/tripwire";
 import { fx } from "@/lib/fx";
 import { AppShell } from "@/components/nexus/AppShell";
 import { Card, Chip, IconBadge, Row, SectionHeader, StatTile, ActionButton } from "@/components/nexus/ui";
