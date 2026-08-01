@@ -79,7 +79,7 @@ export function RadialGauge({
 export function NeuralCore({
   size = 200,
   color = "var(--cyan)",
-  accent = "var(--purple)",
+  accent = "var(--neural)",
   active = true,
   label,
   value,

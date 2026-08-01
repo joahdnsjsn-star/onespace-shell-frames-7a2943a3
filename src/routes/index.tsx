@@ -107,9 +107,9 @@ function Home() {
             <NeuralCore size={168} value={`${t.cpu.toFixed(0)}%`} label="load" />
             <div className="grid grid-cols-2 gap-3">
               <RadialGauge value={t.cpu} label="cpu" size={84} />
-              <RadialGauge value={(t.mem / 32) * 100} label="ram" size={84} color="var(--purple)" />
-              <RadialGauge value={t.disk} label="disk" size={84} color="var(--amber)" />
-              <RadialGauge value={Math.min(100, t.net * 4)} label="net" size={84} color="var(--teal)" />
+              <RadialGauge value={(t.mem / 32) * 100} label="ram" size={84} color="var(--neural)" />
+              <RadialGauge value={t.disk} label="disk" size={84} color="var(--warn)" />
+              <RadialGauge value={Math.min(100, t.net * 4)} label="net" size={84} color="var(--net)" />
             </div>
           </div>
         </ScanFrame>
