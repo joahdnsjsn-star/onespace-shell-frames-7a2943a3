@@ -12,7 +12,6 @@ import {
   Palette,
   SlidersHorizontal,
   Rocket,
-  Boxes,
   ShieldCheck,
   FileText,
   Database,
