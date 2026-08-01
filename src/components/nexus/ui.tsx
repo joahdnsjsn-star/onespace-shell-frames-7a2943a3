@@ -319,7 +319,7 @@ export function Segmented<T extends string>({
     <div
       role="tablist"
       className={cn(
-        "inline-flex shrink-0 gap-0.5 rounded-xl border border-dim/70 bg-surface-3/60 p-0.5",
+        "inline-flex shrink-0 gap-0.5 rounded-xl border border-dim/70 bg-surface-3/60 p-0.5 [&>*]:flex-1",
         className,
       )}
     >

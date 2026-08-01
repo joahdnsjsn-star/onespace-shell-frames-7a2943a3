@@ -119,16 +119,18 @@ function ChoiceRow<T extends string>({
 }) {
   const { value, set } = useSetting<T>(id, initial);
   return (
-    <Row
-      title={title}
-      {...(sub ? { sub } : {})}
-      left={
+    <div className="rounded-xl border border-dim/50 bg-surface-3/50 px-3 py-3">
+      <div className="flex items-center gap-3">
         <IconBadge accent={accent} size={32}>
           {icon}
         </IconBadge>
-      }
-      right={<Segmented options={options} value={value} onChange={set} />}
-    />
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-medium leading-tight">{title}</div>
+          {sub ? <div className="mt-0.5 truncate text-xs text-muted-foreground">{sub}</div> : null}
+        </div>
+      </div>
+      <Segmented options={options} value={value} onChange={set} className="mt-3 flex w-full" />
+    </div>
   );
 }
 
