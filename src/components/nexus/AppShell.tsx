@@ -23,6 +23,7 @@ import { SplashScreen } from "./Mascot";
 import { butlerSay } from "@/lib/voice";
 import { Chip } from "./ui";
 import { OfflineBanner } from "./OfflineBanner";
+import { LinkPill } from "./LinkPill";
 import { AnimatedTitle, BackdropFX, NexusLogo, ScrollProgress } from "./NexusFX";
 import { ButlerDock } from "./ButlerDock";
 import { CommandBar } from "./CommandBar";
@@ -215,6 +216,7 @@ export function AppShell({
 
           <div className="flex shrink-0 items-center gap-2">
             {accentLabel ? <Chip accent="cyan">{accentLabel}</Chip> : null}
+            <LinkPill />
             <button
               type="button"
               onClick={() => {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Code2, Play, Plus, Search, Terminal, Trash2, Undo2 } from "lucide-react";
 import { AppShell } from "@/components/nexus/AppShell";
@@ -8,6 +8,7 @@ import { Coach } from "@/components/nexus/Coach";
 import { fx } from "@/lib/fx";
 import { useBridge } from "@/lib/useBridge";
 import { BridgeError, fetchLibrary, runScript, undoRun, type LibraryScript } from "@/lib/butler-bridge";
+import { historySnapshot, loadHistory, recordRun, subscribeHistory } from "@/lib/history";
 
 export const Route = createFileRoute("/scripts")({
   head: () => ({
@@ -67,6 +68,11 @@ function Scripts() {
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [lastUndoId, setLastUndoId] = useState<string | null>(null);
+  const recent = useSyncExternalStore(subscribeHistory, historySnapshot, historySnapshot).slice(0, 6);
+
+  useEffect(() => {
+    void loadHistory();
+  }, []);
 
   const log = useCallback((...lines: string[]) => {
     setOut((o) => [...o, ...lines].slice(-80));
@@ -136,10 +142,18 @@ function Scripts() {
       fx.tap();
       setBusy(s.id);
       log(`> run ${s.name}`);
+      const t0 = performance.now();
       void runScript(s.id)
         .then((r) => {
           log(r.output || (r.ok ? "  done" : "  failed"));
           setLastUndoId(r.undoId ?? null);
+          void recordRun({
+            scriptId: s.id,
+            name: s.name,
+            category: s.category ?? "general",
+            ok: Boolean(r.ok),
+            ms: Math.round(performance.now() - t0),
+          });
         })
         .catch((err: unknown) => {
           const message =
@@ -147,6 +161,14 @@ function Scripts() {
               ? "  no PC paired — open the LINK page first"
               : `! ${(err as Error).message}`;
           log(message);
+          void recordRun({
+            scriptId: s.id,
+            name: s.name,
+            category: s.category ?? "general",
+            ok: false,
+            ms: Math.round(performance.now() - t0),
+            error: (err as Error).message,
+          });
         })
         .finally(() => setBusy(null));
     },
@@ -198,6 +220,29 @@ function Scripts() {
             </button>
           ))}
         </div>
+        {recent.length ? (
+          <div className="scroll-x -mx-4 flex items-center gap-2 px-4 sm:-mx-6 sm:px-6">
+            <span className="label-mono shrink-0 text-[10px] text-faint">recent</span>
+            {recent.map((r) => {
+              const target = scripts.find((s) => s.id === r.scriptId);
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  disabled={!target || Boolean(busy)}
+                  onClick={() => target && run(target)}
+                  className={cn(
+                    "press label-mono shrink-0 rounded-full border px-3 py-1 text-[10px]",
+                    r.ok ? "border-dim bg-surface-3 text-soft" : "border-red-500/40 bg-surface-3 text-red-300",
+                    !target && "opacity-40",
+                  )}
+                >
+                  {r.name} · {r.ms}ms
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
 
       {/* library — the only scrolling region */}
