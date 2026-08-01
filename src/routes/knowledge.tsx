@@ -291,6 +291,7 @@ function RecallTab({ total }: { total: number }) {
   const [hits, setHits] = useState<KbHit[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [teaching, setTeaching] = useState(false);
 
   const run = useCallback(async (query: string) => {
     if (query.trim().length < 2) {
