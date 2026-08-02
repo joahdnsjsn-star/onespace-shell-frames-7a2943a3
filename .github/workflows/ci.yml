@@ -27,6 +27,12 @@ jobs:
         run: bun run parity
       - name: Build app bundle
         run: bun run build:node
+      - name: Check for stale generated files
+        run: |
+          if ! git diff --exit-code src/routeTree.gen.ts; then
+            echo "❌ src/routeTree.gen.ts is stale — run 'bun run build' locally and commit the updated file."
+            exit 1
+          fi
       - name: Verify bundle output
         run: |
           test -f dist/server/index.mjs
@@ -45,8 +51,11 @@ jobs:
           PORT: 3000
 
       - name: Upload app bundle
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: butler-nexus-android-bundle
           path: dist
           retention-days: 7
+          overwrite: true
+          if-no-files-found: warn
